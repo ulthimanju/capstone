@@ -1,4 +1,4 @@
-# 🎓 Capestone
+# 🎓 Questly
 
 ### AI-Powered Student Learning Platform
 
@@ -6,9 +6,9 @@
 
 ---
 
-## What is Capestone?
+## What is Questly?
 
-Capestone is an AI-powered learning platform built for students. Upload your study documents and let AI generate quizzes, flashcards, and summaries from them. Track coding practice, follow structured courses, and stay motivated with XP, badges, and streaks — all powered by a fully local AI running on your machine.
+Questly is an AI-powered learning platform built for students. Upload your study documents and let AI generate quizzes, flashcards, and summaries from them. Track coding practice, follow structured courses, and stay motivated with XP, badges, and streaks — all powered by a fully local AI running on your machine.
 
 ---
 
@@ -43,8 +43,8 @@ Capestone is an AI-powered learning platform built for students. Upload your stu
 
 ```bash
 # Clone
-git clone https://github.com/ulthimanju/capestone.git
-cd capestone
+git clone https://github.com/ulthimanju/questly.git
+cd questly
 
 # Start Ollama
 ollama serve

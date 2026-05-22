@@ -1,7 +1,7 @@
-# 📋 Capestone — Agile Progress Tracker
+# 📋 Questly — Agile Progress Tracker
 
 > **Methodology**: Adapted Agile (Solo Developer)
-> **Project**: Capestone — AI-Powered Student Learning Platform
+> **Project**: Questly — AI-Powered Student Learning Platform
 > **Stack**: Spring Boot 3.x · React 19 · Ollama · ChromaDB · Kafka · PostgreSQL
 > **Developer**: Manju (Solo)
 > **Start Date**: 2026-05-22
@@ -40,7 +40,7 @@
 
 ## 📌 Phase 1 — Requirements Gathering
 
-> **Goal**: Fully define what Capestone must do, for whom, and under what constraints before a single line of code is written.
+> **Goal**: Fully define what Questly must do, for whom, and under what constraints before a single line of code is written.
 
 **Status**: 🔄 In Progress
 **Started**: 2026-05-22

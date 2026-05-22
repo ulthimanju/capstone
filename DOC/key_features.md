@@ -1,4 +1,4 @@
-# Capestone  Key Features
+# Questly  Key Features
 
 
 **1. Document-Based Learning Path**

@@ -1,4 +1,4 @@
-## Capestone — Tech Stack (Updated)
+## Questly — Tech Stack (Updated)
 
 ---
 

@@ -1,4 +1,4 @@
-# Capestone — User Stories
+# Questly — User Stories
 
 > **Completed**: 2026-05-22
 > **Author**: Manju (Solo Developer)

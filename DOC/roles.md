@@ -1,4 +1,4 @@
-# Capestone — User Roles & Permissions Matrix
+# Questly — User Roles & Permissions Matrix
 
 > **Completed**: 2026-05-22
 > **Author**: Manju (Solo Developer)

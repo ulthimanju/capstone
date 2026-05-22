@@ -1,7 +1,7 @@
-# Capestone — Monorepo Structure
+# Questly — Monorepo Structure
 
 ```
-capestone/
+questly/
 ├── services/
 │   ├── gateway/
 │   ├── auth-service/
