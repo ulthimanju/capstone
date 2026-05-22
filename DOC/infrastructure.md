@@ -1,25 +1,40 @@
-# Capestone — Repositories
+# Capestone — Monorepo Structure
 
-| Repo Name | Responsibility |
-|---|---|
-| `capestone-gateway` | API Gateway, JWT filter, routing |
-| `capestone-auth-service` | Register, login, JWT issue/refresh |
-| `capestone-user-service` | Profiles, XP, badges, streaks |
-| `capestone-notebook-service` | Document upload, learning path, RAG |
-| `capestone-quiz-service` | Quiz generation, weak spot detection |
-| `capestone-flashcard-service` | Flashcard generation, spaced repetition |
-| `capestone-course-service` | Pre-built courses, drip content, modules |
-| `capestone-assignment-service` | Assignment creation, submission, auto-grading |
-| `capestone-practice-service` | LeetCode-style lists, progress tracking |
-| `capestone-ai-service` | Ollama wrapper, summarization, all AI calls |
-| `capestone-gamification-service` | XP engine, badges, challenge mode, leaderboards |
-| `capestone-analytics-service` | Per-student dashboards, scores, drop-off |
-| `capestone-notification-service` | In-app and email notifications |
-| `capestone-frontend` | React 19 + Vite frontend |
-| `capestone-config-server` | Spring Cloud Config central config |
-| `capestone-discovery-server` | Spring Cloud Eureka service registry |
-| `capestone-infra` | Docker Compose, Kafka, PostgreSQL, Redis, ChromaDB setup |
+```
+capestone/
+├── services/
+│   ├── gateway/
+│   ├── auth-service/
+│   ├── user-service/
+│   ├── notebook-service/
+│   ├── quiz-service/
+│   ├── flashcard-service/
+│   ├── course-service/
+│   ├── assignment-service/
+│   ├── practice-service/
+│   ├── ai-service/
+│   ├── gamification-service/
+│   ├── analytics-service/
+│   ├── notification-service/
+│   ├── config-server/
+│   └── discovery-server/
+├── frontend/
+├── infra/
+│   ├── docker-compose.yml
+│   ├── kafka/
+│   ├── postgres/
+│   └── redis/
+├── .github/
+│   └── workflows/
+└── README.md
+```
 
 ---
 
-**17 repos total** — each service fully independent, own DB, own Docker config.
+Each service has:
+- Own `pom.xml`
+- Own `application.yml`
+- Own `Dockerfile`
+- Own database schema
+
+Root has a parent `pom.xml` managing all services together.
