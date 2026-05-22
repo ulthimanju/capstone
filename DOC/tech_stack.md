@@ -70,6 +70,14 @@
 | CI/CD | GitHub Actions |
 | Monitoring | Prometheus + Grafana |
 
+## Models Usage
+
+| Purpose | Model | Size | RAM Needed |
+|---|---|---|---|
+| Main LLM (chat, quiz, summarize) | `llama3.2:3b` | ~2 GB | ~4–5 GB |
+| Embeddings (RAG / ChromaDB) | `nomic-embed-text` | ~274 MB | ~1 GB |
+| Code understanding (optional) | `qwen2.5-coder:3b` | ~2 GB | ~4 GB |
+
 ---
 
 > Everything AI-related runs fully local via Ollama — no external API calls, no cost per token, no data leaving the machine. S3 replaced with MinIO to keep storage local as well.
