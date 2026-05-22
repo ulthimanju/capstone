@@ -1,26 +1,40 @@
 # 📋 Capestone — Agile Progress Tracker
 
 > **Methodology**: Adapted Agile (Solo Developer)
-> **Sprint Length**: 1–1.5 weeks (compressed for July 31 deadline)
+> **Project**: Capestone — AI-Powered Student Learning Platform
+> **Stack**: Spring Boot 3.x · React 19 · Ollama · ChromaDB · Kafka · PostgreSQL
+> **Developer**: Manju (Solo)
 > **Start Date**: 2026-05-22
-> **Developer**: Solo
+> **Target Completion**: 2026-07-31
+
+---
+
+## 📊 Overall Progress
+
+| Metric | Value |
+|---|---|
+| Total Tasks | 112 |
+| Completed | 6 |
+| In Progress | 2 |
+| Pending | 104 |
+| Overall Completion | 5.4% |
 
 ---
 
 ## 🗓️ Project Timeline Overview
 
-| Phase | Status | Target Completion |
-|---|---|---|
-| 📌 Requirements Gathering | 🔄 In Progress | 2026-05-31 |
-| 🏗️ System Design & Architecture | ⏳ Pending | 2026-06-07 |
-| 🔧 Core Infrastructure Setup | ⏳ Pending | 2026-06-14 |
-| 🚀 Feature Development — Sprint 1 | ⏳ Pending | 2026-06-28 |
-| 🚀 Feature Development — Sprint 2 | ⏳ Pending | 2026-07-10 |
-| 🚀 Feature Development — Sprint 3 | ⏳ Pending | 2026-07-18 |
-| 🚀 Feature Development — Sprint 4 | ⏳ Pending | 2026-07-25 |
-| 🧪 Integration Testing | ⏳ Pending | 2026-07-28 |
-| 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-07-30 |
-| 🎓 Final Submission / Demo | ⏳ Pending | 2026-07-31 |
+| Phase | Status | Target | Tasks Done | Tasks Total | Completion |
+|---|---|---|---|---|---|
+| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 6 | 28 | 21% |
+| 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
+| 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
+| 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
+| 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ⏳ Pending | 2026-07-10 | 0 | 8 | 0% |
+| 🚀 Sprint 3 — Courses + Practice + Skill Tree | ⏳ Pending | 2026-07-18 | 0 | 8 | 0% |
+| 🚀 Sprint 4 — Gamification + Analytics + Polish | ⏳ Pending | 2026-07-25 | 0 | 9 | 0% |
+| 🧪 Integration Testing | ⏳ Pending | 2026-07-28 | 0 | 6 | 0% |
+| 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-07-30 | 0 | 6 | 0% |
+| 🎓 Final Submission / Demo | ⏳ Pending | 2026-07-31 | 0 | 4 | 0% |
 
 ---
 
@@ -31,259 +45,373 @@
 **Status**: 🔄 In Progress
 **Started**: 2026-05-22
 **Target**: 2026-05-31
+**Progress**: 6 / 28 tasks complete (21%)
 
 ---
 
 ### ✅ Completed
 
-- [x] Write project abstract
-- [x] Define key features (11 core features identified)
-- [x] Select and document tech stack (Frontend, Backend, AI/RAG, Data, Auth, DevOps)
-- [x] Define high-level architecture (HLD.png)
-- [x] Define problem statement
-- [x] Define infrastructure design
+| # | Task | Completed On | Notes |
+|---|---|---|---|
+| 1 | Write project abstract | 2026-05-22 | One-paragraph summary covering AI, RAG, gamification |
+| 2 | Define problem statement | 2026-05-22 | Student-centric; AI as primary tutor |
+| 3 | Define key features (11 core) | 2026-05-22 | Notebooks, Quiz, Flashcards, Courses, Practice, Skill Tree, Gamification, Analytics, Assignments |
+| 4 | Select and document tech stack | 2026-05-22 | React 19, Spring Boot 3.x, Ollama, ChromaDB, Kafka, PostgreSQL, Redis |
+| 5 | Define high-level architecture (HLD) | 2026-05-22 | 6-layer HLD created in FigJam |
+| 6 | Define infrastructure design | 2026-05-22 | Docker Compose, Kafka, MinIO, Redis, Elasticsearch, Eureka, Zipkin |
 
 ---
 
 ### 🔄 In Progress
 
-- [ ] Define user roles and permissions matrix (STUDENT, TUTOR, ADMIN)
-- [ ] Write detailed user stories for each feature
+| # | Task | Started | Blocker |
+|---|---|---|---|
+| 7 | Define user roles and permissions matrix | 2026-05-22 | Needs STUDENT / TUTOR / ADMIN scope definition |
+| 8 | Write detailed user stories per feature | 2026-05-22 | Depends on role matrix |
 
 ---
 
 ### ⏳ To Do
 
-#### 📄 Documentation
-- [ ] Write full Software Requirements Specification (SRS)
-- [ ] Define non-functional requirements (performance, scalability, security)
-- [ ] Define system constraints and assumptions
-- [ ] Define out-of-scope items explicitly
+#### 📄 Core Documentation
+
+| # | Task | Priority | Depends On |
+|---|---|---|---|
+| 9 | Write full SRS document | 🔴 High | User stories, role matrix |
+| 10 | Define non-functional requirements | 🔴 High | — |
+| 11 | Define system constraints and assumptions | 🟡 Medium | — |
+| 12 | Define out-of-scope items explicitly | 🟡 Medium | — |
+
+**Non-Functional Requirements to Define:**
+- Response time: RAG query < 3s, quiz generation < 5s
+- Availability: 99% uptime (local dev), 95% in demo
+- Security: RS256 JWT, HTTPS only, no plaintext passwords
+- Scalability: Support 100 concurrent students per demo
+- Data integrity: Document embeddings must be idempotent
+
+---
 
 #### 👥 User Stories (Per Feature)
-- [ ] **Document Upload & RAG Knowledge Base** — user story + acceptance criteria
-- [ ] **AI Flashcard Generation** — user story + acceptance criteria
-- [ ] **Quiz Me Mode** — user story + acceptance criteria
-- [ ] **Weak Spot Detection** — user story + acceptance criteria
-- [ ] **Summarize & Simplify** — user story + acceptance criteria
-- [ ] **Pre-Built Courses** — user story + acceptance criteria
-- [ ] **Coding Practice Tracker** — user story + acceptance criteria
-- [ ] **Skill Tree** — user story + acceptance criteria
-- [ ] **Gamification (XP, Badges, Streaks)** — user story + acceptance criteria
-- [ ] **Analytics Dashboard** — user story + acceptance criteria
-- [ ] **Assignment System** — user story + acceptance criteria
+
+> Format: *As a [student], I want to [action] so that [benefit].*
+> Each story needs: Story + Acceptance Criteria + Priority + Estimation
+
+| # | Feature | Story Written | Acceptance Criteria | Priority |
+|---|---|---|---|---|
+| 13 | Document Upload & RAG | ⏳ | ⏳ | 🔴 Must Have |
+| 14 | AI Flashcard Generation | ⏳ | ⏳ | 🔴 Must Have |
+| 15 | Quiz Me Mode | ⏳ | ⏳ | 🔴 Must Have |
+| 16 | Weak Spot Detection | ⏳ | ⏳ | 🔴 Must Have |
+| 17 | Summarize & Simplify | ⏳ | ⏳ | 🟡 Should Have |
+| 18 | Pre-Built Courses | ⏳ | ⏳ | 🟡 Should Have |
+| 19 | Coding Practice Tracker | ⏳ | ⏳ | 🟡 Should Have |
+| 20 | Skill Tree | ⏳ | ⏳ | 🟢 Could Have |
+| 21 | Gamification (XP, Badges, Streaks) | ⏳ | ⏳ | 🟢 Could Have |
+| 22 | Analytics Dashboard | ⏳ | ⏳ | 🟡 Should Have |
+| 23 | Assignment System | ⏳ | ⏳ | 🟢 Could Have |
+
+---
 
 #### 🗂️ Data Modeling
-- [ ] Draft Entity-Relationship Diagram (ERD)
-- [ ] Define PostgreSQL schema for core entities (User, Document, Course, Quiz, etc.)
-- [ ] Define ChromaDB collection structure for embeddings
+
+| # | Task | Priority | Notes |
+|---|---|---|---|
+| 24 | Draft Entity-Relationship Diagram (ERD) | 🔴 High | Core entities: User, Document, Course, Quiz, Flashcard, Badge, XP |
+| 25 | Define PostgreSQL schema per service | 🔴 High | Schema-per-service isolation |
+| 26 | Define ChromaDB collection structure | 🔴 High | Collection naming, metadata fields, embedding dimensions |
+
+**Core Entities to Model:**
+- `users` — id, email, role, xp, streak, created_at
+- `documents` — id, user_id, name, format, minio_path, status
+- `notebooks` — id, user_id, name, source_count
+- `embeddings` — stored in ChromaDB (collection per notebook)
+- `flashcards` — id, notebook_id, question, answer, next_review, ease_factor
+- `quizzes` — id, notebook_id, type (MCQ/fill/short), questions JSON
+- `quiz_attempts` — id, user_id, quiz_id, score, wrong_topic_ids
+- `courses` — id, title, modules JSON, drip_config
+- `enrollments` — id, user_id, course_id, progress, unlocked_modules
+- `practice_lists` — id, user_id, name, platform
+- `practice_items` — id, list_id, problem_url, status, solved_at
+- `skill_tree_nodes` — id, label, prerequisites JSON, unlock_condition
+- `user_skill_progress` — id, user_id, node_id, unlocked, completed_at
+- `xp_ledger` — id, user_id, amount, reason, created_at
+- `badges` — id, name, icon, condition_type, condition_value
+- `user_badges` — id, user_id, badge_id, earned_at
+- `assignments` — id, course_id, title, rubric
+- `submissions` — id, user_id, assignment_id, content, ai_grade, ai_feedback
+
+---
 
 #### 🔌 API Planning
-- [ ] Draft API contract outline (REST endpoints per service)
-- [ ] Define Kafka topic list and event schemas
+
+| # | Task | Priority | Notes |
+|---|---|---|---|
+| 27 | Draft REST endpoint list per service | 🔴 High | OpenAPI 3.0 spec per service |
+| 28 | Define Kafka topic list and event schemas | 🔴 High | Producer / consumer mapping |
+
+**Services needing API contracts:**
+- Auth Service (register, login, refresh, logout)
+- User Service (profile CRUD, XP read)
+- Notebook Service (upload, list, delete, RAG query)
+- Quiz Service (generate, attempt, results)
+- Flashcard Service (generate, review, schedule)
+- Course Service (list, enroll, progress, unlock)
+- Assignment Service (create, submit, grade)
+- Practice Service (list CRUD, item CRUD, status update)
+- Gamification Service (XP earn, badge check, leaderboard)
+- Analytics Service (dashboard summary, topic breakdown)
+- AI Service (internal only — called by other services)
+- Notification Service (internal — Kafka consumer)
+
+---
 
 #### 📐 Design
-- [ ] Create low-fidelity wireframes for key screens
-- [ ] Define UI component inventory
+
+| # | Task | Priority | Notes |
+|---|---|---|---|
+| — | Create low-fidelity wireframes for key screens | 🟡 Medium | Login, Dashboard, Notebook, Quiz, Flashcard, Skill Tree |
+| — | Define UI component inventory | 🟡 Medium | Buttons, Cards, Modals, Tables, Charts, Badges |
+
+**Key Screens to Wireframe:**
+1. Login / Register
+2. Student Dashboard (overview, streaks, XP)
+3. Notebook view (document list + RAG chat)
+4. Quiz session (question + options + timer)
+5. Flashcard review (flip card + SM-2 rating)
+6. Course module view (drip content)
+7. Coding practice list
+8. Skill tree (DAG visual)
+9. Analytics dashboard (charts)
+10. Gamification profile (badges, XP bar)
 
 ---
 
 ## 🏗️ Phase 2 — System Design & Architecture
 
-> **Goal**: Translate requirements into a concrete technical blueprint. Define all microservices, their responsibilities, and how they communicate.
+> **Goal**: Translate requirements into a concrete technical blueprint covering all services, communication, and data flows.
 
 **Status**: ⏳ Pending
 **Target**: 2026-06-07
+**Progress**: 0 / 14 tasks complete
 
-### ⏳ To Do
-
-- [ ] Define microservice list and responsibility boundaries
-- [ ] Design inter-service communication (REST vs Kafka per use case)
-- [ ] Design Spring Cloud Gateway routing rules
-- [ ] Design Spring Cloud Eureka service registry setup
-- [ ] Define Docker Compose service map (local dev)
-- [ ] Design JWT auth flow (issue, validate, refresh)
-- [ ] Design Google OAuth2 login flow
-- [ ] Design RAG pipeline (upload → parse → embed → store → retrieve → generate)
-- [ ] Design spaced repetition (SM-2) scheduling logic
-- [ ] Design Kafka event flow diagrams (async operations)
-- [ ] Finalize PostgreSQL schema (per microservice)
-- [ ] Design Redis caching strategy (sessions, hot data)
-- [ ] Create detailed Low-Level Design (LLD) document
+| # | Task | Priority | Output |
+|---|---|---|---|
+| 1 | Define microservice boundaries (responsibility per service) | 🔴 High | Service responsibility doc |
+| 2 | Design inter-service communication (REST vs Kafka per case) | 🔴 High | Communication matrix |
+| 3 | Design Spring Cloud Gateway routing rules | 🔴 High | Gateway config YAML |
+| 4 | Design Eureka service registry setup | 🟡 Medium | Eureka config |
+| 5 | Design JWT auth flow (issue → validate → refresh → revoke) | 🔴 High | Sequence diagram |
+| 6 | Design Google OAuth2 login flow | 🟡 Medium | Sequence diagram |
+| 7 | Design RAG pipeline (upload → parse → chunk → embed → store → retrieve → generate) | 🔴 High | Pipeline diagram |
+| 8 | Design SM-2 spaced repetition scheduling logic | 🟡 Medium | Algorithm spec |
+| 9 | Design Kafka event flow diagrams | 🟡 Medium | Event flow diagrams |
+| 10 | Finalize PostgreSQL schema (all services) | 🔴 High | SQL DDL scripts |
+| 11 | Design Redis caching strategy | 🟡 Medium | Cache key design doc |
+| 12 | Design skill tree unlock logic (prerequisite DAG) | 🟡 Medium | Algorithm spec |
+| 13 | Design XP rules engine (event → XP mapping) | 🟡 Medium | Rules table |
+| 14 | Create Low-Level Design (LLD) document | 🔴 High | LLD.md |
 
 ---
 
 ## 🔧 Phase 3 — Core Infrastructure Setup
 
-> **Goal**: Bootstrap all services, infrastructure, and tooling so development can begin immediately with a working local environment.
+> **Goal**: Bootstrap all services so development can begin immediately with a working local environment.
 
 **Status**: ⏳ Pending
 **Target**: 2026-06-14
+**Progress**: 0 / 13 tasks complete
 
-### ⏳ To Do
-
-- [ ] Initialize Git monorepo structure
-- [ ] Set up React 19 + Vite frontend project
-- [ ] Set up Spring Boot parent POM (multi-module Maven project)
-- [ ] Configure Docker Compose (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Ollama, Zipkin)
-- [ ] Set up Spring Cloud Config Server
-- [ ] Set up Spring Cloud Eureka Server
-- [ ] Set up Spring Cloud Gateway
-- [ ] Configure RS256 JWT issuer and validator
-- [ ] Set up GitHub Actions CI pipeline (build + test)
-- [ ] Configure Prometheus + Grafana dashboards
-- [ ] Set up Zipkin + Micrometer tracing
-- [ ] Pull and verify Ollama models (`llama3.2:3b`, `nomic-embed-text`)
-- [ ] Verify full local environment startup (Docker Compose up)
-
----
-
-## 🚀 Feature Development Sprints
-
-### Sprint 1 — Auth + Document Upload + RAG Core
-
-**Status**: ⏳ Pending | **Target**: 2026-06-28
-
-#### ⏳ Backlog
-- [ ] User registration & login (JWT)
-- [ ] Google OAuth2 login
-- [ ] Role-based access control (STUDENT, TUTOR, ADMIN)
-- [ ] Document upload (PDF, Markdown, .txt) via MinIO
-- [ ] Google Drive API integration (Docs, Slides)
-- [ ] Document parsing with Apache Tika
-- [ ] Chunking + embedding with `nomic-embed-text` via Ollama
-- [ ] Storing embeddings in ChromaDB
-- [ ] Closed-domain RAG query endpoint (LangChain4j)
-- [ ] Basic frontend: Login page, Document upload UI
+| # | Task | Priority | Verification |
+|---|---|---|---|
+| 1 | Initialize Git monorepo structure | 🔴 High | `git log` shows initial commit |
+| 2 | Set up React 19 + Vite frontend project | 🔴 High | `npm run dev` runs on :5173 |
+| 3 | Set up Spring Boot parent POM (multi-module Maven) | 🔴 High | `mvn clean install` passes |
+| 4 | Configure Docker Compose (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Ollama, Zipkin) | 🔴 High | `docker compose up` all healthy |
+| 5 | Set up Spring Cloud Config Server | 🟡 Medium | Config server on :8888 |
+| 6 | Set up Spring Cloud Eureka Server | 🔴 High | Eureka dashboard on :8761 |
+| 7 | Set up Spring Cloud Gateway | 🔴 High | Gateway on :8080 routes correctly |
+| 8 | Configure RS256 JWT issuer and validator | 🔴 High | Token issued and validated end-to-end |
+| 9 | Set up GitHub Actions CI pipeline | 🟡 Medium | PR triggers build + test |
+| 10 | Configure Prometheus + Grafana | 🟢 Low | Metrics visible on :3000 |
+| 11 | Set up Zipkin + Micrometer tracing | 🟢 Low | Traces visible on :9411 |
+| 12 | Verify Ollama models running | 🔴 High | `ollama list` shows all 4 models |
+| 13 | Verify full local stack startup | 🔴 High | All services UP in Docker Compose |
 
 ---
 
-### Sprint 2 — Flashcards + Quiz + Weak Spot
+## 🚀 Sprint 1 — Auth + Document Upload + RAG Core
 
-**Status**: ⏳ Pending | **Target**: 2026-07-10
+**Status**: ⏳ Pending
+**Target**: 2026-06-28
+**Progress**: 0 / 10 tasks
 
-#### ⏳ Backlog
-- [ ] AI flashcard generation from document content
-- [ ] SM-2 spaced repetition scheduling engine
-- [ ] Flashcard review UI (flip animation, rating buttons)
-- [ ] Quiz generation (MCQ, fill-in-blank, short answer)
-- [ ] Quiz attempt tracking and scoring
-- [ ] Weak spot detection logic (low-score topic resurface)
-- [ ] Weak spot review session UI
-- [ ] Summarize & Simplify endpoint + UI
-
----
-
-### Sprint 3 — Courses + Coding Tracker + Skill Tree
-
-**Status**: ⏳ Pending | **Target**: 2026-07-18
-
-#### ⏳ Backlog
-- [ ] Course entity (modules, lessons, drip-unlock logic)
-- [ ] Course enrollment and progress tracking
-- [ ] Coding practice list CRUD (LeetCode-style)
-- [ ] Solve status tracking (Unsolved, Attempted, Solved)
-- [ ] Skill Tree data model (nodes, prerequisites, unlock state)
-- [ ] Skill Tree visual UI (DAG visualization)
-- [ ] Assignment submission endpoint
-- [ ] AI auto-grading for assignments
+| # | Task | Service | Priority | Acceptance Criteria |
+|---|---|---|---|---|
+| 1 | User registration + login (JWT) | auth-service | 🔴 High | POST /auth/register and /auth/login return valid JWT |
+| 2 | Google OAuth2 login | auth-service | 🟡 Medium | OAuth flow completes, JWT returned |
+| 3 | Role-based access control | gateway | 🔴 High | STUDENT/TUTOR/ADMIN roles enforced at gateway |
+| 4 | Document upload (PDF, MD, TXT) via MinIO | notebook-service | 🔴 High | File stored in MinIO, metadata in PostgreSQL |
+| 5 | Google Drive API integration (Docs, Slides) | notebook-service | 🟡 Medium | Google Doc URL fetched and parsed |
+| 6 | Document parsing with Apache Tika | ai-service | 🔴 High | Raw text extracted from all supported formats |
+| 7 | Chunking + embedding via nomic-embed-text | ai-service | 🔴 High | Chunks stored in ChromaDB with metadata |
+| 8 | Closed-domain RAG query endpoint | ai-service | 🔴 High | Query returns answer grounded only in uploaded docs |
+| 9 | Frontend: Login page | frontend | 🔴 High | Login + register forms functional |
+| 10 | Frontend: Document upload UI | frontend | 🔴 High | Upload UI with format validation + progress indicator |
 
 ---
 
-### Sprint 4 — Gamification + Analytics + Polish
+## 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot
 
-**Status**: ⏳ Pending | **Target**: 2026-07-25
+**Status**: ⏳ Pending
+**Target**: 2026-07-10
+**Progress**: 0 / 8 tasks
 
-#### ⏳ Backlog
-- [ ] XP points system (events → XP rules engine)
-- [ ] Badge award logic and badge gallery UI
-- [ ] Streak tracking (daily activity)
-- [ ] Timed quiz battle mode
-- [ ] Analytics dashboard (time-on-topic, scores, drop-off)
-- [ ] Recharts integration for analytics visualizations
-- [ ] Notifications (Kafka-driven, in-app)
-- [ ] Admin panel (user management, content moderation)
-- [ ] Tutor panel (course creation, assignment management)
+| # | Task | Service | Priority | Acceptance Criteria |
+|---|---|---|---|---|
+| 1 | AI flashcard generation from document content | flashcard-service | 🔴 High | LLM generates Q&A pairs from notebook chunks |
+| 2 | SM-2 spaced repetition scheduling engine | flashcard-service | 🔴 High | Next review date computed based on rating (1–5) |
+| 3 | Flashcard review UI (flip animation, rating) | frontend | 🔴 High | Card flips on click, 4-button rating updates schedule |
+| 4 | Quiz generation (MCQ, fill-in-blank, short answer) | quiz-service | 🔴 High | LLM generates valid question sets from notebook |
+| 5 | Quiz attempt tracking and scoring | quiz-service | 🔴 High | Score persisted per attempt, wrong topics recorded |
+| 6 | Weak spot detection logic | quiz-service | 🔴 High | Topics with >2 wrong attempts flagged and resurfaced |
+| 7 | Weak spot review session UI | frontend | 🟡 Medium | Dedicated review mode filters weak-spot questions |
+| 8 | Summarize & Simplify endpoint + UI | ai-service + frontend | 🟡 Medium | LLM returns condensed version of selected document |
+
+---
+
+## 🚀 Sprint 3 — Courses + Coding Tracker + Skill Tree
+
+**Status**: ⏳ Pending
+**Target**: 2026-07-18
+**Progress**: 0 / 8 tasks
+
+| # | Task | Service | Priority | Acceptance Criteria |
+|---|---|---|---|---|
+| 1 | Course entity: modules, lessons, drip-unlock logic | course-service | 🟡 Medium | Modules unlock sequentially on completion |
+| 2 | Course enrollment and progress tracking | course-service | 🟡 Medium | Enrollment stored, progress % computed |
+| 3 | Coding practice list CRUD | practice-service | 🟡 Medium | Create / read / update / delete practice lists |
+| 4 | Solve status tracking (Unsolved / Attempted / Solved) | practice-service | 🟡 Medium | Status persists per problem per user |
+| 5 | Skill Tree data model (nodes, prerequisites, unlock) | gamification-service | 🟢 Low | Node unlocks when all prerequisite nodes completed |
+| 6 | Skill Tree visual UI (DAG graph) | frontend | 🟢 Low | Interactive DAG with locked/unlocked node states |
+| 7 | Assignment submission endpoint | assignment-service | 🟢 Low | Submission stored, AI grading triggered via Kafka |
+| 8 | AI auto-grading for assignments | ai-service | 🟢 Low | LLM grades submission against rubric, returns score + feedback |
+
+---
+
+## 🚀 Sprint 4 — Gamification + Analytics + Polish
+
+**Status**: ⏳ Pending
+**Target**: 2026-07-25
+**Progress**: 0 / 9 tasks
+
+| # | Task | Service | Priority | Acceptance Criteria |
+|---|---|---|---|---|
+| 1 | XP points system (events → XP rules engine) | gamification-service | 🟢 Low | XP awarded on quiz, flashcard, module completion |
+| 2 | Badge award logic and gallery UI | gamification-service + frontend | 🟢 Low | Badges auto-awarded when conditions met |
+| 3 | Streak tracking (daily activity) | user-service | 🟢 Low | Streak increments on daily login or activity |
+| 4 | Timed quiz battle mode | gamification-service | 🟢 Low | Two users compete on same quiz set with timer |
+| 5 | Analytics dashboard data aggregation | analytics-service | 🟡 Medium | Aggregates scores, time-on-topic, drop-off from Kafka events |
+| 6 | Analytics dashboard UI (Recharts) | frontend | 🟡 Medium | Charts: time series, bar charts, topic breakdown |
+| 7 | In-app notifications (Kafka-driven) | notification-service | 🟢 Low | Notifications appear on badge earn, graded assignment |
+| 8 | Tutor panel (course creation, assignment management) | frontend | 🟢 Low | Tutor can create/edit courses and assignments |
+| 9 | Admin panel (user management) | frontend | 🟢 Low | Admin can view all users and roles |
 
 ---
 
 ## 🧪 Integration Testing
 
-**Status**: ⏳ Pending | **Target**: 2026-07-28
+**Status**: ⏳ Pending
+**Target**: 2026-07-28
+**Progress**: 0 / 6 tasks
 
-- [ ] End-to-end test: Upload → RAG → Quiz flow
-- [ ] End-to-end test: Enrollment → Module unlock → Completion
-- [ ] End-to-end test: XP earn → Badge award → Streak update
-- [ ] Load test: Document ingestion pipeline (Apache Tika + ChromaDB)
-- [ ] Security test: JWT validation, role enforcement
-- [ ] API contract tests (Spring Cloud Contract or REST Assured)
+| # | Test Scenario | Services Involved | Pass Criteria |
+|---|---|---|---|
+| 1 | Upload → parse → embed → RAG query | notebook, ai | Accurate answer from uploaded doc only |
+| 2 | Login → enroll → complete module → unlock next | auth, course, gamification | Module 2 unlocks after module 1 completed |
+| 3 | Quiz attempt → weak spot flagged → resurface | quiz | Weak topic reappears in next session |
+| 4 | Activity → XP awarded → badge triggered → notification sent | gamification, user, notification | Full Kafka event chain verified |
+| 5 | JWT validation, role enforcement at gateway | auth, gateway | STUDENT cannot access TUTOR-only endpoints |
+| 6 | Load test: document ingestion pipeline | notebook, ai, chromadb | 10 concurrent uploads complete without failure |
 
 ---
 
 ## 🐛 Bug Fixing & Polish
 
-**Status**: ⏳ Pending | **Target**: 2026-07-30
+**Status**: ⏳ Pending
+**Target**: 2026-07-30
+**Progress**: 0 / 6 tasks
 
-- [ ] Fix all P0/P1 bugs from integration testing
-- [ ] UI polish: responsiveness, loading states, error handling
-- [ ] Performance optimization: slow queries, cache tuning
-- [ ] Accessibility review (ARIA labels, keyboard navigation)
-- [ ] Finalize Docker Compose for demo environment
-- [ ] Write README and setup guide
+| # | Task | Priority |
+|---|---|---|
+| 1 | Fix all P0/P1 bugs from integration testing | 🔴 High |
+| 2 | UI polish: responsiveness, loading states, error handling | 🟡 Medium |
+| 3 | Performance optimization: slow queries, cache tuning | 🟡 Medium |
+| 4 | Accessibility review (ARIA labels, keyboard nav) | 🟢 Low |
+| 5 | Finalize Docker Compose for demo environment | 🔴 High |
+| 6 | Write README and setup guide | 🟡 Medium |
 
 ---
 
 ## 🎓 Final Submission / Demo
 
-**Status**: ⏳ Pending | **Target**: 2026-07-31
+**Status**: ⏳ Pending
+**Target**: 2026-07-31
+**Progress**: 0 / 4 tasks
 
-- [ ] Prepare demo script and walkthrough
-- [ ] Record demo video
-- [ ] Finalize project report / documentation
-- [ ] Submit capstone project
+| # | Task | Priority |
+|---|---|---|
+| 1 | Prepare demo script and walkthrough | 🔴 High |
+| 2 | Record demo video | 🔴 High |
+| 3 | Finalize project report / documentation | 🔴 High |
+| 4 | Submit capstone project | 🔴 High |
 
 ---
 
 ## 📊 Sprint Velocity Log
 
-> Track actual vs estimated effort each sprint to improve future estimates.
-
-| Sprint | Planned Tasks | Completed Tasks | Notes |
-|---|---|---|---|
-| Requirements | — | — | In progress |
-| Design | — | — | — |
-| Infrastructure | — | — | — |
-| Sprint 1 | — | — | — |
-| Sprint 2 | — | — | — |
-| Sprint 3 | — | — | — |
-| Sprint 4 | — | — | — |
+| Sprint | Planned Tasks | Completed | Carry Over | Notes |
+|---|---|---|---|---|
+| Phase 1 — Requirements | 28 | 6 | 22 | In progress |
+| Phase 2 — Design | 14 | 0 | — | Not started |
+| Phase 3 — Infrastructure | 13 | 0 | — | Not started |
+| Sprint 1 | 10 | 0 | — | Not started |
+| Sprint 2 | 8 | 0 | — | Not started |
+| Sprint 3 | 8 | 0 | — | Not started |
+| Sprint 4 | 9 | 0 | — | Not started |
+| Testing | 6 | 0 | — | Not started |
+| Polish | 6 | 0 | — | Not started |
+| Demo | 4 | 0 | — | Not started |
 
 ---
 
 ## 🗒️ Decision Log
 
-> Record key technical and design decisions with rationale to avoid revisiting them.
-
 | Date | Decision | Rationale |
 |---|---|---|
-| 2026-05-22 | Use Ollama for all AI (fully local) | Zero token cost, no data leaves machine |
+| 2026-05-22 | Ollama for all AI (fully local) | Zero token cost, no data leaves machine |
 | 2026-05-22 | MinIO instead of AWS S3 | Keep storage local during development |
-| 2026-05-22 | LangChain4j for RAG | Native Java integration with Spring Boot |
-| 2026-05-22 | ChromaDB as vector store | Lightweight, easy local setup |
-| 2026-05-22 | SM-2 algorithm for spaced repetition | Industry-standard, well-documented |
+| 2026-05-22 | LangChain4j for RAG | Native Java, no Python dependency |
+| 2026-05-22 | ChromaDB as vector store | Lightweight, easy local Docker setup |
+| 2026-05-22 | SM-2 algorithm for spaced repetition | Industry standard, well-documented, proven |
+| 2026-05-22 | Monorepo (single Git repo, all services) | Easier for solo dev — one clone, shared Compose |
+| 2026-05-22 | Schema-per-service PostgreSQL isolation | Microservice principle — no cross-service DB joins |
+| 2026-05-22 | llama3.2:3b as primary LLM | Fits 16GB RAM; mistral:7b as fallback |
+| 2026-05-22 | nomic-embed-text for embeddings | Local, fast, good quality for RAG |
+| 2026-05-22 | RS256 JWT (asymmetric) | Gateway validates without calling auth service |
 
 ---
 
 ## ⚠️ Risks & Blockers
 
-| Risk | Severity | Mitigation |
-|---|---|---|
-| Ollama LLM quality on 3B models | Medium | Test with multiple models; fallback to Mistral |
-| RAG hallucination within closed domain | High | Strict prompt constraints + source citation |
-| Kafka complexity for solo dev | Medium | Use sync REST for non-critical paths initially |
-| Scope creep (11 features is large) | **Critical** | Strict MoSCoW; defer Could Have items aggressively — only 10 weeks total |
-| Compressed timeline (July 31 deadline) | **Critical** | No buffer weeks; any blocker must be resolved same day |
-| ChromaDB persistence across restarts | Low | Use named volumes in Docker Compose |
+| Risk | Severity | Status | Mitigation |
+|---|---|---|---|
+| llama3.2:3b quality on complex tasks | 🟡 Medium | Monitoring | Test with mistral:7b fallback |
+| RAG hallucination within closed domain | 🔴 High | Active | Strict system prompts + source citation in response |
+| Kafka complexity for solo dev | 🟡 Medium | Planned | Use sync REST for non-critical paths initially; add Kafka later |
+| Scope creep (11 features) | 🔴 High | Active | MoSCoW prioritization enforced per sprint |
+| ChromaDB data loss on restart | 🟢 Low | Planned | Named Docker volumes in Compose |
+| Intel Arc GPU not supported by Ollama | 🟡 Medium | Active | CPU mode confirmed working; slower but functional |
+| 16GB RAM under pressure with all services | 🟡 Medium | Active | Close non-essential apps; start services selectively |
 
 ---
 
@@ -291,12 +419,62 @@
 
 | Priority | Features |
 |---|---|
-| **Must Have** | Auth, Document Upload, RAG QA, Flashcards, Quiz, Weak Spot |
-| **Should Have** | Summarize, Coding Tracker, Analytics Dashboard, Courses |
-| **Could Have** | Skill Tree, Assignments, Gamification |
-| **Won't Have (v1)** | Timed Quiz Battles, Multi-user collaboration |
+| 🔴 **Must Have** | Auth, Document Upload, RAG Q&A, Flashcards (SM-2), Quiz (MCQ/fill/short), Weak Spot Detection |
+| 🟡 **Should Have** | Summarize & Simplify, Coding Practice Tracker, Analytics Dashboard, Pre-Built Courses |
+| 🟢 **Could Have** | Skill Tree, Assignment System, Gamification (XP/Badges/Streaks), Timed Quiz Battles |
+| ⚫ **Won't Have (v1)** | Multi-user collaboration, Mobile app, External LMS integrations |
 
 ---
 
-*Last Updated: 2026-05-22 | Phase: Requirements Gathering | End Date: 2026-07-31*
+## 🔌 Kafka Topics Reference
 
+| Topic | Producer | Consumers | Payload |
+|---|---|---|---|
+| `user.registered` | auth-service | user-service, notification-service | userId, email, role |
+| `document.uploaded` | notebook-service | ai-service | documentId, minioPath, notebookId |
+| `document.embedded` | ai-service | notebook-service | documentId, chunkCount, collectionId |
+| `quiz.completed` | quiz-service | analytics-service, gamification-service | userId, quizId, score, wrongTopics |
+| `flashcard.reviewed` | flashcard-service | analytics-service, gamification-service | userId, cardId, rating, nextReview |
+| `assignment.submitted` | assignment-service | ai-service | submissionId, content, rubric |
+| `assignment.graded` | ai-service | assignment-service, notification-service | submissionId, grade, feedback |
+| `module.completed` | course-service | gamification-service, analytics-service | userId, courseId, moduleId |
+| `challenge.completed` | gamification-service | user-service, notification-service | userId, challengeId, result |
+| `practice.solved` | practice-service | gamification-service, analytics-service | userId, problemId, status |
+| `xp.awarded` | gamification-service | user-service | userId, amount, reason |
+| `badge.earned` | gamification-service | user-service, notification-service | userId, badgeId |
+
+---
+
+## 🏷️ Service Port Registry
+
+| Service | Port | URL |
+|---|---|---|
+| API Gateway | 8080 | http://localhost:8080 |
+| Eureka Discovery | 8761 | http://localhost:8761 |
+| Config Server | 8888 | http://localhost:8888 |
+| Auth Service | 8081 | http://localhost:8081 |
+| User Service | 8082 | http://localhost:8082 |
+| Notebook Service | 8083 | http://localhost:8083 |
+| Quiz Service | 8084 | http://localhost:8084 |
+| Flashcard Service | 8085 | http://localhost:8085 |
+| Course Service | 8086 | http://localhost:8086 |
+| Assignment Service | 8087 | http://localhost:8087 |
+| Practice Service | 8088 | http://localhost:8088 |
+| AI Service | 8089 | http://localhost:8089 |
+| Gamification Service | 8090 | http://localhost:8090 |
+| Analytics Service | 8091 | http://localhost:8091 |
+| Notification Service | 8092 | http://localhost:8092 |
+| Frontend (Vite) | 5173 | http://localhost:5173 |
+| PostgreSQL | 5432 | localhost:5432 |
+| Redis | 6379 | localhost:6379 |
+| Kafka | 9092 | localhost:9092 |
+| ChromaDB | 8000 | http://localhost:8000 |
+| MinIO | 9000 / 9001 | http://localhost:9001 (console) |
+| Ollama | 11434 | http://localhost:11434 |
+| Zipkin | 9411 | http://localhost:9411 |
+| Prometheus | 9090 | http://localhost:9090 |
+| Grafana | 3000 | http://localhost:3000 |
+
+---
+
+*Last Updated: 2026-05-22 | Phase: Requirements Gathering | Next: Complete user stories + SRS*
