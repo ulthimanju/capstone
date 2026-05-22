@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 6 |
-| In Progress | 2 |
+| Completed | 8 |
+| In Progress | 0 |
 | Pending | 104 |
-| Overall Completion | 5.4% |
+| Overall Completion | 7.1% |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Phase | Status | Target | Tasks Done | Tasks Total | Completion |
 |---|---|---|---|---|---|
-| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 6 | 28 | 21% |
+| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 8 | 28 | 29% |
 | 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
@@ -45,7 +45,7 @@
 **Status**: 🔄 In Progress
 **Started**: 2026-05-22
 **Target**: 2026-05-31
-**Progress**: 6 / 28 tasks complete (21%)
+**Progress**: 8 / 28 tasks complete (29%)
 
 ---
 
@@ -59,15 +59,14 @@
 | 4 | Select and document tech stack | 2026-05-22 | React 19, Spring Boot 3.x, Ollama, ChromaDB, Kafka, PostgreSQL, Redis |
 | 5 | Define high-level architecture (HLD) | 2026-05-22 | 6-layer HLD created in FigJam |
 | 6 | Define infrastructure design | 2026-05-22 | Docker Compose, Kafka, MinIO, Redis, Elasticsearch, Eureka, Zipkin |
+| 7 | Define user roles and permissions matrix | 2026-05-22 | STUDENT / TUTOR / ADMIN — 11 resource groups, 50+ permission rules |
+| 8 | Write detailed user stories per feature | 2026-05-22 | 11 stories with acceptance criteria — saved in roles_and_stories.md |
 
 ---
 
 ### 🔄 In Progress
 
-| # | Task | Started | Blocker |
-|---|---|---|---|
-| 7 | Define user roles and permissions matrix | 2026-05-22 | Needs STUDENT / TUTOR / ADMIN scope definition |
-| 8 | Write detailed user stories per feature | 2026-05-22 | Depends on role matrix |
+*No tasks currently in progress.*
 
 ---
 
