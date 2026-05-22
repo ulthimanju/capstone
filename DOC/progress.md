@@ -60,7 +60,7 @@
 | 5 | Define high-level architecture (HLD) | 2026-05-22 | 6-layer HLD created in FigJam |
 | 6 | Define infrastructure design | 2026-05-22 | Docker Compose, Kafka, MinIO, Redis, Elasticsearch, Eureka, Zipkin |
 | 7 | Define user roles and permissions matrix | 2026-05-22 | STUDENT / TUTOR / ADMIN — 11 resource groups, 50+ permission rules |
-| 8 | Write detailed user stories per feature | 2026-05-22 | 11 stories with acceptance criteria — saved in roles_and_stories.md |
+| 8 | Write detailed user stories per feature | 2026-05-22 | 11 stories with acceptance criteria — saved in stories.md |
 
 ---
 
