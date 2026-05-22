@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 8 |
+| Completed | 12 |
 | In Progress | 0 |
-| Pending | 104 |
-| Overall Completion | 7.1% |
+| Pending | 100 |
+| Overall Completion | 10.7% |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Phase | Status | Target | Tasks Done | Tasks Total | Completion |
 |---|---|---|---|---|---|
-| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 8 | 28 | 29% |
+| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 12 | 28 | 43% |
 | 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
@@ -61,6 +61,10 @@
 | 6 | Define infrastructure design | 2026-05-22 | Docker Compose, Kafka, MinIO, Redis, Elasticsearch, Eureka, Zipkin |
 | 7 | Define user roles and permissions matrix | 2026-05-22 | STUDENT / TUTOR / ADMIN — 11 resource groups, 50+ permission rules |
 | 8 | Write detailed user stories per feature | 2026-05-22 | 11 stories with acceptance criteria — saved in stories.md |
+| 9 | Write full SRS document | 2026-05-22 | Full SRS in SRS.md — 12 feature areas, FR IDs, NFR IDs |
+| 10 | Define non-functional requirements | 2026-05-22 | 7 NFR categories: Performance, Availability, Security, Scalability, Data Integrity, Usability, Maintainability |
+| 11 | Define system constraints and assumptions | 2026-05-22 | Hardware, software, regulatory, time constraints + 10 assumptions |
+| 12 | Define out-of-scope items explicitly | 2026-05-22 | 22 OOS items across features, infra, integrations, data/compliance |
 
 ---
 
@@ -74,19 +78,7 @@
 
 #### 📄 Core Documentation
 
-| # | Task | Priority | Depends On |
-|---|---|---|---|
-| 9 | Write full SRS document | 🔴 High | User stories, role matrix |
-| 10 | Define non-functional requirements | 🔴 High | — |
-| 11 | Define system constraints and assumptions | 🟡 Medium | — |
-| 12 | Define out-of-scope items explicitly | 🟡 Medium | — |
-
-**Non-Functional Requirements to Define:**
-- Response time: RAG query < 3s, quiz generation < 5s
-- Availability: 99% uptime (local dev), 95% in demo
-- Security: RS256 JWT, HTTPS only, no plaintext passwords
-- Scalability: Support 100 concurrent students per demo
-- Data integrity: Document embeddings must be idempotent
+*All tasks completed — see SRS.md.*
 
 ---
 
@@ -370,7 +362,7 @@
 
 | Sprint | Planned Tasks | Completed | Carry Over | Notes |
 |---|---|---|---|---|
-| Phase 1 — Requirements | 28 | 6 | 22 | In progress |
+| Phase 1 — Requirements | 28 | 12 | 16 | In progress |
 | Phase 2 — Design | 14 | 0 | — | Not started |
 | Phase 3 — Infrastructure | 13 | 0 | — | Not started |
 | Sprint 1 | 10 | 0 | — | Not started |
@@ -476,4 +468,4 @@
 
 ---
 
-*Last Updated: 2026-05-22 | Phase: Requirements Gathering | Next: Complete user stories + SRS*
+*Last Updated: 2026-05-22 | Phase: Requirements Gathering | Next: Complete user stories per feature + ERD + API Planning*
