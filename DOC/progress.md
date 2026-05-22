@@ -1,7 +1,7 @@
 # 📋 Capestone — Agile Progress Tracker
 
 > **Methodology**: Adapted Agile (Solo Developer)
-> **Sprint Length**: 2 weeks
+> **Sprint Length**: 1–1.5 weeks (compressed for July 31 deadline)
 > **Start Date**: 2026-05-22
 > **Developer**: Solo
 
@@ -11,16 +11,16 @@
 
 | Phase | Status | Target Completion |
 |---|---|---|
-| 📌 Requirements Gathering | 🔄 In Progress | 2026-06-05 |
-| 🏗️ System Design & Architecture | ⏳ Pending | 2026-06-19 |
-| 🔧 Core Infrastructure Setup | ⏳ Pending | 2026-07-03 |
-| 🚀 Feature Development — Sprint 1 | ⏳ Pending | 2026-07-17 |
-| 🚀 Feature Development — Sprint 2 | ⏳ Pending | 2026-07-31 |
-| 🚀 Feature Development — Sprint 3 | ⏳ Pending | 2026-08-14 |
-| 🚀 Feature Development — Sprint 4 | ⏳ Pending | 2026-08-28 |
-| 🧪 Integration Testing | ⏳ Pending | 2026-09-11 |
-| 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-09-25 |
-| 🎓 Final Submission / Demo | ⏳ Pending | 2026-10-09 |
+| 📌 Requirements Gathering | 🔄 In Progress | 2026-05-31 |
+| 🏗️ System Design & Architecture | ⏳ Pending | 2026-06-07 |
+| 🔧 Core Infrastructure Setup | ⏳ Pending | 2026-06-14 |
+| 🚀 Feature Development — Sprint 1 | ⏳ Pending | 2026-06-28 |
+| 🚀 Feature Development — Sprint 2 | ⏳ Pending | 2026-07-10 |
+| 🚀 Feature Development — Sprint 3 | ⏳ Pending | 2026-07-18 |
+| 🚀 Feature Development — Sprint 4 | ⏳ Pending | 2026-07-25 |
+| 🧪 Integration Testing | ⏳ Pending | 2026-07-28 |
+| 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-07-30 |
+| 🎓 Final Submission / Demo | ⏳ Pending | 2026-07-31 |
 
 ---
 
@@ -30,7 +30,7 @@
 
 **Status**: 🔄 In Progress
 **Started**: 2026-05-22
-**Target**: 2026-06-05
+**Target**: 2026-05-31
 
 ---
 
@@ -93,7 +93,7 @@
 > **Goal**: Translate requirements into a concrete technical blueprint. Define all microservices, their responsibilities, and how they communicate.
 
 **Status**: ⏳ Pending
-**Target**: 2026-06-19
+**Target**: 2026-06-07
 
 ### ⏳ To Do
 
@@ -118,7 +118,7 @@
 > **Goal**: Bootstrap all services, infrastructure, and tooling so development can begin immediately with a working local environment.
 
 **Status**: ⏳ Pending
-**Target**: 2026-07-03
+**Target**: 2026-06-14
 
 ### ⏳ To Do
 
@@ -142,7 +142,7 @@
 
 ### Sprint 1 — Auth + Document Upload + RAG Core
 
-**Status**: ⏳ Pending | **Target**: 2026-07-17
+**Status**: ⏳ Pending | **Target**: 2026-06-28
 
 #### ⏳ Backlog
 - [ ] User registration & login (JWT)
@@ -160,7 +160,7 @@
 
 ### Sprint 2 — Flashcards + Quiz + Weak Spot
 
-**Status**: ⏳ Pending | **Target**: 2026-07-31
+**Status**: ⏳ Pending | **Target**: 2026-07-10
 
 #### ⏳ Backlog
 - [ ] AI flashcard generation from document content
@@ -176,7 +176,7 @@
 
 ### Sprint 3 — Courses + Coding Tracker + Skill Tree
 
-**Status**: ⏳ Pending | **Target**: 2026-08-14
+**Status**: ⏳ Pending | **Target**: 2026-07-18
 
 #### ⏳ Backlog
 - [ ] Course entity (modules, lessons, drip-unlock logic)
@@ -192,7 +192,7 @@
 
 ### Sprint 4 — Gamification + Analytics + Polish
 
-**Status**: ⏳ Pending | **Target**: 2026-08-28
+**Status**: ⏳ Pending | **Target**: 2026-07-25
 
 #### ⏳ Backlog
 - [ ] XP points system (events → XP rules engine)
@@ -209,7 +209,7 @@
 
 ## 🧪 Integration Testing
 
-**Status**: ⏳ Pending | **Target**: 2026-09-11
+**Status**: ⏳ Pending | **Target**: 2026-07-28
 
 - [ ] End-to-end test: Upload → RAG → Quiz flow
 - [ ] End-to-end test: Enrollment → Module unlock → Completion
@@ -222,7 +222,7 @@
 
 ## 🐛 Bug Fixing & Polish
 
-**Status**: ⏳ Pending | **Target**: 2026-09-25
+**Status**: ⏳ Pending | **Target**: 2026-07-30
 
 - [ ] Fix all P0/P1 bugs from integration testing
 - [ ] UI polish: responsiveness, loading states, error handling
@@ -235,7 +235,7 @@
 
 ## 🎓 Final Submission / Demo
 
-**Status**: ⏳ Pending | **Target**: 2026-10-09
+**Status**: ⏳ Pending | **Target**: 2026-07-31
 
 - [ ] Prepare demo script and walkthrough
 - [ ] Record demo video
@@ -281,7 +281,8 @@
 | Ollama LLM quality on 3B models | Medium | Test with multiple models; fallback to Mistral |
 | RAG hallucination within closed domain | High | Strict prompt constraints + source citation |
 | Kafka complexity for solo dev | Medium | Use sync REST for non-critical paths initially |
-| Scope creep (11 features is large) | High | Strict MoSCoW prioritization per sprint |
+| Scope creep (11 features is large) | **Critical** | Strict MoSCoW; defer Could Have items aggressively — only 10 weeks total |
+| Compressed timeline (July 31 deadline) | **Critical** | No buffer weeks; any blocker must be resolved same day |
 | ChromaDB persistence across restarts | Low | Use named volumes in Docker Compose |
 
 ---
@@ -297,5 +298,5 @@
 
 ---
 
-*Last Updated: 2026-05-22 | Phase: Requirements Gathering*
+*Last Updated: 2026-05-22 | Phase: Requirements Gathering | End Date: 2026-07-31*
 
