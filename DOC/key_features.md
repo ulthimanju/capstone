@@ -1,8 +1,8 @@
-# Capestone — Key Features
+# Capestone  Key Features
 
 
 **1. Document-Based Learning Path**
-Upload PDFs, Markdown, .txt, Google Docs, or Google Slides. AI builds a closed knowledge base from your files — no open internet, reducing hallucinations. Supports up to 50 sources per notebook, 500,000 words per source.
+Upload PDFs, Markdown, .txt, Google Docs, or Google Slides. AI builds a closed knowledge base from your files  no open internet, reducing hallucinations. Supports up to 50 sources per notebook, 500,000 words per source.
 
 **2. AI-Generated Flashcards**
 Automatically generates flashcards from uploaded documents with spaced repetition (SM-2 algorithm) built in.

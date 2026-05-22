@@ -1,0 +1,9 @@
+# Capestone  Project Abstract
+
+Capestone is an AI-powered student learning platform designed to unify fragmented study workflows into a single intelligent system. Students upload their own documents  PDFs, Markdown files, Google Docs, and more  which are processed into a closed knowledge base using Retrieval-Augmented Generation (RAG), ensuring AI responses are grounded strictly in the uploaded content. From this knowledge base, Capestone automatically generates flashcards with spaced repetition, quizzes in multiple formats, concise summaries, and personalized weak spot reviews tailored to each student's performance history.
+
+Beyond document-based learning, Capestone supports enrollment in structured courses with drip-unlocked modules, coding practice list management with progress tracking, and a visual skill tree that enforces prerequisite mastery before advancing. A gamification layer  XP points, badges, streaks, and timed quiz challenges  keeps students consistently engaged. An analytics dashboard gives each student clear visibility into their progress, time on topic, and areas needing attention.
+
+The platform is built on a microservices architecture using Spring Boot and React, with Claude API powering all AI features including quiz generation, summarization, auto-grading, and weak spot analysis. ChromaDB serves as the vector store for document embeddings, enabling accurate closed-domain question answering. PostgreSQL, Redis, and Apache Kafka form the data and messaging backbone, with the system designed for scalability, modularity, and production-grade reliability.
+
+Capestone's core goal is to replace the need for multiple disconnected tools by making a student's own study material the engine of their entire learning experience.
