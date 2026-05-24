@@ -130,22 +130,12 @@
 
 #### 📐 Design
 
-| # | Task | Priority | Notes |
+| # | Task | Status | Notes |
 |---|---|---|---|
-| — | Create low-fidelity wireframes for key screens | 🟡 Medium | Login, Dashboard, Notebook, Quiz, Flashcard, Skill Tree |
-| — | Define UI component inventory | 🟡 Medium | Buttons, Cards, Modals, Tables, Charts, Badges |
+| — | Create low-fidelity wireframes for key screens | ⏳ Pending | 10 screens — AI prompts written, images to be generated externally |
+| — | Define UI component inventory | ✅ Done | 73 components across 15 categories |
 
-**Key Screens to Wireframe:**
-1. Login / Register
-2. Student Dashboard (overview, streaks, XP)
-3. Notebook view (document list + RAG chat)
-4. Quiz session (question + options + timer)
-5. Flashcard review (flip card + SM-2 rating)
-6. Course module view (drip content)
-7. Coding practice list
-8. Skill tree (DAG visual)
-9. Analytics dashboard (charts)
-10. Gamification profile (badges, XP bar)
+> 📐 Full component inventory → see [UI_component_inventory.md](./UI_component_inventory.md)
 
 ---
 
