@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 23 |
+| Completed | 26 |
 | In Progress | 0 |
-| Pending | 89 |
-| Overall Completion | 20.5% |
+| Pending | 86 |
+| Overall Completion | 23.2% |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Phase | Status | Target | Tasks Done | Tasks Total | Completion |
 |---|---|---|---|---|---|
-| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 23 | 28 | 82% |
+| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 26 | 28 | 93% |
 | 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
@@ -45,7 +45,7 @@
 **Status**: 🔄 In Progress
 **Started**: 2026-05-22
 **Target**: 2026-05-31
-**Progress**: 23 / 28 tasks complete (82%)
+**Progress**: 26 / 28 tasks complete (93%)
 
 ---
 
@@ -107,31 +107,13 @@
 
 #### 🗂️ Data Modeling
 
-| # | Task | Priority | Notes |
+| # | Task | Status | Notes |
 |---|---|---|---|
-| 24 | Draft Entity-Relationship Diagram (ERD) | 🔴 High | Core entities: User, Document, Course, Quiz, Flashcard, Badge, XP |
-| 25 | Define PostgreSQL schema per service | 🔴 High | Schema-per-service isolation |
-| 26 | Define ChromaDB collection structure | 🔴 High | Collection naming, metadata fields, embedding dimensions |
+| 24 | Draft Entity-Relationship Diagram (ERD) | ✅ Done | All 18 core entities defined |
+| 25 | Define PostgreSQL schema per service | ✅ Done | Schema-per-service isolation — 11 services |
+| 26 | Define ChromaDB collection structure | ✅ Done | Collection naming, metadata, dimensions |
 
-**Core Entities to Model:**
-- `users` — id, email, role, xp, streak, created_at
-- `documents` — id, user_id, name, format, minio_path, status
-- `notebooks` — id, user_id, name, source_count
-- `embeddings` — stored in ChromaDB (collection per notebook)
-- `flashcards` — id, notebook_id, question, answer, next_review, ease_factor
-- `quizzes` — id, notebook_id, type (MCQ/fill/short), questions JSON
-- `quiz_attempts` — id, user_id, quiz_id, score, wrong_topic_ids
-- `courses` — id, title, modules JSON, drip_config
-- `enrollments` — id, user_id, course_id, progress, unlocked_modules
-- `practice_lists` — id, user_id, name, platform
-- `practice_items` — id, list_id, problem_url, status, solved_at
-- `skill_tree_nodes` — id, label, prerequisites JSON, unlock_condition
-- `user_skill_progress` — id, user_id, node_id, unlocked, completed_at
-- `xp_ledger` — id, user_id, amount, reason, created_at
-- `badges` — id, name, icon, condition_type, condition_value
-- `user_badges` — id, user_id, badge_id, earned_at
-- `assignments` — id, course_id, title, rubric
-- `submissions` — id, user_id, assignment_id, content, ai_grade, ai_feedback
+> 🗂️ Full schema details → see [data_modeling.md](./data_modeling.md)
 
 ---
 
@@ -364,7 +346,7 @@
 
 | Sprint | Planned Tasks | Completed | Carry Over | Notes |
 |---|---|---|---|---|
-| Phase 1 — Requirements | 28 | 23 | 5 | In progress |
+| Phase 1 — Requirements | 28 | 26 | 2 | In progress |
 | Phase 2 — Design | 14 | 0 | — | Not started |
 | Phase 3 — Infrastructure | 13 | 0 | — | Not started |
 | Sprint 1 | 10 | 0 | — | Not started |
@@ -470,4 +452,4 @@
 
 ---
 
-*Last Updated: 2026-05-24 | Phase: Requirements Gathering | Next: ERD + PostgreSQL schema + API Planning (tasks 24–28)*
+*Last Updated: 2026-05-24 | Phase: Requirements Gathering | Next: REST API contracts + Kafka topic schemas (tasks 27–28)*
