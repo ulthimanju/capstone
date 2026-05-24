@@ -61,7 +61,7 @@ CREATE TABLE profiles (
 
 CREATE TABLE user_stats (
     user_id          UUID PRIMARY KEY,
-    xp               INT NOT NULL DEFAULT 0,
+    xp               INT NOT NULL DEFAULT 0,          -- materialized cache; source of truth is xp_ledger
     streak           INT NOT NULL DEFAULT 0,
     last_active_at   TIMESTAMP,
     total_quizzes    INT NOT NULL DEFAULT 0,
@@ -170,7 +170,9 @@ CREATE TABLE flashcard_reviews (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     flashcard_id UUID NOT NULL REFERENCES flashcards(id) ON DELETE CASCADE,
     user_id      UUID NOT NULL,
-    rating       INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    rating       INT NOT NULL CHECK (rating BETWEEN 0 AND 5),
+    -- SM-2 scale: 0=Blackout, 1=Wrong, 2=Hard, 3=Correct(effort), 4=Good, 5=Easy
+    -- UI maps 4 buttons → values: Again=0, Hard=2, Good=4, Easy=5
     reviewed_at  TIMESTAMP NOT NULL DEFAULT NOW()
 );
 ```
@@ -277,6 +279,8 @@ CREATE TABLE xp_ledger (
     reason     VARCHAR(100) NOT NULL,               -- QUIZ_COMPLETED | FLASHCARD_REVIEWED | etc.
     ref_id     UUID,                                -- quiz_id | flashcard_id | module_id
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    -- xp_ledger is the audit log / source of truth
+    -- user_stats.xp is a materialized cache updated via xp.awarded Kafka event
 );
 
 CREATE TABLE badges (
@@ -319,9 +323,11 @@ CREATE TABLE challenges (
     quiz_id       UUID NOT NULL,
     challenger_id UUID NOT NULL,
     opponent_id   UUID NOT NULL,
-    status        VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING | ACTIVE | COMPLETED
+    status        VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING | ACCEPTED | REJECTED | ACTIVE | COMPLETED
     winner_id     UUID,
     created_at    TIMESTAMP NOT NULL DEFAULT NOW()
+    -- challenge.completed is produced and consumed by gamification-service (separate consumer group)
+    -- self-consumption is intentional: producer handles lifecycle, consumer triggers XP award logic
 );
 ```
 

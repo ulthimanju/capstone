@@ -144,7 +144,7 @@ Response: {
 |---|---|---|---|
 | POST | `/api/flashcards/generate` | STUDENT | Generate flashcards from notebook |
 | GET | `/api/flashcards` | STUDENT | List all own flashcards |
-| GET | `/api/flashcards/due` | STUDENT | Get cards due for review today |
+| GET | `/api/flashcards/due` | STUDENT | Get cards due today (`?notebookId=uuid` optional filter) |
 | POST | `/api/flashcards/{id}/review` | STUDENT | Submit review rating (SM-2) |
 | DELETE | `/api/flashcards/{id}` | STUDENT | Delete a flashcard |
 
@@ -155,6 +155,7 @@ Request:  { "notebookId": "uuid", "count": 20 }
 Response: { "generated": 20, "flashcards": [{ "id": "uuid", "question": "...", "answer": "..." }] }
 
 // POST /api/flashcards/{id}/review
+// SM-2 scale 0–5: Again=0, Hard=2, Good=4, Easy=5 (4-button UI maps to these values)
 Request:  { "rating": 4 }
 Response: { "nextReview": "2026-05-27", "interval": 3, "easeFactor": 2.50 }
 ```

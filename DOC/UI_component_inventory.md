@@ -195,13 +195,20 @@ OAuth button with Google branding.
 ---
 
 ### `RatingButton`
-SM-2 rating button used in flashcard review (1–4 scale).
+SM-2 rating button used in flashcard review. Four buttons map to SM-2 quality values (0–5 scale).
+
+| Button Label | SM-2 Value | Meaning |
+|---|---|---|
+| Again | 0 | Complete blackout |
+| Hard | 2 | Correct with major difficulty |
+| Good | 4 | Correct with some hesitation |
+| Easy | 5 | Perfect response |
 
 | Prop | Type | Description |
 |---|---|---|
-| `rating` | 1 \| 2 \| 3 \| 4 | Rating value |
+| `value` | 0 \| 2 \| 4 \| 5 | SM-2 quality value |
 | `label` | string | "Again" / "Hard" / "Good" / "Easy" |
-| `onClick` | (rating: number) => void | Rating handler |
+| `onClick` | (value: number) => void | Rating handler |
 
 ---
 
@@ -703,11 +710,18 @@ Session wrapper showing card count + due info.
 ---
 
 ### `ReviewRatingBar`
-Four-button rating row (SM-2 scale).
+Four-button rating row. Maps SM-2 0–5 quality scale to 4 labelled buttons.
+
+| Button | Value sent |
+|---|---|
+| Again | 0 |
+| Hard | 2 |
+| Good | 4 |
+| Easy | 5 |
 
 | Prop | Type | Description |
 |---|---|---|
-| `onRate` | (rating: 1\|2\|3\|4) => void | Rating handler |
+| `onRate` | (value: 0\|2\|4\|5) => void | Rating handler |
 | `nextReview` | string | Shown after rating |
 
 ---
