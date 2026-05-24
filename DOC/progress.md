@@ -84,9 +84,6 @@
 
 #### 👥 User Stories (Per Feature)
 
-> Format: *As a [student], I want to [action] so that [benefit].*
-> Each story needs: Story + Acceptance Criteria + Priority + Estimation
-
 | # | Feature | Story Written | Acceptance Criteria | Priority |
 |---|---|---|---|---|
 | 13 | Document Upload & RAG | ✅ | ✅ | 🔴 Must Have |
@@ -103,8 +100,6 @@
 
 ---
 
-> 📖 Full story details → see [stories.md](./stories.md)
-
 #### 🗂️ Data Modeling
 
 | # | Task | Status | Notes |
@@ -112,8 +107,6 @@
 | 24 | Draft Entity-Relationship Diagram (ERD) | ✅ Done | All 18 core entities defined |
 | 25 | Define PostgreSQL schema per service | ✅ Done | Schema-per-service isolation — 11 services |
 | 26 | Define ChromaDB collection structure | ✅ Done | Collection naming, metadata, dimensions |
-
-> 🗂️ Full schema details → see [data_modeling.md](./data_modeling.md)
 
 ---
 
@@ -123,8 +116,6 @@
 |---|---|---|---|
 | 27 | Draft REST endpoint list per service | ✅ Done | 11 services — REST contracts defined |
 | 28 | Define Kafka topic list and event schemas | ✅ Done | 12 topics, full event schemas |
-
-> 🔌 Full API contracts + Kafka schemas → see [api_planning.md](./api_planning.md)
 
 ---
 
