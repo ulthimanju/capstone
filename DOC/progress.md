@@ -68,20 +68,6 @@
 
 ---
 
-### 🔄 In Progress
-
-*No tasks currently in progress.*
-
----
-
-### ⏳ To Do
-
-#### 📄 Core Documentation
-
-*All tasks completed — see SRS.md.*
-
----
-
 #### 👥 User Stories (Per Feature)
 
 | # | Feature | Story Written | Acceptance Criteria | Priority |
