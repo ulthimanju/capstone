@@ -132,10 +132,8 @@
 
 | # | Task | Status | Notes |
 |---|---|---|---|
-| — | Create low-fidelity wireframes for key screens | ⏳ Pending | 10 screens — AI prompts written, images to be generated externally |
+| — | Create low-fidelity wireframes for key screens | ✅ Done | 10 screens — saved in `assets/wireframes/` |
 | — | Define UI component inventory | ✅ Done | 73 components across 15 categories |
-
-> 📐 Full component inventory → see [UI_component_inventory.md](./UI_component_inventory.md)
 
 ---
 
