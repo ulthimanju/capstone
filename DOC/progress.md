@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 12 |
+| Completed | 23 |
 | In Progress | 0 |
-| Pending | 100 |
-| Overall Completion | 10.7% |
+| Pending | 89 |
+| Overall Completion | 20.5% |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Phase | Status | Target | Tasks Done | Tasks Total | Completion |
 |---|---|---|---|---|---|
-| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 12 | 28 | 43% |
+| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 23 | 28 | 82% |
 | 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
@@ -45,7 +45,7 @@
 **Status**: 🔄 In Progress
 **Started**: 2026-05-22
 **Target**: 2026-05-31
-**Progress**: 12 / 28 tasks complete (43%)
+**Progress**: 23 / 28 tasks complete (82%)
 
 ---
 
@@ -89,19 +89,21 @@
 
 | # | Feature | Story Written | Acceptance Criteria | Priority |
 |---|---|---|---|---|
-| 13 | Document Upload & RAG | ⏳ | ⏳ | 🔴 Must Have |
-| 14 | AI Flashcard Generation | ⏳ | ⏳ | 🔴 Must Have |
-| 15 | Quiz Me Mode | ⏳ | ⏳ | 🔴 Must Have |
-| 16 | Weak Spot Detection | ⏳ | ⏳ | 🔴 Must Have |
-| 17 | Summarize & Simplify | ⏳ | ⏳ | 🟡 Should Have |
-| 18 | Pre-Built Courses | ⏳ | ⏳ | 🟡 Should Have |
-| 19 | Coding Practice Tracker | ⏳ | ⏳ | 🟡 Should Have |
-| 20 | Skill Tree | ⏳ | ⏳ | 🟢 Could Have |
-| 21 | Gamification (XP, Badges, Streaks) | ⏳ | ⏳ | 🟢 Could Have |
-| 22 | Analytics Dashboard | ⏳ | ⏳ | 🟡 Should Have |
-| 23 | Assignment System | ⏳ | ⏳ | 🟢 Could Have |
+| 13 | Document Upload & RAG | ✅ | ✅ | 🔴 Must Have |
+| 14 | AI Flashcard Generation | ✅ | ✅ | 🔴 Must Have |
+| 15 | Quiz Me Mode | ✅ | ✅ | 🔴 Must Have |
+| 16 | Weak Spot Detection | ✅ | ✅ | 🔴 Must Have |
+| 17 | Summarize & Simplify | ✅ | ✅ | 🟡 Should Have |
+| 18 | Pre-Built Courses | ✅ | ✅ | 🟡 Should Have |
+| 19 | Coding Practice Tracker | ✅ | ✅ | 🟡 Should Have |
+| 20 | Skill Tree | ✅ | ✅ | 🟢 Could Have |
+| 21 | Gamification (XP, Badges, Streaks) | ✅ | ✅ | 🟢 Could Have |
+| 22 | Analytics Dashboard | ✅ | ✅ | 🟡 Should Have |
+| 23 | Assignment System | ✅ | ✅ | 🟢 Could Have |
 
 ---
+
+> 📖 Full story details → see [stories.md](./stories.md)
 
 #### 🗂️ Data Modeling
 
@@ -362,7 +364,7 @@
 
 | Sprint | Planned Tasks | Completed | Carry Over | Notes |
 |---|---|---|---|---|
-| Phase 1 — Requirements | 28 | 12 | 16 | In progress |
+| Phase 1 — Requirements | 28 | 23 | 5 | In progress |
 | Phase 2 — Design | 14 | 0 | — | Not started |
 | Phase 3 — Infrastructure | 13 | 0 | — | Not started |
 | Sprint 1 | 10 | 0 | — | Not started |
@@ -468,4 +470,4 @@
 
 ---
 
-*Last Updated: 2026-05-22 | Phase: Requirements Gathering | Next: Complete user stories per feature + ERD + API Planning*
+*Last Updated: 2026-05-24 | Phase: Requirements Gathering | Next: ERD + PostgreSQL schema + API Planning (tasks 24–28)*

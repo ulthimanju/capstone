@@ -1,39 +1,61 @@
 # Questly — User Stories
 
-> **Completed**: 2026-05-22
+> **Updated**: 2026-05-24
 > **Author**: Manju (Solo Developer)
 > **Format**: As a student, I want to [action] so that [benefit].
-> Each story includes acceptance criteria.
+> Each story includes acceptance criteria, priority, and status.
+
+---
+
+## Status Summary
+
+| # | Feature | Story | Acceptance Criteria | Priority | Status |
+|---|---|---|---|---|---|
+| 1 | Document Upload & RAG | ✅ | ✅ | 🔴 Must Have | ✅ Done |
+| 2 | AI Flashcard Generation | ✅ | ✅ | 🔴 Must Have | ✅ Done |
+| 3 | Quiz Me Mode | ✅ | ✅ | 🔴 Must Have | ✅ Done |
+| 4 | Weak Spot Detection | ✅ | ✅ | 🔴 Must Have | ✅ Done |
+| 5 | Summarize & Simplify | ✅ | ✅ | 🟡 Should Have | ✅ Done |
+| 6 | Pre-Built Courses | ✅ | ✅ | 🟡 Should Have | ✅ Done |
+| 7 | Coding Practice Tracker | ✅ | ✅ | 🟡 Should Have | ✅ Done |
+| 8 | Skill Tree | ✅ | ✅ | 🟢 Could Have | ✅ Done |
+| 9 | Gamification (XP, Badges, Streaks) | ✅ | ✅ | 🟢 Could Have | ✅ Done |
+| 10 | Analytics Dashboard | ✅ | ✅ | 🟡 Should Have | ✅ Done |
+| 11 | Assignment System | ✅ | ✅ | 🟢 Could Have | ✅ Done |
 
 ---
 
 ### 1. Document Upload & RAG Knowledge Base
 
 **Story:**
-As a student, I want to upload my study documents and ask questions from them so that I get accurate answers based only on my own material.
+As a student, I want to upload my study documents and query them so that I get answers grounded strictly in my own material.
 
 **Acceptance Criteria:**
-- Student can upload PDF, Markdown, .txt files
-- Student can link Google Docs / Google Slides via URL
-- Upload limit enforced: max 50 sources per notebook, 500,000 words per source
-- After upload, document is parsed and embedded automatically
-- RAG query returns answer with source reference
-- Answer is grounded strictly in uploaded content — no open internet
+- Upload PDF, Markdown, .txt supported
+- Google Docs and Google Slides linkable via URL
+- Max 50 sources per notebook, 500,000 words per source enforced
+- Document parsed and embedded automatically after upload
+- RAG query returns answer with source chunk reference
+- No open internet used — closed knowledge base only
+
+**Priority:** 🔴 Must Have | **Completed:** 2026-05-24
 
 ---
 
 ### 2. AI Flashcard Generation
 
 **Story:**
-As a student, I want flashcards automatically generated from my uploaded documents so that I can review key concepts without manually creating them.
+As a student, I want flashcards auto-generated from my uploaded documents so that I can review key concepts without creating them manually.
 
 **Acceptance Criteria:**
-- Flashcards generated from selected notebook
-- Each card has a clear question and answer
-- Cards scheduled using SM-2 spaced repetition
-- Student can rate card difficulty (1–5) after review
-- Next review date updates based on rating
-- Student can see cards due today
+- Flashcards generated from selected notebook via LLM
+- Each card has a clear question and a concise answer
+- SM-2 spaced repetition schedules next review date
+- Student rates card difficulty (1–5) after each review
+- Next review date recalculated based on rating
+- Student can view all cards due today in one session
+
+**Priority:** 🔴 Must Have | **Completed:** 2026-05-24
 
 ---
 
@@ -44,117 +66,135 @@ As a student, I want AI-generated quizzes from my documents so that I can test m
 
 **Acceptance Criteria:**
 - Student selects a notebook to generate quiz from
-- Quiz contains MCQ, fill-in-the-blank, and short answer questions
-- Student completes quiz and submits
-- Score displayed immediately after submission
-- Wrong answers recorded per topic
+- Quiz contains at least one MCQ, one fill-in-the-blank, one short answer
+- Student submits quiz and sees score immediately
+- Each wrong answer records the associated topic
+- Student can retry the same quiz after completion
+
+**Priority:** 🔴 Must Have | **Completed:** 2026-05-24
 
 ---
 
 ### 4. Weak Spot Detection
 
 **Story:**
-As a student, I want the system to track topics I keep getting wrong so that I can focus my revision where it matters most.
+As a student, I want the system to track topics I keep getting wrong so that my revision focuses where it matters most.
 
 **Acceptance Criteria:**
-- Topics with 2+ consecutive wrong answers flagged as weak spots
-- Weak spots resurfaced automatically in next quiz session
-- Student can view their weak spot list on dashboard
-- Weak spots clear automatically after 2 consecutive correct answers
+- Topic flagged as weak after 2+ consecutive wrong answers
+- Weak spot topics resurfaced automatically in next quiz session
+- Student can view their full weak spot list on dashboard
+- Weak spot clears after 2 consecutive correct answers on same topic
+
+**Priority:** 🔴 Must Have | **Completed:** 2026-05-24
 
 ---
 
 ### 5. Summarize & Simplify
 
 **Story:**
-As a student, I want long documents condensed into short summaries so that I can quickly grasp the key points.
+As a student, I want long documents condensed into short summaries so that I can quickly grasp the key points without reading everything.
 
 **Acceptance Criteria:**
-- Student selects a document or notebook
-- AI returns a concise summary (max 500 words)
-- Summary uses simpler language than the original
-- Student can copy or save the summary as a note
+- Student selects a document or full notebook to summarize
+- AI returns summary in plain, simpler language (max 500 words)
+- Summary displayed inline and copyable
+- Student can regenerate summary if unsatisfied
+
+**Priority:** 🟡 Should Have | **Completed:** 2026-05-24
 
 ---
 
 ### 6. Pre-Built Courses
 
 **Story:**
-As a student, I want to enroll in structured courses created by tutors so that I have a guided learning path beyond my own documents.
+As a student, I want to enroll in structured courses so that I have a guided learning path beyond my own documents.
 
 **Acceptance Criteria:**
-- Student can browse available courses
-- Student can enroll in a course with one click
-- Modules unlock sequentially after completing the previous one (drip content)
+- Student can browse all available courses
+- Student enrolls with one click
+- Modules unlock sequentially — next module unlocks only after current one is completed
 - Progress percentage shown per course
 - Student can resume from last completed module
+
+**Priority:** 🟡 Should Have | **Completed:** 2026-05-24
 
 ---
 
 ### 7. Coding Practice Tracker
 
 **Story:**
-As a student, I want to manage a list of coding problems and track which ones I've solved so that I can monitor my placement preparation progress.
+As a student, I want to manage a list of coding problems and track which ones I have solved so that I can monitor my placement preparation progress.
 
 **Acceptance Criteria:**
-- Student can create named practice lists
-- Student can add problems by pasting a URL (LeetCode or any platform)
-- Each problem has a status: Unsolved / Attempted / Solved
-- Student can update status at any time
-- Dashboard shows total solved count and percentage per list
+- Student creates named practice lists
+- Student adds problems by pasting any URL (LeetCode or any platform)
+- Each problem has status: Unsolved / Attempted / Solved
+- Student updates status at any time
+- Dashboard shows total solved count and completion percentage per list
+
+**Priority:** 🟡 Should Have | **Completed:** 2026-05-24
 
 ---
 
 ### 8. Skill Tree
 
 **Story:**
-As a student, I want a visual skill tree that shows which topics I've mastered and what I can unlock next so that I have a clear sense of progress.
+As a student, I want a visual skill tree that shows what I have mastered and what I can unlock next so that I always know what to study.
 
 **Acceptance Criteria:**
-- Skill tree displayed as an interactive DAG
-- Nodes show locked / in-progress / unlocked states
-- A node unlocks only when all prerequisite nodes are completed
-- Completing a quiz or module on a topic marks the corresponding node as progressed
-- Student can click a node to see what's needed to unlock it
+- Skill tree rendered as interactive DAG
+- Nodes show three states: Locked / In Progress / Unlocked
+- Node unlocks only when all prerequisite nodes are completed
+- Completing a quiz or module on a topic progresses the corresponding node
+- Clicking a locked node shows what is required to unlock it
+
+**Priority:** 🟢 Could Have | **Completed:** 2026-05-24
 
 ---
 
 ### 9. Gamification (XP, Badges, Streaks)
 
 **Story:**
-As a student, I want to earn XP, badges, and maintain a streak so that learning feels rewarding and I stay consistent.
+As a student, I want to earn XP, collect badges, and maintain a daily streak so that learning feels rewarding and I stay consistent.
 
 **Acceptance Criteria:**
 - XP awarded on: quiz completion, flashcard review, module completion, problem solved
-- Badges awarded automatically when conditions are met (e.g. 7-day streak, first quiz, 100 XP)
-- Daily streak increments on any learning activity per day
+- Badge awarded automatically when its condition is met
+- Daily streak increments on any learning activity within a 24-hour window
 - Streak resets if no activity for 24 hours
-- Student can view XP total, badge gallery, and leaderboard
+- Student views XP total, badge gallery, and leaderboard from profile
+
+**Priority:** 🟢 Could Have | **Completed:** 2026-05-24
 
 ---
 
 ### 10. Analytics Dashboard
 
 **Story:**
-As a student, I want to see my learning progress in charts so that I understand where I'm spending time and where I'm underperforming.
+As a student, I want to see my learning activity in charts so that I understand where I am spending time and where I am underperforming.
 
 **Acceptance Criteria:**
 - Dashboard shows: total study time, quizzes taken, avg score, flashcards reviewed, problems solved
 - Time-on-topic breakdown shown as a bar chart
 - Score trend shown as a line chart over time
 - Weak spots highlighted on dashboard
-- Data updates in near real-time after each activity
+- Data refreshes after every completed activity
+
+**Priority:** 🟡 Should Have | **Completed:** 2026-05-24
 
 ---
 
 ### 11. Assignment System
 
 **Story:**
-As a student, I want to submit assignments and receive AI-generated grades and feedback so that I know where to improve without waiting for a tutor.
+As a student, I want to submit assignments and receive AI-generated grades and feedback so that I know where to improve without waiting.
 
 **Acceptance Criteria:**
-- Student views assignment with title, description, and rubric
+- Student views assignment title, description, and rubric
 - Student submits text or file-based answer
-- AI grades submission against rubric (score + written feedback)
+- AI grades submission against rubric — returns score and written feedback
 - Result visible within 30 seconds of submission
-- Student can view past submissions and grades
+- Student views all past submissions and grades in history
+
+**Priority:** 🟢 Could Have | **Completed:** 2026-05-24
