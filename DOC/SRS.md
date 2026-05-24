@@ -319,7 +319,7 @@ Questly is a standalone web application with a microservices backend. It does no
 | NFR-SCALE-01 | The system shall support **100 concurrent students** during the demo without degraded performance beyond defined NFR-PERF targets. |
 | NFR-SCALE-02 | Each microservice shall be independently deployable and restartable without affecting other services. |
 | NFR-SCALE-03 | The Kafka message broker shall decouple producers and consumers so that high event volume does not block synchronous user actions. |
-| NFR-SCALE-04 | The system architecture shall allow horizontal scaling of individual services by running multiple instances behind the Gateway in a future deployment. |
+| NFR-SCALE-04 | The system architecture shall allow horizontal scaling of individual services by running multiple instances behind the Gateway using Docker Compose scaling. |
 
 ### 4.5 Data Integrity
 
@@ -430,10 +430,9 @@ The following features and capabilities are explicitly **not** included in versi
 | # | Out-of-Scope Item | Reason |
 |---|---|---|
 | OOS-09 | **Cloud deployment** (AWS, GCP, Azure) | All infrastructure stays local in v1 |
-| OOS-10 | **Production-grade Kubernetes orchestration** | Docker Compose is sufficient for the demo scale |
-| OOS-11 | **Automated disaster recovery / backups** | Local dev environment; manual Docker volume backup is acceptable |
-| OOS-12 | **Multi-region or geo-distributed deployment** | Single-machine setup in v1 |
-| OOS-13 | **CDN for static asset delivery** | Local Vite dev server is used |
+| OOS-10 | **Automated disaster recovery / backups** | Local dev environment; manual Docker volume backup is acceptable |
+| OOS-11 | **Multi-region or geo-distributed deployment** | Single-machine setup in v1 |
+| OOS-12 | **CDN for static asset delivery** | Local Vite dev server is used |
 
 ### 7.3 Integrations
 

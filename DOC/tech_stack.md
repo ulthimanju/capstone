@@ -66,7 +66,6 @@
 | Layer | Technology |
 |---|---|
 | Containerization | Docker + Docker Compose |
-| Orchestration | Kubernetes |
 | CI/CD | GitHub Actions |
 | Monitoring | Prometheus + Grafana |
 
