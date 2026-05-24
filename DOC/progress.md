@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 26 |
+| Completed | 28 |
 | In Progress | 0 |
-| Pending | 86 |
-| Overall Completion | 23.2% |
+| Pending | 84 |
+| Overall Completion | 25.0% |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Phase | Status | Target | Tasks Done | Tasks Total | Completion |
 |---|---|---|---|---|---|
-| 📌 Phase 1 — Requirements Gathering | 🔄 In Progress | 2026-05-31 | 26 | 28 | 93% |
+| 📌 Phase 1 — Requirements Gathering | ✅ Complete | 2026-05-24 | 28 | 28 | 100% |
 | 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
@@ -42,10 +42,10 @@
 
 > **Goal**: Fully define what Questly must do, for whom, and under what constraints before a single line of code is written.
 
-**Status**: 🔄 In Progress
+**Status**: ✅ Complete
 **Started**: 2026-05-22
-**Target**: 2026-05-31
-**Progress**: 26 / 28 tasks complete (93%)
+**Completed**: 2026-05-24
+**Progress**: 28 / 28 tasks complete (100%)
 
 ---
 
@@ -119,24 +119,12 @@
 
 #### 🔌 API Planning
 
-| # | Task | Priority | Notes |
+| # | Task | Status | Notes |
 |---|---|---|---|
-| 27 | Draft REST endpoint list per service | 🔴 High | OpenAPI 3.0 spec per service |
-| 28 | Define Kafka topic list and event schemas | 🔴 High | Producer / consumer mapping |
+| 27 | Draft REST endpoint list per service | ✅ Done | 11 services — REST contracts defined |
+| 28 | Define Kafka topic list and event schemas | ✅ Done | 12 topics, full event schemas |
 
-**Services needing API contracts:**
-- Auth Service (register, login, refresh, logout)
-- User Service (profile CRUD, XP read)
-- Notebook Service (upload, list, delete, RAG query)
-- Quiz Service (generate, attempt, results)
-- Flashcard Service (generate, review, schedule)
-- Course Service (list, enroll, progress, unlock)
-- Assignment Service (create, submit, grade)
-- Practice Service (list CRUD, item CRUD, status update)
-- Gamification Service (XP earn, badge check, leaderboard)
-- Analytics Service (dashboard summary, topic breakdown)
-- AI Service (internal only — called by other services)
-- Notification Service (internal — Kafka consumer)
+> 🔌 Full API contracts + Kafka schemas → see [api_planning.md](./api_planning.md)
 
 ---
 
@@ -346,7 +334,7 @@
 
 | Sprint | Planned Tasks | Completed | Carry Over | Notes |
 |---|---|---|---|---|
-| Phase 1 — Requirements | 28 | 26 | 2 | In progress |
+| Phase 1 — Requirements | 28 | 28 | 0 | ✅ Complete |
 | Phase 2 — Design | 14 | 0 | — | Not started |
 | Phase 3 — Infrastructure | 13 | 0 | — | Not started |
 | Sprint 1 | 10 | 0 | — | Not started |
@@ -452,4 +440,4 @@
 
 ---
 
-*Last Updated: 2026-05-24 | Phase: Requirements Gathering | Next: REST API contracts + Kafka topic schemas (tasks 27–28)*
+*Last Updated: 2026-05-24 | Phase 1: ✅ Complete | Next: Phase 2 — System Design & Architecture*
