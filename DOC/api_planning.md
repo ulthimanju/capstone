@@ -317,24 +317,35 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 
 | Method | Endpoint | Called By | Description |
 |---|---|---|---|
-| POST | `/internal/ai/embed` | notebook-service | Embed document chunks |
-| POST | `/internal/ai/query` | notebook-service | RAG query against ChromaDB |
-| POST | `/internal/ai/generate/quiz` | quiz-service | Generate quiz questions |
-| POST | `/internal/ai/generate/flashcards` | flashcard-service | Generate flashcards |
-| POST | `/internal/ai/summarize` | notebook-service | Summarize document |
-| POST | `/internal/ai/grade` | assignment-service | Grade submission against rubric |
+| POST | `/internal/v1/ai/embed` | notebook-service | Embed document chunks |
+| POST | `/internal/v1/ai/query` | notebook-service | RAG query against ChromaDB |
+| POST | `/internal/v1/ai/generate/quiz` | quiz-service | Generate quiz questions |
+| POST | `/internal/v1/ai/generate/flashcards` | flashcard-service | Generate flashcards |
+| POST | `/internal/v1/ai/summarize` | notebook-service | Summarize document |
+| POST | `/internal/v1/ai/grade` | assignment-service | Grade submission against rubric |
 
 ---
 
-### Notification Service `:8092` (Internal — Kafka Consumer Only)
+### Notification Service `:8092`
 
-> No REST endpoints exposed. Consumes Kafka events and writes to `db_notification`.
+> Primarily a Kafka consumer. Exposes one REST endpoint for frontend notification retrieval.
+
+**REST Endpoints:**
+
+| Method | Endpoint | Role | Description |
+|---|---|---|---|
+| GET | `/api/notifications` | STUDENT/TUTOR/ADMIN | Get own notifications (paginated) |
+| PATCH | `/api/notifications/{id}/read` | STUDENT/TUTOR/ADMIN | Mark notification as read |
+| PATCH | `/api/notifications/read-all` | STUDENT/TUTOR/ADMIN | Mark all notifications as read |
+
+**Kafka Topics Consumed:**
 
 | Kafka Topic Consumed | Action |
 |---|---|
 | `user.registered` | Send welcome notification |
 | `assignment.graded` | Notify student of grade |
 | `badge.earned` | Notify student of new badge |
+| `challenge.accepted` | Notify challenger that opponent accepted |
 | `challenge.completed` | Notify both participants of result |
 
 ---
@@ -346,6 +357,7 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 | `user.registered` | auth-service | user-service, notification-service | New user signs up |
 | `document.uploaded` | notebook-service | ai-service | Document upload complete |
 | `document.embedded` | ai-service | notebook-service | Embedding stored in ChromaDB |
+| `document.deleted` | notebook-service | ai-service | Document deleted — purge ChromaDB chunks |
 | `quiz.completed` | quiz-service | analytics-service, gamification-service | Student submits quiz |
 | `flashcard.reviewed` | flashcard-service | analytics-service, gamification-service | Student rates a flashcard |
 | `assignment.submitted` | assignment-service | ai-service | Student submits assignment |
@@ -354,7 +366,9 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 | `practice.solved` | practice-service | gamification-service, analytics-service | Student marks problem solved |
 | `xp.awarded` | gamification-service | user-service | XP event triggered |
 | `badge.earned` | gamification-service | user-service, notification-service | Badge condition met |
-| `challenge.completed` | gamification-service | user-service, notification-service | Challenge ends |
+| `challenge.accepted` | gamification-service | notification-service | Opponent accepts challenge |
+| `challenge.rejected` | gamification-service | notification-service | Opponent rejects challenge |
+| `challenge.completed` | gamification-service | gamification-service, analytics-service, notification-service | Challenge ends |
 
 ---
 
@@ -369,6 +383,9 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 
 // document.embedded
 { "documentId": "uuid", "notebookId": "uuid", "chunkCount": 42, "collectionId": "notebook_uuid", "timestamp": "..." }
+
+// document.deleted
+{ "documentId": "uuid", "notebookId": "uuid", "userId": "uuid", "collectionId": "notebook_uuid", "timestamp": "..." }
 
 // quiz.completed
 { "userId": "uuid", "quizId": "uuid", "score": 80.0, "totalQuestions": 10, "wrongTopics": ["..."], "timestamp": "..." }
@@ -393,6 +410,12 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 
 // badge.earned
 { "userId": "uuid", "badgeId": "uuid", "badgeName": "First Quiz", "timestamp": "..." }
+
+// challenge.accepted
+{ "challengeId": "uuid", "challengerId": "uuid", "opponentId": "uuid", "timestamp": "..." }
+
+// challenge.rejected
+{ "challengeId": "uuid", "challengerId": "uuid", "opponentId": "uuid", "timestamp": "..." }
 
 // challenge.completed
 { "challengeId": "uuid", "challengerId": "uuid", "opponentId": "uuid", "winnerId": "uuid", "timestamp": "..." }
