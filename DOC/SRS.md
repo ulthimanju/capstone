@@ -268,7 +268,7 @@ Questly is a standalone web application with a microservices backend. It does no
 | FR-ASSIGN-01 | A tutor shall be able to create an assignment with a title, description, and grading rubric. |
 | FR-ASSIGN-02 | A student shall be able to view all assignments available to them. |
 | FR-ASSIGN-03 | A student shall be able to submit a text-based or file-based answer to an assignment. |
-| FR-ASSIGN-04 | Upon submission, the system shall trigger AI auto-grading via Kafka event to the AI service. |
+| FR-ASSIGN-04 | Upon submission, the system shall trigger AI auto-grading via a Kafka event to the assignment service grading orchestrator. |
 | FR-ASSIGN-05 | The AI shall grade the submission against the rubric and return a score and written feedback. |
 | FR-ASSIGN-06 | The graded result shall be visible to the student within 30 seconds of submission. |
 | FR-ASSIGN-07 | A student shall be able to view their past submissions and grades. |
@@ -305,7 +305,7 @@ Questly is a standalone web application with a microservices backend. It does no
 |---|---|
 | NFR-SEC-01 | All authentication tokens shall use **RS256 asymmetric signing** (private key on auth-service, public key on gateway). |
 | NFR-SEC-02 | Access tokens shall expire within **15 minutes**; refresh tokens within **7 days**. |
-| NFR-SEC-03 | All service-to-service communication shall pass through the **API Gateway**; no service shall be directly externally accessible. |
+| NFR-SEC-03 | All service-to-service communication shall pass through the **API Gateway** (except internal private network REST calls to the internal-only `ai-service`); no service shall be directly externally accessible. |
 | NFR-SEC-04 | All inter-service HTTP calls shall validate the JWT before processing any request. |
 | NFR-SEC-05 | No plaintext passwords shall be stored; bcrypt with a cost factor ≥ 12 shall be used. |
 | NFR-SEC-06 | API endpoints for TUTOR and ADMIN roles shall reject requests from STUDENT tokens with HTTP 403. |
@@ -325,7 +325,7 @@ Questly is a standalone web application with a microservices backend. It does no
 
 | ID | Requirement |
 |---|---|
-| NFR-DATA-01 | Document embedding pipelines shall be **idempotent** — re-uploading the same document shall not create duplicate embeddings. |
+| NFR-DATA-01 | Document embedding pipelines shall be **idempotent** — re-uploading the same document within the same notebook shall not create duplicate embeddings. |
 | NFR-DATA-02 | XP ledger entries shall be immutable once written; corrections are made via compensating entries only. |
 | NFR-DATA-03 | Quiz attempt scores shall be persisted atomically; a failed write shall not record a partial score. |
 | NFR-DATA-04 | All database volumes shall be named Docker volumes to survive container restarts without data loss. |

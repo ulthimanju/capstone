@@ -300,7 +300,7 @@
 | Sprint | Planned Tasks | Completed | Carry Over | Notes |
 |---|---|---|---|---|
 | Phase 1 — Requirements | 28 | 28 | 0 | ✅ Complete |
-| Phase 2 — Design | 14 | 0 | — | Not started |
+| Phase 2 — Design | 14 | 14 | 0 | ✅ Complete |
 | Phase 3 — Infrastructure | 13 | 0 | — | Not started |
 | Sprint 1 | 10 | 0 | — | Not started |
 | Sprint 2 | 8 | 0 | — | Not started |
