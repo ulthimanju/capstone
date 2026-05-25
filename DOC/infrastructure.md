@@ -19,6 +19,10 @@ questly/
 │   ├── config-server/
 │   └── discovery-server/
 ├── frontend/
+├── docs/
+│   ├── LLD.md
+│   └── schema/
+│       └── *.sql
 ├── infra/
 │   ├── docker-compose.yml
 │   ├── kafka/

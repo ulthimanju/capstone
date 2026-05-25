@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 28 |
+| Completed | 42 |
 | In Progress | 0 |
-| Pending | 84 |
-| Overall Completion | 25.0% |
+| Pending | 70 |
+| Overall Completion | 37.5% |
 
 ---
 
@@ -26,7 +26,7 @@
 | Phase | Status | Target | Tasks Done | Tasks Total | Completion |
 |---|---|---|---|---|---|
 | 📌 Phase 1 — Requirements Gathering | ✅ Complete | 2026-05-24 | 28 | 28 | 100% |
-| 🏗️ Phase 2 — System Design & Architecture | ⏳ Pending | 2026-06-07 | 0 | 14 | 0% |
+| 🏗️ Phase 2 — System Design & Architecture | ✅ Complete | 2026-06-07 | 14 | 14 | 100% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
 | 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ⏳ Pending | 2026-07-10 | 0 | 8 | 0% |
@@ -118,26 +118,26 @@
 
 > **Goal**: Translate requirements into a concrete technical blueprint covering all services, communication, and data flows.
 
-**Status**: ⏳ Pending
+**Status**: ✅ Complete
 **Target**: 2026-06-07
-**Progress**: 0 / 14 tasks complete
+**Progress**: 14 / 14 tasks complete (100%)
 
-| # | Task | Priority | Output |
-|---|---|---|---|
-| 1 | Define microservice boundaries (responsibility per service) | 🔴 High | Service responsibility doc |
-| 2 | Design inter-service communication (REST vs Kafka per case) | 🔴 High | Communication matrix |
-| 3 | Design Spring Cloud Gateway routing rules | 🔴 High | Gateway config YAML |
-| 4 | Design Eureka service registry setup | 🟡 Medium | Eureka config |
-| 5 | Design JWT auth flow (issue → validate → refresh → revoke) | 🔴 High | Sequence diagram |
-| 6 | Design Google OAuth2 login flow | 🟡 Medium | Sequence diagram |
-| 7 | Design RAG pipeline (upload → parse → chunk → embed → store → retrieve → generate) | 🔴 High | Pipeline diagram |
-| 8 | Design SM-2 spaced repetition scheduling logic | 🟡 Medium | Algorithm spec |
-| 9 | Design Kafka event flow diagrams | 🟡 Medium | Event flow diagrams |
-| 10 | Finalize PostgreSQL schema (all services) | 🔴 High | SQL DDL scripts |
-| 11 | Design Redis caching strategy | 🟡 Medium | Cache key design doc |
-| 12 | Design skill tree unlock logic (prerequisite DAG) | 🟡 Medium | Algorithm spec |
-| 13 | Design XP rules engine (event → XP mapping) | 🟡 Medium | Rules table |
-| 14 | Create Low-Level Design (LLD) document | 🔴 High | LLD.md |
+| # | Task | Priority | Output | Completed |
+|---|---|---|---|---|
+| 1 | Define microservice boundaries (responsibility per service) | 🔴 High | Service responsibility doc | ✅ Done |
+| 2 | Design inter-service communication (REST vs Kafka per case) | 🔴 High | Communication matrix | ✅ Done |
+| 3 | Design Spring Cloud Gateway routing rules | 🔴 High | Gateway config YAML | ✅ Done |
+| 4 | Design Eureka service registry setup | 🟡 Medium | Eureka config | ✅ Done |
+| 5 | Design JWT auth flow (issue → validate → refresh → revoke) | 🔴 High | Sequence diagram | ✅ Done |
+| 6 | Design Google OAuth2 login flow | 🟡 Medium | Sequence diagram | ✅ Done |
+| 7 | Design RAG pipeline (upload → parse → chunk → embed → store → retrieve → generate) | 🔴 High | Pipeline diagram | ✅ Done |
+| 8 | Design SM-2 spaced repetition scheduling logic | 🟡 Medium | Algorithm spec | ✅ Done |
+| 9 | Design Kafka event flow diagrams | 🟡 Medium | Event flow diagrams | ✅ Done |
+| 10 | Finalize PostgreSQL schema (all services) | 🔴 High | SQL DDL scripts | ✅ Done |
+| 11 | Design Redis caching strategy | 🟡 Medium | Cache key design doc | ✅ Done |
+| 12 | Design skill tree unlock logic (prerequisite DAG) | 🟡 Medium | Algorithm spec | ✅ Done |
+| 13 | Design XP rules engine (event → XP mapping) | 🟡 Medium | Rules table | ✅ Done |
+| 14 | Create Low-Level Design (LLD) document | 🔴 High | LLD.md | ✅ Done |
 
 ---
 
