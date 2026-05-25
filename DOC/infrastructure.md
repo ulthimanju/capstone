@@ -19,7 +19,7 @@ questly/
 │   ├── config-server/
 │   └── discovery-server/
 ├── frontend/
-├── docs/
+├── DOC/
 │   ├── LLD.md
 │   └── schema/
 │       └── *.sql
