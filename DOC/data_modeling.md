@@ -63,7 +63,7 @@ CREATE TABLE user_stats (
     user_id          UUID PRIMARY KEY,
     xp               INT NOT NULL DEFAULT 0,          -- materialized cache; source of truth is xp_ledger
     streak           INT NOT NULL DEFAULT 0,
-    last_active_at   TIMESTAMP,
+    last_active_at   TIMESTAMPTZ,
     total_quizzes    INT NOT NULL DEFAULT 0,
     total_flashcards INT NOT NULL DEFAULT 0,
     total_solved     INT NOT NULL DEFAULT 0
@@ -92,6 +92,7 @@ CREATE TABLE documents (
     name        VARCHAR(255) NOT NULL,
     format      VARCHAR(20) NOT NULL,               -- PDF | MD | TXT | GDOC | GSLIDE
     minio_path  TEXT NOT NULL,
+    file_hash   VARCHAR(64),                        -- SHA-256 for notebook deduplication
     word_count  INT,
     status      VARCHAR(20) NOT NULL DEFAULT 'PROCESSING', -- PROCESSING | READY | FAILED
     created_at  TIMESTAMP NOT NULL DEFAULT NOW()
@@ -131,6 +132,7 @@ CREATE TABLE quiz_attempts (
     score           DECIMAL(5,2) NOT NULL,
     total_questions INT NOT NULL,
     wrong_topic_ids TEXT[],                          -- array of topic strings
+    challenge_id    UUID,                            -- references challenges.id (nullable)
     completed_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -325,6 +327,7 @@ CREATE TABLE challenges (
     opponent_id   UUID NOT NULL,
     status        VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING | ACCEPTED | REJECTED | ACTIVE | COMPLETED
     winner_id     UUID,
+    version       INT NOT NULL DEFAULT 0,              -- for Optimistic Locking concurrency protection
     created_at    TIMESTAMP NOT NULL DEFAULT NOW()
     -- challenge.completed is produced and consumed by gamification-service (separate consumer group)
     -- self-consumption is intentional: producer handles lifecycle, consumer triggers XP award logic

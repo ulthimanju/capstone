@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS user_stats (
     user_id          UUID PRIMARY KEY,               -- maps exactly to db_auth.users.id
     xp               INT NOT NULL DEFAULT 0,          -- Materialized cache sum; audited by xp_ledger
     streak           INT NOT NULL DEFAULT 0,
-    last_active_at   TIMESTAMP,
+    last_active_at   TIMESTAMP WITH TIME ZONE,
     total_quizzes    INT NOT NULL DEFAULT 0,
     total_flashcards INT NOT NULL DEFAULT 0,
     total_solved     INT NOT NULL DEFAULT 0

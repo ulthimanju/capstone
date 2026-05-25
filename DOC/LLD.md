@@ -12,20 +12,20 @@ Questly is structured as a decentralized, polyglot-ready microservice monorepo. 
 
 | Service Name | Port | Database | Primary Technology | Responsibility & External Exposure |
 | :--- | :--- | :--- | :--- | :--- |
-| `gateway` | `8080` | None | Spring Cloud Gateway | Entry point, CORS, RS256 JWT validation, routing |
+| `gateway` | `8080` | None | Spring Cloud Gateway | Entry point, CORS, RS256 JWT validation, routing, token masking |
 | `discovery-server` | `8761` | None | Spring Cloud Eureka | Dynamic registration, load balancer service registry |
 | `config-server` | `8888` | None | Spring Cloud Config | Centralized configuration repository provider |
 | `auth-service` | `8081` | `db_auth` | Spring Boot, Spring Security | Local register/login, Google OAuth2, JWKS endpoint, Refresh token |
 | `user-service` | `8082` | `db_user` | Spring Boot | Profile metadata management, cached statistics |
-| `notebook-service` | `8083` | `db_notebook` | Spring Boot, MinIO SDK | Document uploads, folder notebook hierarchy, RAG caller |
+| `notebook-service` | `8083` | `db_notebook` | Spring Boot, MinIO SDK | Document uploads, folder notebook hierarchy, RAG caller, Drive sync |
 | `quiz-service` | `8084` | `db_quiz` | Spring Boot | AI quiz generation caller, attempt tracker, weak-spot engine |
 | `flashcard-service`| `8085` | `db_flashcard` | Spring Boot | AI flashcard generation caller, SM-2 scheduling engine |
 | `course-service` | `8086` | `db_course` | Spring Boot | Curriculum enrollment, drip-unlock module gating |
-| `assignment-service`| `8087`| `db_assignment` | Spring Boot | Assignment submissions, AI auto-grading orchestrator |
+| `assignment-service`| `8087`| `db_assignment` | Spring Boot | Assignment submissions, AI auto-grading orchestrator, event-driven loops |
 | `practice-service` | `8088` | `db_practice` | Spring Boot | LeetCode list tracker, solving status tracking |
 | `gamification-service`| `8090`| `db_gamification` | Spring Boot | XP rules ledger, badge awards, skill-tree DAG, duel challenges |
 | `analytics-service`| `8091` | `db_analytics` | Spring Boot | **Pure consumer**. Aggregates study activity metrics |
-| `notification-service`| `8092`| `db_notification` | Spring Boot | **Pure consumer**. Dispatches alerts and in-app updates |
+| `notification-service`| `8092`| `db_notification` | Spring Boot, WebFlux | **Pure consumer**. Dispatches real-time SSE updates |
 | `ai-service` | `8089` | ChromaDB | Spring Boot, LangChain4j | **Internal-only**. Document embedding, parsing, RAG query, AI generation |
 
 *Statelessness Note*: `gateway`, `discovery-server`, and `config-server` are 100% stateless infrastructure components. They require no database schemas, no local storage volumes, and scale horizontally without coordination.
@@ -200,44 +200,115 @@ The `ai-service` is highly resource-intensive and encapsulated. It is **denied**
 
 ### 🔔 2.2 Notification Service (`notification-service`)
 - **State**: Stores simple push/pull notifications in `db_notification` for audit tracking.
-- **REST Exposure**: Only exposes read/patch status endpoints to the public frontend gateway (`/api/notifications/**`).
+- **REST Exposure**: Only exposes read/patch status endpoints to the public frontend gateway (`/api/notifications/**`), plus one real-time SSE stream endpoint.
 - **Inbound Calls**: **Zero**. All dynamic trigger notifications are generated asynchronously via Kafka event brokers.
+
+#### 📡 2.2.1 Real-Time Server-Sent Events (SSE) Push Delivery
+To satisfy the requirements of immediate feedback (visible within 30 seconds for grading, 5 seconds for analytics), the `notification-service` establishes a stateless Server-Sent Events (SSE) real-time pipeline.
+
+```
+                  ┌──────────────────┐
+                  │  Active Browser  │
+                  └────────┬─────────┘
+                           │ (Persistent SSE Connection: GET /api/notifications/stream)
+                           ▼
+                  ┌──────────────────┐
+                  │     gateway      │
+                  └────────┬─────────┘
+                           │ (Dynamic Route Propagation)
+                           ▼
+                  ┌──────────────────┐
+                  │notification-svc  │
+                  └────────┬─────────┘
+                           │ (Subscribes to redis channel user:notifications:{userId})
+                           ▼
+                  ┌──────────────────┐
+                  │  Redis Broker    │
+                  └──────────────────┘
+```
+
+1. **Client Stream Gating**:
+   - The frontend browser opens a persistent SSE connection at `GET /api/notifications/stream`.
+   - The request contains standard Bearer authorization headers validated by the Gateway (which propagates `X-User-Id` downstream).
+   - The `notification-service` handles this dynamically using Spring WebFlux:
+     ```java
+     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+     public Flux<ServerSentEvent<NotificationDto>> streamNotifications(@RequestHeader("X-User-Id") UUID userId) {
+         return redisTemplate.listenToChannel("user:notifications:" + userId)
+             .map(msg -> ServerSentEvent.builder(msg).event("notification").build());
+     }
+     ```
+2. **Alert Propagation**:
+   - When `notification-service` consumes any event topic (e.g. `xp.awarded`, `badge.earned`, `challenge.completed`, or the generic `notification.dispatch` failure alert):
+     - It commits the new record to `db_notification.notifications`.
+     - It pushes a JSON representation of the notification to the Redis channel `user:notifications:{userId}`.
+     - The active SSE thread captures the Redis Pub/Sub broadcast and immediately pushes it downstream to the client browser, securing a latency of **<200ms**.
 
 ---
 
-## 3. Security & Identity Management
+## 3. Resiliency & Failure Flows (Edge Cases)
+
+To preserve architectural decoupling and ensure robust execution, failure modes are dynamically captured and mitigated locally without creating extra Kafka topic overhead.
+
+```
+                   ┌──────────────────┐
+                   │ notebook-service │
+                   └────────┬─────────┘
+                            │ (POST /internal/v1/ai/embed)
+                            ▼
+                   ┌──────────────────┐
+                   │    ai-service    │
+                   └────────┬─────────┘
+                            ├─► [ChromaDB Timeout? Catch Exception]
+                            ├─► [Tika Parse Error? Return REST error: FAILED]
+                            ▼
+                   ┌──────────────────┐
+                   │ notebook-service │
+                   └────────┬─────────┘
+                            ├─► [Updates status to FAILED in Postgres]
+                            ├─► [Publishes notification.dispatch event to Kafka]
+                            ▼
+                   ┌──────────────────┐
+                   │ Kafka Broker     │
+                   └────────┬─────────┘
+                            ▼
+                   ┌──────────────────┐
+                   │notification-svc  │
+                   └────────┬─────────┘
+                            ├─► [Writes to db_notification]
+                            ├─► [SSE push notification alert to Browser]
+```
+
+### 📋 3.1 Document Ingestion / Embedding Failure
+1. **ChromaDB Outage / Connection Timeout**:
+   - If `ai-service` cannot connect to ChromaDB during vector writes, it throws a connection exception.
+   - **Spring Retry Pattern**: The connection attempt is wrapped with Spring Retry configuring exponential backoff (`maxAttempts = 3`, `backoffPeriod = 1000ms`, `multiplier = 2`).
+   - If the database remains offline after retries, `ai-service` logs the stack trace, catches the failure gracefully, and returns a detailed REST response back to `notebook-service`: `{ "status": "FAILED", "error": "ChromaDB connection timeout" }`.
+2. **Apache Tika Parsing Errors**:
+   - If a student uploads a corrupt, password-protected, or unsupported PDF/Doc, Apache Tika throws a parsing exception.
+   - `ai-service` catches this error instantly and returns a REST payload to `notebook-service`: `{ "status": "FAILED", "error": "Document parsing failed: corrupt format" }`.
+3. **Notebook Database State Update**:
+   - On receiving any `FAILED` status block in the REST response, `notebook-service` writes the status update `FAILED` **directly to PostgreSQL** (`db_notebook.documents.status = 'FAILED'`). No Kafka topic is created for intermediate document failures.
+4. **Asynchronous Notification Routing**:
+   - To alert the student, `notebook-service` publishes a generic **`notification.dispatch`** event to Kafka.
+   - The `notification-service` (the **sole consumer** of the dispatch topic) consumes the event, saves the alert to `db_notification`, and pushes it to the browser SSE stream.
+
+### 🧠 3.2 Ollama / Local LLM Downtime
+1. **REST Invocations**:
+   - If Ollama is offline or undergoing high CPU contention when an internal service calls `ai-service` (e.g. for quiz generation or RAG queries), the HTTP request times out.
+   - The connection is retried twice. On complete failure, `ai-service` responds to the caller with a standard, graceful fallback response:
+     - *RAG query fallback*: returns a grounded response: *"Questly is currently experiencing local AI engine maintenance. Please try again in a few minutes."*
+     - *Quiz/Flashcard fallback*: returns a clean REST exception block, allowing `quiz-service`/`flashcard-service` to show the student a friendly warning without crashing their active session.
+
+---
+
+## 4. Security & Identity Management
 
 Questly secures edge routing and services with an asymmetric **RS256 JWT** authentication model combined with **Google OAuth2** federated login.
 
-```
-┌──────┐          ┌──────────────┐          ┌──────────────┐          ┌──────────────────┐
-│ User │          │   gateway    │          │ auth-service │          │   user-service   │
-└──┬───┘          └──────┬───────┘          └──────┬───────┘          └────────┬─────────┘
-   │                     │                         │                           │
-   │ 1. POST /login      │                         │                           │
-   ├────────────────────>│────────────────────────>│                           │
-   │                     │                         │                           │
-   │ 2. Return Tokens    │                         │                           │
-   │    (RS256 signed)   │                         │                           │
-   │<────────────────────│<────────────────────────┤                           │
-   │                     │                         │                           │
-   │ 3. Fetch JWKS keys  │                         │                           │
-   │    (once/cached)    │                         │                           │
-   │                     ├────────────────────────>│                           │
-   │                     │<────────────────────────┤                           │
-   │                     │                         │                           │
-   │ 4. Request /users/me│                         │                           │
-   │    with Bearer Token│                         │                           │
-   ├────────────────────>│                         │                           │
-   │                     │ [Validates Signature]   │                           │
-   │                     │ [Injects X-User-Id]     │                           │
-   │                     ├─────────────────────────┼──────────────────────────>│
-   │                     │                         │                           │
-```
-
 ---
 
-### 🔑 3.1 Asymmetric RS256 JWT Authentication & JWKS
+### 🔑 4.1 Asymmetric RS256 JWT Authentication & JWKS
 
 1. **Token Generation (`auth-service`)**:
    - On a successful local password verification or Google OAuth2 callback, `auth-service` signs a JWT token using an asymmetric **Private RSA Key** (stored securely in Spring Cloud Config server).
@@ -253,21 +324,7 @@ Questly secures edge routing and services with an asymmetric **RS256 JWT** authe
      ```
 2. **Dynamic JWKS Endpoint**:
    - `auth-service` exposes public credentials dynamically at: `GET /api/auth/.well-known/jwks.json`
-   - Yields the RSA Public Key exponent and modulus parameters safely:
-     ```json
-     {
-       "keys": [
-         {
-           "kty": "RSA",
-           "use": "sig",
-           "alg": "RS256",
-           "kid": "questly-key-id",
-           "n": "u1W3b...[modulus]",
-           "e": "AQAB"
-         }
-       ]
-     }
-     ```
+   - Yields the RSA Public Key exponent and modulus parameters safely.
 3. **Gateway Signature Validation**:
    - The `gateway` intercepts all inbound resource requests. It is configured with a Spring Security `ReactiveJwtDecoder` pointing directly to the JWKS endpoint:
      ```yaml
@@ -285,51 +342,26 @@ Questly secures edge routing and services with an asymmetric **RS256 JWT** authe
 
 ---
 
-### 🌐 3.2 Google OAuth2 Login Sequence
+### 🔒 4.2 Google Drive Import Token Security & Gateway Masking
 
-Questly supports seamless Google Single Sign-On (SSO):
+To allow students to import Google Docs and Slides dynamically without risking credential leaks:
 
-```
-┌──────┐          ┌──────────┐          ┌──────────────┐          ┌──────────────┐          ┌────────┐
-│ User │          │ gateway  │          │ auth-service │          │ user-service │          │ Google │
-└──┬───┘          └────┬─────┘          └──────┬───────┘          └──────┬───────┘          └───┬────┘
-   │                   │                       │                         │                      │
-   │ 1. GET /oauth2/google                     │                         │                      │
-   ├──────────────────>│──────────────────────>│                                                │
-   │ 2. Redirect to Google Auth Page           │                                                │
-   │<──────────────────│<──────────────────────┤                                                │
-   │                                           │                                                │
-   │ 3. Authenticates & Grants Consent         │                                                │
-   ├───────────────────────────────────────────┼───────────────────────────────────────────────>│
-   │ 4. Callback /oauth2/callback?code=xxx     │                                                │
-   ├──────────────────>│──────────────────────>├───────────────────────────────────────────────>│
-   │                                           │ [Exchanges auth-code for Profile Details]      │
-   │                                           │                                                │
-   │                                           │ 5. user.registered Event (Kafka)               │
-   │                                           ├─────────────────────────┬─────────────────────>│
-   │                                           │                         │                      │
-   │                                           │                         ▼                      │
-   │                                           │                  [Creates Profile]             │
-   │ 6. Redirect back to UI with JWT Tokens    │                                                │
-   │<──────────────────│<──────────────────────┤                                                │
-```
-
-1. **Callback & Identity Mapping**:
-   - Google returns profile details (`sub`, `email`, `name`, `picture`).
-   - If the `email` does not exist in `db_auth.users`:
-     - Creates a user record with `provider='GOOGLE'`, `provider_id=sub`, and generating a random UUID as the internal `userId`.
-     - Publishes a `user.registered` event payload to Kafka containing the internal `userId`, `email`, `name`, and `picture` url.
-   - If the email *does* exist, updates `provider_id` (if changing authentication method) and retrieves the existing `userId`.
-2. **Token Issuance**:
-   - Generates a local access JWT and refresh token using the internal `userId`, redirecting the student back to the frontend dashboard.
+1. **Short-Lived Token Flow**:
+   - The frontend browser completes Google authentication, obtains a short-lived Google OAuth API access token, and passes it inside the **`X-Google-Access-Token`** header of the notebook import request.
+2. **Gateway Masking Security Constraint**:
+   - The Spring Cloud Gateway is configured with strict logging exclusions. The `X-Google-Access-Token` custom header is **explicitly masked, redacted, or excluded** from all API Gateway access logs, system tracers, and telemetry logs.
+3. **In-Memory Gating**:
+   - The token is propagated dynamically to the internal `notebook-service`.
+   - **Strict Volatile Memory Gating**: The `notebook-service` holds this token **strictly in volatile JVM heap memory** during the duration of the Google Drive API download request. It is **never logged**, **never cached** in Redis, and **never persisted** to PostgreSQL.
+   - Once the raw stream is safely downloaded to MinIO, the token is discarded from memory immediately.
 
 ---
 
-## 4. API Gateway & Discovery Routing
+## 5. API Gateway & Discovery Routing
 
 Spring Cloud Gateway acts as the secure, load-balanced entry boundary. It discovers routing coordinates from Eureka registry dynamically.
 
-### 🌐 4.1 Gateway Routing Configuration (`application.yml`)
+### 🌐 5.1 Gateway Routing Configuration (`application.yml`)
 
 ```yaml
 spring:
@@ -418,53 +450,35 @@ spring:
             - StripPrefix=0
 ```
 
-### 🛰️ 4.2 Security Gating Filter Rules
+### 🛰️ 5.2 Header Whitelisting Pass-Through (Timezone & SSO)
+- **Timezone Header Propagation**: The gateway is whitelisted to pass through custom headers. The student's local timezone (captured from browser) is passed in the request header **`X-User-Timezone`** (e.g. `America/New_York`). The gateway automatically propagates this header downstream to `user-service` to execute accurate timezone-aware streak calculations.
 - **Internal Paths Gating**: Global filter blocks any dynamic mapping paths containing `/internal/**`. This ensures `/internal/v1/ai/**` can only be routed from within the private Kubernetes namespace or local network loop.
 - **Gateway Filters**: Enforces a default global rate limiter based on the sliding-window algorithm backed by Redis.
 
 ---
 
-## 5. Local RAG Pipeline & ChromaDB Lifecycle
+## 6. Local RAG Pipeline & ChromaDB Lifecycle
 
 Questly uses a fully isolated, offline RAG pipeline utilizing local Ollama execution and LangChain4j abstractions.
 
-```
-       [ raw document ]
-              │
-              ▼ (Apache Tika Text Extractor)
-         [ raw text ]
-              │
-              ▼ (LangChain4j Document Splitter: 512 tokens / 64 overlap)
-         [ chunks ]
-              │
-              ▼ (nomic-embed-text via Ollama)
-        [ embeddings ]
-              │
-              ▼ (ChromaDB API V2 client)
-   [ Collection: notebook_{id} ]
-```
-
 ---
 
-### 📂 5.1 Document Ingestion Flow
-1. **Extraction**: `ai-service` receives document path, reads raw stream from MinIO, and parses file content using **Apache Tika** to extract clean string buffers.
-2. **Chunking**: Uses LangChain4j's `DocumentSplitters.recursive(512, 64, new GptBytePairEncoder())` to ensure semantic chunks are partitioned with overlaps to preserve contextual transitions.
-3. **Embeddings Generation**: Chunks are processed in batches via Ollama API mapping `nomic-embed-text` (producing 768-dimension coordinate arrays).
-4. **Isolated Vector Storage**:
+### 📂 6.1 Document Ingestion & Notebook-Scoped Deduplication
+1. **Deduplication Check**:
+   - To achieve complete storage and embedding idempotency, `notebook-service` generates a **SHA-256 hash** of the raw file byte stream upon receive.
+   - It queries `db_notebook.documents` for a duplicate hash matching **both** `file_hash` and the specific `notebook_id`.
+   - **Notebook-Scoped Bounds**: Deduplication is strictly notebook-level. If the same document is uploaded to two separate notebooks, it creates two separate entries and vector collections to preserve strict document boundaries and prevent RAG leaks.
+   - If a duplicate exists inside the *same* notebook, `notebook-service` returns the existing `documentId` immediately, skipping MinIO writes and vector indexing.
+2. **Extraction**: `ai-service` parses file content using **Apache Tika** to extract clean string buffers.
+3. **Chunking**: Uses LangChain4j's `DocumentSplitters.recursive(512, 64, new GptBytePairEncoder())` to chunk data.
+4. **Embeddings Generation**: Chunks are processed via Ollama using `nomic-embed-text` (producing 768-dimension arrays).
+5. **Isolated Vector Storage**:
    - Collections are partitioned per-notebook using naming schema: `notebook_{notebook_id}`.
    - **Strict Lazy Collection Lifecycle**: Collections are not created on empty notebook creation. Instead, the collection is instantiated strictly on the successful processing of the first document upload payload.
-   - **Chroma API Setup**:
-     ```java
-     ChromaEmbeddingStore store = ChromaEmbeddingStore.builder()
-         .apiVersion(ChromaApiVersion.V2)
-         .baseUrl("http://localhost:8000")
-         .collectionName("notebook_" + notebookId)
-         .build();
-     ```
 
 ---
 
-### 🔍 5.2 Retrieval & Grounded Query Execution
+### 🔍 6.2 Retrieval & Grounded Query Execution
 1. **Inquiry Validation**: When executing a query, `ai-service` runs a defensive fallback check. If the ChromaDB collection `notebook_{notebookId}` does not exist (e.g., student notebook has no files uploaded), it returns a standard grounded error response immediately without reaching out to Ollama: *"Please upload study documents to this notebook first."*
 2. **Context Compilation**:
    - Embeds user input question using `nomic-embed-text`.
@@ -490,11 +504,11 @@ Questly uses a fully isolated, offline RAG pipeline utilizing local Ollama execu
 
 ---
 
-## 6. Core Algorithmic Specs
+## 7. Core Algorithmic Specs
 
 Questly handles card learning schedules, prerequisite node locks, and XP ledger tracking using standardized algorithms.
 
-### 🗂️ 6.1 SM-2 Spaced Repetition Logic
+### 🗂️ 7.1 SM-2 Spaced Repetition Logic
 
 To calculate a student's optimal card review cycle, Questly implements the classic SM-2 scheduling algorithm.
 
@@ -525,17 +539,9 @@ To calculate a student's optimal card review cycle, Questly implements the class
 
 ---
 
-### 🌳 6.2 Skill Tree Unlock Logic (Prerequisite DAG)
+### 🌳 7.2 Skill Tree Unlock Logic (Prerequisite DAG)
 
 The skill tree is structured as a **Directed Acyclic Graph (DAG)**.
-
-```
-       [ Node A (Locked) ]
-             ▲     ▲
-      (Prereq)     (Prereq)
-             │     │
-      [ Node B ]  [ Node C ]
-```
 
 #### Graph Definition:
 - Each node $N$ possesses a collection of prerequisite UUIDs: $\text{prerequisites}(N) = \{P_1, P_2, \dots, P_k\}$
@@ -551,11 +557,11 @@ $$\text{prerequisites}(N) \subseteq C_U$$
 3. **Unlock Propagation**:
    - Queries all adjacent target nodes where the completed node was a prerequisite.
    - For each target node, checks the subset unlock rule $\text{prerequisites}(N) \subseteq C_U$.
-   - If satisfied, writes an unlock record to `user_skill_progress` and publishes a `notification.dispatch` request for the student.
+   - If satisfied, writes an unlock record to `user_skill_progress` and publishes a generic `notification.dispatch` event to alert the student.
 
 ---
 
-### 🏆 6.3 XP Rules Engine & Ledger Audit
+### 🏆 7.3 XP Rules Engine & Ledger Audit
 
 To maintain strict data integrity and prevent gamification hacking, XP totals are audited using double-entry ledger bookkeeping.
 
@@ -570,11 +576,34 @@ To maintain strict data integrity and prevent gamification hacking, XP totals ar
 
 #### Bookkeeping Design:
 1. **Source of Truth**: All XP increases are committed as immutable rows to `db_gamification.xp_ledger`.
-2. **Materialized View**: `db_user.user_stats.xp` is a materialized sum. It is updated asynchronously when the `gamification-service` evaluates a ledger entry and broadcasts a `xp.awarded` Kafka event. If discrepancies are suspected, a reconciliation job sums the ledger entries to overwrite the cache.
+2. **Materialized View**: `db_user.user_stats.xp` is a materialized sum updated asynchronously via `xp.awarded` Kafka events.
 
 ---
 
-## 7. Redis Caching Strategy
+### ⚔️ 7.4 Challenge Battle Duel Mechanics & Concurrency Gating
+
+To secure synchronized, real-time quiz battles while preventing concurrency locks:
+
+1. **Grounded Quiz Templates**:
+   - When a challenger invites an opponent, a quiz template is generated by `ai-service` and locked in the `db_gamification.challenges` record using foreign key **`quiz_id`**.
+   - This secures that both opponents answer the **exact same set of questions**, eliminating bias.
+2. **Asynchronous Execution & Synchronization**:
+   - The battle is executed in a turn-based, asynchronous manner within a 24-hour expiration window.
+   - Each player answers questions in their browser, submits the answers to `quiz-service`, and triggers a `quiz.completed` Kafka event carrying an optional **`challengeId`** parameter.
+3. **Battle Resolution Loop**:
+   - `gamification-service` consumes all `quiz.completed` events. If the event carries a `challengeId`:
+     - It fetches the active challenge record from `db_gamification.challenges`.
+     - Once **both** scores are committed in the DB, it compares overall scores.
+     - *Tie-Breaker Rule*: If scores are tied, the player who completed their quiz with the lowest duration in seconds (`duration_s` from event) is declared the winner.
+     - Updates `challenges.winner_id`, commits status to `COMPLETED`, and publishes `challenge.completed` to award the winner +150 XP and dispatch SSE notification banners.
+4. **Optimistic Concurrency Gating**:
+   - **Race Condition**: If both duelists submit their answers near-simultaneously, separate Kafka consumer threads will attempt to update the same challenge record.
+   - **Design**: The `challenges` table contains a **`version INT NOT NULL DEFAULT 0`** column. `gamification-service` utilizes standard **JPA Optimistic Locking** (`@Version` annotations on entities).
+   - If thread collision occurs, one update transaction succeeds while the other fails with a `MaxUploadSizeExceededException` or `OptimisticLockingFailureException`. The failing thread retries automatically (via dynamic Spring `@Retryable` logic) to safely re-read the updated record and complete duel resolution cleanly.
+
+---
+
+## 8. Redis Caching Strategy
 
 Questly uses a high-performance Redis container to cache transient user statistics, streak counters, and live duel states.
 
@@ -588,11 +617,35 @@ Questly uses a high-performance Redis container to cache transient user statisti
 
 ---
 
-## 8. Kafka Event Choreography Flows
+## 9. Inter-Service Communication Matrix
+
+To prevent dynamic coupling and ensure clear integration layers, the system relies on specific inter-service contracts:
+
+| Origin Service | Target Service | Interaction Type | Protocol | Trigger Condition / Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| `gateway` | *All Services* | Outbound Edge Routing | HTTP REST | Incoming user calls routed dynamically using Eureka registry `lb://` maps |
+| `notebook-service` | `ai-service` | Synchronous Extraction | HTTP REST | `POST /internal/v1/ai/embed` — Ingest and vectorize files synchronously |
+| `notebook-service` | `ai-service` | Synchronous RAG | HTTP REST | `POST /internal/v1/ai/query` — Ground Q&A query using ChromaDB context |
+| `notebook-service` | `ai-service` | Synchronous Summarize | HTTP REST | `POST /internal/v1/ai/summarize` — Generate condensed summary of documents |
+| `quiz-service` | `ai-service` | Synchronous Quiz Gen | HTTP REST | `POST /internal/v1/ai/generate/quiz` — Request structured JSON quiz questions |
+| `flashcard-service` | `ai-service` | Synchronous Card Gen | HTTP REST | `POST /internal/v1/ai/generate/flashcards` — Request structured study flashcards |
+| `assignment-service` | `ai-service` | Synchronous Grading | HTTP REST | `POST /internal/v1/ai/grade` — Grade submission text against evaluation rubric |
+| `assignment-service` | `Kafka Broker` | Asynchronous Submit | Kafka Event | Publishes `assignment.submitted` on student submission |
+| `assignment-service` | `assignment-svc` | Event Self-Consumption | Kafka Event | Consumes own `assignment.submitted` event to run sync REST calls to `ai-service` |
+| `notebook-service` | `Kafka Broker` | Asynchronous Event | Kafka Event | Publishes `document.uploaded` on success; `document.deleted` on deletion |
+| `notebook-service` | `Kafka Broker` | Asynchronous Fail Alert | Kafka Event | Publishes generic `notification.dispatch` to alert user of PDF parsing failures |
+| `quiz-service` | `Kafka Broker` | Asynchronous Attempt | Kafka Event | Publishes `quiz.completed` event carrying final score and optional `challengeId` |
+| `flashcard-service` | `Kafka Broker` | Asynchronous Review | Kafka Event | Publishes `flashcard.reviewed` carrying SM-2 schedule configurations |
+| `gamification-service` | `Kafka Broker` | Asynchronous Events | Kafka Event | Publishes `xp.awarded`, `badge.earned`, `challenge.completed` events |
+| `gamification-service` | `gamification-svc` | Event Self-Consumption | Kafka Event | Consumes own `challenge.completed` event to resolve duel winner XP rewards |
+
+---
+
+## 10. Kafka Event Choreography Flows
 
 Questly relies on Kafka event choreography to handle complex asynchronous operations, decoupled notifications, and analytics pipelines.
 
-### 🖼️ 8.1 Core Choreography Diagrams
+### 🖼️ 10.1 Core Choreography Diagrams
 
 #### Ingestion & Vector Embedding Workflow:
 
@@ -607,7 +660,8 @@ sequenceDiagram
     participant Chroma as Chroma VectorDB
 
     Student->>NotebookSvc: POST /api/notebooks/{id}/documents (file)
-    Note over NotebookSvc: Validate size & format
+    Note over NotebookSvc: Generate SHA-256 byte Hash
+    Note over NotebookSvc: Notebook-level Deduplication check
     NotebookSvc->>MinIOSvc: Save file (documents/{uuid}.pdf)
     NotebookSvc->>NotebookSvc: Commit record with status='PROCESSING'
     NotebookSvc-->>Student: Return doc details (status='PROCESSING')
@@ -625,6 +679,30 @@ sequenceDiagram
     
     Kafka-->>NotebookSvc: Consume document.embedded
     Note over NotebookSvc: Update DB status to 'READY'
+```
+
+#### Ingestion Failures Alert Workflow (Generic `notification.dispatch` Routing):
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student
+    participant NotebookSvc as notebook-service
+    participant Kafka as Kafka Broker
+    participant AISvc as ai-service
+    participant NotifSvc as notification-service
+
+    NotebookSvc->>AISvc: POST /internal/v1/ai/embed
+    Note over AISvc: Tika parsing fails (corrupt PDF)
+    AISvc-->>NotebookSvc: Return HTTP REST response status='FAILED'
+    
+    NotebookSvc->>NotebookSvc: Update document status='FAILED' directly in Postgres
+    
+    NotebookSvc->>Kafka: Publish generic notification.dispatch event (type='DOCUMENT_FAILED')
+    
+    Kafka-->>NotifSvc: Consume notification.dispatch (Sole Consumer Group)
+    Note over NotifSvc: Write alert to db_notification.notifications
+    NotifSvc-->>Student: SSE real-time stream push notification update
 ```
 
 #### Vector Purging Workflow (Document Deletion):
@@ -690,7 +768,7 @@ sequenceDiagram
     end
 ```
 
-#### Challenge Self-Consumption Workflow:
+#### Challenge Self-Consumption & Correlation Workflow:
 
 ```mermaid
 sequenceDiagram
@@ -707,7 +785,8 @@ sequenceDiagram
     
     Note over GamifySvc: Both players complete quiz battle...
     Note over GamifySvc: Challenge ends, evaluate scores
-    GamifySvc->>GamifySvc: Write winner_id & complete status
+    Note over GamifySvc: Concurrency Gating: JPA @Version check
+    GamifySvc->>GamifySvc: Write winner_id, increment version, complete status
     
     GamifySvc->>Kafka: Publish challenge.completed event
     
@@ -721,6 +800,6 @@ sequenceDiagram
         Note over AnalyticsSvc: Record platform duel stats
     and Alerts Dispatch
         Kafka-->>NotifSvc: Consume challenge.completed
-        Note over NotifSvc: Save final results in db_notification, dispatch duel finish banner
+        Note over NotifSvc: Save final results in db_notification, dispatch duel finish banner via SSE
     end
 ```

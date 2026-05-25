@@ -361,15 +361,19 @@
 | `user.registered` | auth-service | user-service, notification-service | userId, email, role |
 | `document.uploaded` | notebook-service | ai-service | documentId, minioPath, notebookId |
 | `document.embedded` | ai-service | notebook-service | documentId, chunkCount, collectionId |
-| `quiz.completed` | quiz-service | analytics-service, gamification-service | userId, quizId, score, wrongTopics |
+| `document.deleted` | notebook-service | ai-service | documentId, notebookId, collectionId |
+| `quiz.completed` | quiz-service | analytics-service, gamification-service | userId, quizId, score, wrongTopics, challengeId |
 | `flashcard.reviewed` | flashcard-service | analytics-service, gamification-service | userId, cardId, rating, nextReview |
-| `assignment.submitted` | assignment-service | ai-service | submissionId, content, rubric |
-| `assignment.graded` | ai-service | assignment-service, notification-service | submissionId, grade, feedback |
+| `assignment.submitted` | assignment-service | assignment-service | submissionId, assignmentId, userId, content, rubric |
+| `assignment.graded` | ai-service | assignment-service, notification-service | submissionId, userId, grade, feedback |
 | `module.completed` | course-service | gamification-service, analytics-service | userId, courseId, moduleId |
-| `challenge.completed` | gamification-service | user-service, notification-service | userId, challengeId, result |
-| `practice.solved` | practice-service | gamification-service, analytics-service | userId, problemId, status |
+| `challenge.accepted` | gamification-service | notification-service | challengeId, challengerId, opponentId |
+| `challenge.rejected` | gamification-service | notification-service | challengeId, challengerId, opponentId |
+| `challenge.completed` | gamification-service | gamification-service, analytics-service, notification-service | challengeId, challengerId, opponentId, winnerId |
+| `practice.solved` | practice-service | gamification-service, analytics-service | userId, itemId, listId, difficulty |
 | `xp.awarded` | gamification-service | user-service | userId, amount, reason |
 | `badge.earned` | gamification-service | user-service, notification-service | userId, badgeId |
+| `notification.dispatch` | notebook-service, gamification-service | notification-service | userId, title, body, type, refId |
 
 ---
 

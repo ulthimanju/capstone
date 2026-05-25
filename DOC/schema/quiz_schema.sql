@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     score           DECIMAL(5,2) NOT NULL,
     total_questions INT NOT NULL,
     wrong_topic_ids TEXT[],                          -- array of topic labels for weak spots
+    challenge_id    UUID,                            -- references db_gamification.challenges.id
     completed_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -50,4 +51,5 @@ CREATE INDEX IF NOT EXISTS idx_quizzes_notebook_id ON quizzes(notebook_id);
 CREATE INDEX IF NOT EXISTS idx_quizzes_user_id ON quizzes(user_id);
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_quiz_id ON quiz_attempts(quiz_id);
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_id ON quiz_attempts(user_id);
+CREATE INDEX IF NOT EXISTS idx_quiz_attempts_challenge_id ON quiz_attempts(challenge_id);
 CREATE INDEX IF NOT EXISTS idx_weak_spots_user_notebook ON weak_spots(user_id, notebook_id);

@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS challenges (
     opponent_id   UUID NOT NULL,                      -- maps to db_auth.users.id
     status        VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING | ACCEPTED | REJECTED | ACTIVE | COMPLETED
     winner_id     UUID,                               -- maps to db_auth.users.id
+    version       INT NOT NULL DEFAULT 0,              -- Version column for optimistic locking protection
     created_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

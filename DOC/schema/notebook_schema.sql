@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS documents (
     name        VARCHAR(255) NOT NULL,
     format      VARCHAR(20) NOT NULL,               -- PDF | MD | TXT | GDOC | GSLIDE
     minio_path  TEXT NOT NULL,
+    file_hash   VARCHAR(64),                        -- SHA-256 for notebook-scoped deduplication
     word_count  INT,
     status      VARCHAR(20) NOT NULL DEFAULT 'PROCESSING', -- PROCESSING | READY | FAILED
     created_at  TIMESTAMP NOT NULL DEFAULT NOW()
@@ -26,5 +27,7 @@ CREATE TABLE IF NOT EXISTS documents (
 
 -- Index to optimize fetching all documents for a notebook
 CREATE INDEX IF NOT EXISTS idx_documents_notebook_id ON documents(notebook_id);
+-- Index to optimize notebook-level SHA-256 deduplication
+CREATE INDEX IF NOT EXISTS idx_documents_file_hash ON documents(notebook_id, file_hash);
 -- Index to optimize querying notebooks owned by a specific user
 CREATE INDEX IF NOT EXISTS idx_notebooks_user_id ON notebooks(user_id);

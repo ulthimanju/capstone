@@ -329,13 +329,14 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 
 ### Notification Service `:8092`
 
-> Primarily a Kafka consumer. Exposes one REST endpoint for frontend notification retrieval.
+> Primarily a Kafka consumer. Exposes REST endpoints for frontend notification retrieval and active streaming.
 
 **REST Endpoints:**
 
 | Method | Endpoint | Role | Description |
 |---|---|---|---|
 | GET | `/api/notifications` | STUDENT/TUTOR/ADMIN | Get own notifications (paginated) |
+| GET | `/api/notifications/stream` | STUDENT/TUTOR/ADMIN | Establishes a persistent real-time Server-Sent Events (SSE) stream, backed by Redis Pub/Sub |
 | PATCH | `/api/notifications/{id}/read` | STUDENT/TUTOR/ADMIN | Mark notification as read |
 | PATCH | `/api/notifications/read-all` | STUDENT/TUTOR/ADMIN | Mark all notifications as read |
 
@@ -348,6 +349,7 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 | `badge.earned` | Notify student of new badge |
 | `challenge.accepted` | Notify challenger that opponent accepted |
 | `challenge.completed` | Notify both participants of result |
+| `notification.dispatch` | Save custom alert to DB and push to browser SSE stream |
 
 ---
 
@@ -361,7 +363,7 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 | `document.deleted` | notebook-service | ai-service | Document deleted — purge ChromaDB chunks |
 | `quiz.completed` | quiz-service | analytics-service, gamification-service | Student submits quiz |
 | `flashcard.reviewed` | flashcard-service | analytics-service, gamification-service | Student rates a flashcard |
-| `assignment.submitted` | assignment-service | ai-service | Student submits assignment |
+| `assignment.submitted` | assignment-service | assignment-service | Student submits assignment |
 | `assignment.graded` | ai-service | assignment-service, notification-service | AI grading complete |
 | `module.completed` | course-service | gamification-service, analytics-service | Student completes module |
 | `practice.solved` | practice-service | gamification-service, analytics-service | Student marks problem solved |
@@ -370,6 +372,7 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 | `challenge.accepted` | gamification-service | notification-service | Opponent accepts challenge |
 | `challenge.rejected` | gamification-service | notification-service | Opponent rejects challenge |
 | `challenge.completed` | gamification-service | gamification-service, analytics-service, notification-service | Challenge ends |
+| `notification.dispatch` | notebook-service, gamification-service | notification-service | Custom in-app alert or notification trigger |
 
 ---
 
@@ -389,7 +392,7 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 { "documentId": "uuid", "notebookId": "uuid", "userId": "uuid", "collectionId": "notebook_uuid", "timestamp": "..." }
 
 // quiz.completed
-{ "userId": "uuid", "quizId": "uuid", "score": 80.0, "totalQuestions": 10, "wrongTopics": ["..."], "timestamp": "..." }
+{ "userId": "uuid", "quizId": "uuid", "score": 80.0, "totalQuestions": 10, "wrongTopics": ["..."], "challengeId": "uuid | null", "timestamp": "..." }
 
 // flashcard.reviewed
 { "userId": "uuid", "flashcardId": "uuid", "rating": 4, "nextReview": "2026-05-27", "timestamp": "..." }
@@ -420,4 +423,7 @@ Response: [{ "topic": "Arrays", "studyTimeSecs": 3200, "avgScore": 85.0 }]
 
 // challenge.completed
 { "challengeId": "uuid", "challengerId": "uuid", "opponentId": "uuid", "winnerId": "uuid", "timestamp": "..." }
+
+// notification.dispatch
+{ "userId": "uuid", "title": "...", "body": "...", "type": "DOCUMENT_FAILED | SKILL_TREE_UNLOCKED | ...", "refId": "uuid | null", "timestamp": "..." }
 ```
