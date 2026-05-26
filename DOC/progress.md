@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 42 |
+| Completed | 55 |
 | In Progress | 0 |
-| Pending | 70 |
-| Overall Completion | 37.5% |
+| Pending | 57 |
+| Overall Completion | 49.1% |
 
 ---
 
@@ -27,7 +27,7 @@
 |---|---|---|---|---|---|
 | 📌 Phase 1 — Requirements Gathering | ✅ Complete | 2026-05-24 | 28 | 28 | 100% |
 | 🏗️ Phase 2 — System Design & Architecture | ✅ Complete | 2026-06-07 | 14 | 14 | 100% |
-| 🔧 Phase 3 — Core Infrastructure Setup | ⏳ Pending | 2026-06-14 | 0 | 13 | 0% |
+| 🔧 Phase 3 — Core Infrastructure Setup | ✅ Complete | 2026-06-14 | 13 | 13 | 100% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
 | 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ⏳ Pending | 2026-07-10 | 0 | 8 | 0% |
 | 🚀 Sprint 3 — Courses + Practice + Skill Tree | ⏳ Pending | 2026-07-18 | 0 | 8 | 0% |
@@ -145,25 +145,26 @@
 
 > **Goal**: Bootstrap all services so development can begin immediately with a working local environment.
 
-**Status**: ⏳ Pending
-**Target**: 2026-06-14
-**Progress**: 0 / 13 tasks complete
+**Status**: ✅ Complete
+**Started**: 2026-05-25
+**Completed**: 2026-05-26
+**Progress**: 13 / 13 tasks complete (100%)
 
-| # | Task | Priority | Verification |
-|---|---|---|---|
-| 1 | Initialize Git monorepo structure | 🔴 High | `git log` shows initial commit |
-| 2 | Set up React 19 + Vite frontend project | 🔴 High | `npm run dev` runs on :5173 |
-| 3 | Set up Spring Boot parent POM (multi-module Maven) | 🔴 High | `mvn clean install` passes |
-| 4 | Configure Docker Compose (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Ollama, Zipkin) | 🔴 High | `docker compose up` all healthy |
-| 5 | Set up Spring Cloud Config Server | 🟡 Medium | Config server on :8888 |
-| 6 | Set up Spring Cloud Eureka Server | 🔴 High | Eureka dashboard on :8761 |
-| 7 | Set up Spring Cloud Gateway | 🔴 High | Gateway on :8080 routes correctly |
-| 8 | Configure RS256 JWT issuer and validator | 🔴 High | Token issued and validated end-to-end |
-| 9 | Set up GitHub Actions CI pipeline | 🟡 Medium | PR triggers build + test |
-| 10 | Configure Prometheus + Grafana | 🟢 Low | Metrics visible on :3000 |
-| 11 | Set up Zipkin + Micrometer tracing | 🟢 Low | Traces visible on :9411 |
-| 12 | Verify Ollama models running | 🔴 High | `ollama list` shows all 4 models |
-| 13 | Verify full local stack startup | 🔴 High | All services UP in Docker Compose |
+| # | Task | Priority | Verification | Status |
+|---|---|---|---|---|
+| 1 | Initialize Git monorepo structure | 🔴 High | `git log` shows initial commit | ✅ Done |
+| 2 | Set up React 19 + Vite frontend project | 🔴 High | `npm run dev` runs on :5173 | ✅ Done |
+| 3 | Set up Spring Boot parent POM (multi-module Maven) | 🔴 High | `mvn clean install` passes | ✅ Done |
+| 4 | Configure Docker Compose (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Ollama, Zipkin) | 🔴 High | `docker compose up` all healthy | ✅ Done |
+| 5 | Set up Spring Cloud Config Server | 🟡 Medium | Config server on :8888 | ✅ Done |
+| 6 | Set up Spring Cloud Eureka Server | 🔴 High | Eureka dashboard on :8761 | ✅ Done |
+| 7 | Set up Spring Cloud Gateway | 🔴 High | Gateway on :8080 routes correctly | ✅ Done |
+| 8 | Configure RS256 JWT issuer and validator | 🔴 High | Token issued and validated end-to-end | ✅ Done |
+| 9 | Set up GitHub Actions CI pipeline | 🟡 Medium | PR triggers build + test | ✅ Done |
+| 10 | Configure Prometheus + Grafana | 🟢 Low | Metrics visible on :3000 | ✅ Done |
+| 11 | Set up Zipkin + Micrometer tracing | 🟢 Low | Traces visible on :9411 | ✅ Done |
+| 12 | Verify Ollama models running | 🔴 High | `ollama list` shows all 4 models | ✅ Done |
+| 13 | Verify full local stack startup | 🔴 High | All services UP in Docker Compose | ✅ Done |
 
 ---
 
@@ -301,7 +302,7 @@
 |---|---|---|---|---|
 | Phase 1 — Requirements | 28 | 28 | 0 | ✅ Complete |
 | Phase 2 — Design | 14 | 14 | 0 | ✅ Complete |
-| Phase 3 — Infrastructure | 13 | 0 | — | Not started |
+| Phase 3 — Infrastructure | 13 | 13 | 0 | ✅ Complete |
 | Sprint 1 | 10 | 0 | — | Not started |
 | Sprint 2 | 8 | 0 | — | Not started |
 | Sprint 3 | 8 | 0 | — | Not started |
@@ -409,4 +410,4 @@
 
 ---
 
-*Last Updated: 2026-05-24 | Phase 1: ✅ Complete | Next: Phase 2 — System Design & Architecture*
+*Last Updated: 2026-05-26 | Phase 3: ✅ Complete | Next: Sprint 1 — Auth + Document Upload + RAG Core*

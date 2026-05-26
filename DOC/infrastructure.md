@@ -17,7 +17,8 @@ questly/
 │   ├── analytics-service/
 │   ├── notification-service/
 │   ├── config-server/
-│   └── discovery-server/
+│   ├── discovery-server/
+│   └── logs/            <-- Contains microservice runtime stdout/stderr logs and process PID files
 ├── frontend/
 ├── DOC/
 │   ├── LLD.md
@@ -40,5 +41,7 @@ Each service has:
 - Own `application.yml`
 - Own `Dockerfile`
 - Own database schema
+
+The `services/logs/` directory contains active standard output files and `.pid` tracking files for service orchestrator lifecycle mapping.
 
 Root has a parent `pom.xml` managing all services together.
