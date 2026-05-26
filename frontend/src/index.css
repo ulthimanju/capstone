@@ -167,10 +167,16 @@ body {
 }
 
 /* ── Focus ring utility ── */
-*:focus-visible {
+*:focus-visible:not(input):not(textarea):not(select) {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
   border-radius: var(--radius-md);
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
 }
 
 /* ── Custom scrollbar ── */

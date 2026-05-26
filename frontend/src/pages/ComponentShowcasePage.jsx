@@ -24,6 +24,7 @@ import StatusBadge from '../components/ui/StatusBadge';
 import FormatBadge from '../components/ui/FormatBadge';
 import XPBadge from '../components/ui/XPBadge';
 import BadgeIcon from '../components/ui/BadgeIcon';
+import BadgeStack from '../components/ui/BadgeStack';
 import Toast from '../components/ui/Toast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import EmptyState from '../components/ui/EmptyState';
@@ -252,6 +253,38 @@ export default function ComponentShowcasePage() {
             <BadgeIcon icon="🏆" label="Champion" earned={true} />
             <BadgeIcon icon="🎯" label="Sharpshooter" earned={true} />
             <BadgeIcon icon="🔥" label="On Fire" earned={false} />
+          </div>
+        </SubSection>
+        <SubSection title="Stacked Achievements / Avatars (BadgeStack)">
+          <div className="flex flex-wrap items-center gap-8">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-text-muted uppercase">Avatar Stack (Max 3)</span>
+              <BadgeStack
+                items={[
+                  { id: 1, label: 'Alex Chen', image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80' },
+                  { id: 2, label: 'Sarah Kim', image: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=80&h=80&q=80' },
+                  { id: 3, label: 'Raj Patel', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80' },
+                  { id: 4, label: 'John Doe', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80' },
+                  { id: 5, label: 'Emily Watson', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80' },
+                ]}
+                max={3}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-text-muted uppercase">Achievement Stack (Max 4)</span>
+              <BadgeStack
+                items={[
+                  { id: 1, label: 'Champion', icon: '🏆' },
+                  { id: 2, label: 'Sharpshooter', icon: '🎯' },
+                  { id: 3, label: 'On Fire', icon: '🔥' },
+                  { id: 4, label: 'Bookworm', icon: '📚' },
+                  { id: 5, label: 'Speed Demon', icon: '⚡' },
+                  { id: 6, label: 'Big Brain', icon: '🧠' },
+                ]}
+                max={4}
+                size="lg"
+              />
+            </div>
           </div>
         </SubSection>
       </Section>
