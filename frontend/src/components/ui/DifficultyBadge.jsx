@@ -5,7 +5,7 @@
  */
 
 const difficultyConfig = {
-  EASY:   { classes: 'bg-success-muted text-brand',   label: 'Easy' },
+  EASY:   { classes: 'bg-success-muted text-success',   label: 'Easy' },
   MEDIUM: { classes: 'bg-warning-muted text-warning',  label: 'Medium' },
   HARD:   { classes: 'bg-danger-muted text-danger',    label: 'Hard' },
 };

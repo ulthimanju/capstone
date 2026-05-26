@@ -1,3 +1,5 @@
+import StatusBadge from '../ui/StatusBadge';
+
 /**
  * DocumentListItem — Horizontal row card for document entries.
  *
@@ -17,15 +19,20 @@ export default function DocumentListItem({ name, format, status, onDelete, onCli
     TXT: 'bg-accent-blue-muted text-accent-blue',
   };
 
-  /** Status dot colors */
-  const statusColors = {
-    ready: 'bg-brand',
-    processing: 'bg-warning',
-    error: 'bg-danger',
+  const getStatusType = (statusStr) => {
+    switch (statusStr?.toLowerCase()) {
+      case 'ready':
+        return 'success';
+      case 'processing':
+        return 'warning';
+      case 'error':
+        return 'error';
+      default:
+        return 'neutral';
+    }
   };
 
   const formatClass = formatColors[format?.toUpperCase()] || 'bg-surface-elevated text-text-muted';
-  const statusDotColor = statusColors[status?.toLowerCase()] || 'bg-text-muted';
 
   return (
     <div
@@ -54,10 +61,9 @@ export default function DocumentListItem({ name, format, status, onDelete, onCli
 
       {/* Status badge */}
       {status && (
-        <span className="inline-flex items-center gap-1.5 text-xs text-text-muted flex-shrink-0 mr-2">
-          <span className={`w-1.5 h-1.5 rounded-full ${statusDotColor}`} />
+        <StatusBadge status={getStatusType(status)} className="mr-2 flex-shrink-0">
           {status}
-        </span>
+        </StatusBadge>
       )}
 
       {/* Delete icon (visible on hover) */}

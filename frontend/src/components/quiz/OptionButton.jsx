@@ -30,7 +30,7 @@ export default function OptionButton({
   let icon = null;
 
   if (correct === true) {
-    stateClasses = 'bg-success-muted border-brand text-brand';
+    stateClasses = 'bg-success-muted border-success text-success';
     hoverClasses = '';
     icon = (
       <svg className="w-4 h-4 shrink-0" viewBox="0 0 16 16" fill="currentColor">

@@ -5,7 +5,7 @@
  */
 
 const variantClasses = {
-  success: 'bg-success-muted text-brand',
+  success: 'bg-success-muted text-success',
   warning: 'bg-warning-muted text-warning',
   danger: 'bg-danger-muted text-danger',
   neutral: 'bg-surface-elevated text-text-muted',

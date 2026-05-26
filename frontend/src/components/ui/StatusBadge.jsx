@@ -5,7 +5,7 @@
  */
 
 const statusConfig = {
-  success: { bg: 'bg-success-muted', text: 'text-brand',        dot: 'bg-brand' },
+  success: { bg: 'bg-success-muted', text: 'text-success',        dot: 'bg-success' },
   warning: { bg: 'bg-warning-muted', text: 'text-warning',      dot: 'bg-warning' },
   error:   { bg: 'bg-danger-muted',  text: 'text-danger',       dot: 'bg-danger' },
   neutral: { bg: 'bg-surface-elevated', text: 'text-text-muted', dot: 'bg-text-muted' },

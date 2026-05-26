@@ -6,7 +6,7 @@
 
 const roleConfig = {
   STUDENT: { classes: 'bg-accent-blue-muted text-accent-blue', label: 'Student' },
-  TUTOR:   { classes: 'bg-success-muted text-brand',           label: 'Tutor' },
+  TUTOR:   { classes: 'bg-success-muted text-success',           label: 'Tutor' },
   ADMIN:   { classes: 'bg-accent-purple-muted text-accent-purple', label: 'Admin' },
 };
 

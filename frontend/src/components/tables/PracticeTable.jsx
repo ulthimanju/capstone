@@ -1,7 +1,7 @@
 import DataTable from './DataTable';
 
 const DIFFICULTY_STYLES = {
-  easy: 'bg-success-muted text-brand',
+  easy: 'bg-success-muted text-success',
   medium: 'bg-warning-muted text-warning',
   hard: 'bg-danger-muted text-danger',
 };
@@ -11,7 +11,7 @@ const STATUS_CYCLE = ['UNSOLVED', 'ATTEMPTED', 'SOLVED'];
 const STATUS_DOT_STYLES = {
   UNSOLVED: 'bg-border',
   ATTEMPTED: 'bg-warning',
-  SOLVED: 'bg-brand',
+  SOLVED: 'bg-success',
 };
 
 /**

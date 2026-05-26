@@ -83,7 +83,7 @@ export default function SkillTreeCanvas({
               orient="auto"
               markerUnits="strokeWidth"
             >
-              <polygon points="0 0, 8 3, 0 6" fill="#3ecf8e" />
+              <polygon points="0 0, 8 3, 0 6" fill="#3b82f6" />
             </marker>
           </defs>
 

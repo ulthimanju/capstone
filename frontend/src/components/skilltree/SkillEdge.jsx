@@ -3,7 +3,7 @@
  *
  * Renders a directional edge with an arrowhead marker.
  * - **locked**: dim border-colored stroke
- * - **unlocked**: brand-colored stroke with a green glow
+ * - **unlocked**: brand-colored stroke with a blue glow
  *
  * @param {object}  props
  * @param {{ x: number, y: number }} props.from – Start coordinates
@@ -34,7 +34,7 @@ export default function SkillEdge({
         >
           <polygon
             points="0 0, 8 3, 0 6"
-            fill={unlocked ? '#3ecf8e' : '#2a2a2a'}
+            fill={unlocked ? '#3b82f6' : '#2a2a2a'}
           />
         </marker>
       </defs>
@@ -44,12 +44,12 @@ export default function SkillEdge({
         y1={from.y}
         x2={to.x}
         y2={to.y}
-        stroke={unlocked ? '#3ecf8e' : '#2a2a2a'}
+        stroke={unlocked ? '#3b82f6' : '#2a2a2a'}
         strokeWidth={2}
         markerEnd={`url(#${markerId})`}
         filter={
           unlocked
-            ? 'drop-shadow(0 0 4px rgba(62,207,142,0.4))'
+            ? 'drop-shadow(0 0 4px rgba(59,130,246,0.4))'
             : undefined
         }
         className={className}

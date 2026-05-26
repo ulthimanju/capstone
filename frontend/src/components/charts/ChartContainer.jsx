@@ -10,7 +10,7 @@ export const CHART_THEME = {
   gridDash: '3 3',
   tooltipBg: '#1c1c1c',
   tooltipBorder: '#2a2a2a',
-  primaryColor: '#3ecf8e',
+  primaryColor: '#3b82f6',
   secondaryColor: '#3e9acf',
   tertiaryColor: '#cf3e8e',
   axisColor: '#8c8c8c',

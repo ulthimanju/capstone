@@ -29,7 +29,7 @@ export default function AssignmentCard({ title, status, grade, dueDate, classNam
 
   /** Status badge styles */
   const statusBadge = {
-    GRADED: 'bg-success-muted text-brand',
+    GRADED: 'bg-success-muted text-success',
     SUBMITTED: 'bg-accent-blue-muted text-accent-blue',
     PENDING: 'bg-surface-elevated text-text-muted',
   };
