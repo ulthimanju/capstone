@@ -1,1 +1,227 @@
+/* ── Google Fonts (must come before tailwindcss import) ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 @import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════
+   QUESTLY DESIGN SYSTEM — Supabase-Inspired Dark Theme
+   ══════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Color Tokens ── */
+  --color-bg:               #0f0f0f;
+  --color-surface:          #1c1c1c;
+  --color-surface-elevated: #222222;
+  --color-surface-sidebar:  #141414;
+  --color-surface-warm:     #201a1a;
+
+  --color-brand:            #3ecf8e;
+  --color-brand-hover:      #4ade9a;
+  --color-brand-dark:       #2eb87a;
+  --color-brand-muted:      #1a2a24;
+
+  --color-text-primary:     #ededed;
+  --color-text-muted:       #8c8c8c;
+  --color-text-disabled:    #555555;
+
+  --color-danger:           #f04438;
+  --color-danger-muted:     #450a0a;
+  --color-warning:          #f79009;
+  --color-warning-muted:    #431407;
+  --color-success:          #3ecf8e;
+  --color-success-muted:    #14532d;
+
+  --color-border:           #2a2a2a;
+  --color-border-hover:     #3a3a3a;
+
+  --color-focus-ring:       rgba(62, 207, 142, 0.3);
+  --color-brand-glow:       rgba(62, 207, 142, 0.05);
+  --color-brand-focus-glow: rgba(62, 207, 142, 0.2);
+
+  /* Accent palette for charts & badges */
+  --color-accent-blue:       #3e9acf;
+  --color-accent-blue-muted:  #1a2a3a;
+  --color-accent-pink:       #cf3e8e;
+  --color-accent-purple:     #8b5cf6;
+  --color-accent-purple-muted: #1a1a3a;
+
+  /* Rank colors */
+  --color-gold:   #fbbf24;
+  --color-silver: #94a3b8;
+  --color-bronze: #d97706;
+
+  /* ── Typography ── */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  --text-xs:  0.75rem;
+  --text-sm:  0.875rem;
+  --text-base: 0.875rem;
+  --text-lg:  1rem;
+  --text-xl:  1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* ── Spacing ── */
+  --spacing-0: 0px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* ── Radius ── */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-card:    0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-modal:   0 8px 30px rgba(0, 0, 0, 0.6);
+  --shadow-tooltip: 0 4px 12px rgba(0, 0, 0, 0.5);
+
+  /* ── Animations ── */
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
+  --animate-pulse-brand: pulse-brand 2s ease-in-out infinite;
+  --animate-shake: shake 0.4s ease-in-out;
+  --animate-shrink-width: shrink-width linear;
+  --animate-flip: flip 0.4s ease-in-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(100%); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes pulse-brand {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(3px); }
+  }
+
+  @keyframes shrink-width {
+    from { width: 100%; }
+    to   { width: 0%; }
+  }
+
+  @keyframes flip {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(180deg); }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   BASE / GLOBAL STYLES
+   ══════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: var(--color-brand);
+  color: var(--color-bg);
+}
+
+/* ── Focus ring utility ── */
+*:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* ── Global transition defaults ── */
+a, button, input, select, textarea {
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* ── Skeleton shimmer utility ── */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-surface-elevated) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Flashcard 3D flip support ── */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
