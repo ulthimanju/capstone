@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>com.questly</groupId>
+    <artifactId>questly-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Questly Parent POM</name>
+    <description>Root multi-module parent POM managing all Questly backend microservices</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
+    </properties>
+
+    <modules>
+        <!-- Core Infrastructure Servers -->
+        <module>services/config-server</module>
+        <module>services/discovery-server</module>
+        <module>services/gateway</module>
+
+        <!-- Backend Functional Microservices -->
+        <module>services/auth-service</module>
+        <module>services/user-service</module>
+        <module>services/notebook-service</module>
+        <module>services/quiz-service</module>
+        <module>services/flashcard-service</module>
+        <module>services/course-service</module>
+        <module>services/assignment-service</module>
+        <module>services/practice-service</module>
+        <module>services/ai-service</module>
+        <module>services/gamification-service</module>
+        <module>services/analytics-service</module>
+        <module>services/notification-service</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Cloud Bills of Materials (BOM) -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Spring Boot Maven Plugin for generating executable fat JARs -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

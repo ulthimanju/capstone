@@ -1,0 +1,60 @@
+# Shared Defaults for all Questly Microservices
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  # Database Connections Default (Individual service overrides only database name)
+  datasource:
+    username: postgres
+    password: postgrespassword
+    driver-class-name: org.postgresql.Driver
+    # Spring Boot JPA Default setup
+    jpa:
+      hibernate:
+        ddl-auto: validate
+      show-sql: false
+
+  # Redis Default Connection Properties
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# JWT RS256 Token Configuration Parameters
+auth:
+  jwt:
+    # 2048-bit RSA Private Key base64 string for token signing
+    private-key: >
+      MIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQDrq6jnbtxH4Gn0bjHPf6o74MVWaB
+      g+lOYiC6gQM/xeibukFYtz45AuqQ6/JLnrsbuq+GtopgGBUY5mYk6r6jPStFrz+4HiT8OHKUIFNPqh
+      1uehTxNvh8hbKaFwVLbReogm4iXFbcNccq0a4ACExKRlq05VWNusxjeB4j8M16TYdt5zTfM9c3U1Bz
+      tM9c3U1BbzRKL2EsqjkA7t7JcpP1QVwHG+YznD3hmdoFBfEXrqQxOfggWN7XBzSv//d41azE0ElOaf
+      by4qphizU0TVvqsH8PUApTpoF7T24nDFKsNlztHN7N1/qMC7HFnDSZG0aCuBm/od4j8KLTvB2xiYpe
+      gezov5pnbURAgMBAAECgf8H8KCgK3wAb+8h7RSAiSyTF9+OKbOnaBzYyMvAv/+gr8NCo/cu0FvrNob
+      oqbQZ3MMV34i+3djvInBJwsYjxKA6WRk3XyHhHg7YXut6gW5wRW1IYgGloE1/xMdLoY8HP7mWlcfv/
+      uK2Gqb6YNGjp3xicIMTHQtJpuP33EeDh0BmioolVygIl6xJmk5oWMcMgIu1RF3HvvYQK7ZXMAZqmyb
+      lLq4sXi9SV4obm3g9iXGvhgFBFXlGDWVuzHzHV3pPPh9T3WdyMsQbNRcyydoIOw9GaWmdnqtC75TfV
+      IYblyG4RC+6cfi31YE0+P7BHk0SEeDOfm6I2E39Vo6w3VEKSkECgYEA7rhGY6RFgb7UgKm5CoPjMI9
+      +1fUVoBRWtvNeXLcxMVkYXO8rVn5BWLpN43RXRgdD5SyJLDZ1zh/qCKkQEvdNFtwYUJ9fl8vEhCTmK
+      iU/Z1YhZ/ahGTny6U42ONoaLbkWYeuYPoW/5PCUWMgZp5kL3iytuFx7H3vMgUiYAXvqFOECgYEA/Lr
+      g6KvDpWaWVdFFGkZsMwS+DO5TM5vAVZJD6rEzVddKZ8zPSKISqdIbrDCbXVdgeZwoo/DbgZiA6/urP
+      sestH/lIOR93s1/7wO9e82sAkjCjnMbdKIJFzqqHso+5jQgSyk1e12LXiK3BnK2tSnXCW2PA1Em/L+
+      zjPpYriIwdjECgYAB30weB/HLnLWJ9MrQvEwR225BO1TaFo6/jJUW4RDvtCUuxWlvmjnk+kEWIZl1o
+      ST1LS4+PIccAMATJVBM9ceTAFLofvd+90gpSSjM99HRe6lzaUnGKuAu2EAwnfVKmoMEbZaaFu50Wza
+      uo5Mf72FacrtCEOeeTZhDA1C94jzpwQKBgCmcAweLsAx9VWcPq1bmHU5RC5FJc71deU8dY70yK4eIi
+      KGKYN5OgNAg3Zl97zZw+ltLUI2dTCaMGz2/E7SkX1TgcbL2q5qRLu0FKp9Ff3pozE9zuCN9wg1nBTd
+      IiQ6Rqnd1c266OgXnpUaUgGxXVSYiOZeMNuUKEt+1IACbdGshAoGAdPqp0Dpq25ZueZr4QRG5rJqd
+      y/eHDR3QLERLGnhXy07U6VXHrsGlLYnTVnMZN6IhIJTiJw+YrrVYnKPHq0zMqFrbl+vphB/m8I15P
+      5Nr5RqnwvyFLZotQI/h15kfuRX8dqy1MYCTAo0gmUjBdOkxFkqhFZndEmkonjJOXtXbevs=
+
+# Actuator Management Default
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
