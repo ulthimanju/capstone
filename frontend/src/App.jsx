@@ -1,247 +1,148 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router';
+import AppShell from './components/layout/AppShell';
+import DashboardPage from './pages/DashboardPage';
+import ComponentShowcasePage from './pages/ComponentShowcasePage';
+
+/* ── Navigation items ── */
+const NAV_ITEMS = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    path: '/',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'notebooks',
+    label: 'Notebooks',
+    path: '/notebooks',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+      </svg>
+    ),
+  },
+  {
+    id: 'quizzes',
+    label: 'Quizzes',
+    path: '/quizzes',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'flashcards',
+    label: 'Flashcards',
+    path: '/flashcards',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" />
+      </svg>
+    ),
+  },
+  {
+    id: 'skilltree',
+    label: 'Skill Tree',
+    path: '/skilltree',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605" />
+      </svg>
+    ),
+  },
+  {
+    id: 'chat',
+    label: 'AI Chat',
+    path: '/chat',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'leaderboard',
+    label: 'Leaderboard',
+    path: '/leaderboard',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.996.178-1.768.654-2.097 1.299-.329.644-.41 1.543.134 2.576l.047.089c.562 1.04 1.519 1.957 2.666 2.507M18.75 4.236c.996.178 1.768.654 2.097 1.299.329.644.41 1.543-.134 2.576l-.047.089c-.562 1.04-1.519 1.957-2.666 2.507" />
+      </svg>
+    ),
+  },
+  {
+    id: 'showcase',
+    label: 'Components',
+    path: '/showcase',
+    badge: '71',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z" />
+      </svg>
+    ),
+  },
+];
+
+const MOCK_USER = {
+  name: 'Manju',
+  avatar: null,
+};
 
 function App() {
-  const [servicesHealth, setServicesHealth] = useState({
-    gateway: 'loading',
-    discovery: 'loading',
-    config: 'loading',
-    auth: 'loading',
-    user: 'loading',
-    notebook: 'loading',
-  })
+  const [activeNav, setActiveNav] = useState('dashboard');
 
-  useEffect(() => {
-    // Check health of infrastructure servers locally or mock
-    const timers = [
-      setTimeout(() => setServicesHealth(prev => ({ ...prev, config: 'UP' })), 800),
-      setTimeout(() => setServicesHealth(prev => ({ ...prev, discovery: 'UP' })), 1200),
-      setTimeout(() => setServicesHealth(prev => ({ ...prev, gateway: 'UP' })), 1600),
-      setTimeout(() => setServicesHealth(prev => ({ ...prev, auth: 'UP' })), 2000),
-      setTimeout(() => setServicesHealth(prev => ({ ...prev, user: 'UP' })), 2200),
-      setTimeout(() => setServicesHealth(prev => ({ ...prev, notebook: 'UP' })), 2400),
-    ]
-    return () => timers.forEach(clearTimeout)
-  }, [])
+  const handleNavChange = (id) => {
+    setActiveNav(id);
+    const item = NAV_ITEMS.find((n) => n.id === id);
+    if (item?.path) {
+      window.history.pushState({}, '', item.path);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500 selection:text-white">
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-purple-900/20 via-blue-900/10 to-transparent blur-3xl pointer-events-none rounded-full" />
-
-      {/* Header */}
-      <header className="border-b border-slate-800/80 backdrop-blur-md sticky top-0 z-50 bg-slate-950/80">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <span className="font-extrabold text-white text-xl">Q</span>
-            </div>
-            <div>
-              <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Questly</span>
-              <span className="text-xs block text-purple-400 font-semibold -mt-1 tracking-wider uppercase">Gamified Learning</span>
-            </div>
-          </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-            <a href="#overview" className="hover:text-white transition-colors">Overview</a>
-            <a href="#services" className="hover:text-white transition-colors">Infrastructure</a>
-            <a href="#features" className="hover:text-white transition-colors">Core Features</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Phase 3 Live
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-        {/* Hero Section */}
-        <section className="text-center py-16 md:py-24">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-white via-slate-100 to-purple-400 bg-clip-text text-transparent">
-            Questly Learning Platform
-          </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 mb-8 leading-relaxed">
-            A state-of-the-art gamified microlearning system. Turn your study notebooks, lectures, and documents into interactive gamified quests powered by local LLMs and AI agent loops.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="#services"
-              className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 hover:-translate-y-0.5 transition-all"
-            >
-              Monitor Core Infrastructure
-            </a>
-            <a
-              href="#features"
-              className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold transition-all hover:-translate-y-0.5"
-            >
-              Explore Features
-            </a>
-          </div>
-        </section>
-
-        {/* Infrastructure Monitor */}
-        <section id="services" className="py-12 border-t border-slate-900">
-          <div className="mb-10 text-center md:text-left md:flex items-end justify-between">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Service Topology & Health</h2>
-              <p className="text-slate-400">Real-time dynamic orchestration status across microservice register checkgates</p>
-            </div>
-            <span className="text-xs text-purple-400 font-mono mt-2 block md:mt-0">15 Active Modules | Spring Boot 3.3.0 | Java 21</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Core Infrastructure */}
-            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/30 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-purple-500/10 text-purple-400 rounded-md uppercase tracking-wider">Infrastructure</span>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${servicesHealth.config === 'UP' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                    {servicesHealth.config}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1">Config Server</h3>
-                <p className="text-sm text-slate-400 mb-4">Provides centralized environment configs to modules from a native classpath repository.</p>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">Port: 8888</span>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/30 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-purple-500/10 text-purple-400 rounded-md uppercase tracking-wider">Infrastructure</span>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${servicesHealth.discovery === 'UP' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                    {servicesHealth.discovery}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1">Discovery Server</h3>
-                <p className="text-sm text-slate-400 mb-4">Eureka Service Registry mapping instances to coordinate secure internal REST routing paths.</p>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">Port: 8761</span>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/30 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-purple-500/10 text-purple-400 rounded-md uppercase tracking-wider">Infrastructure</span>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${servicesHealth.gateway === 'UP' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                    {servicesHealth.gateway}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1">API Gateway</h3>
-                <p className="text-sm text-slate-400 mb-4">OAuth2 resource server protecting backend endpoints using static PEM RS256 decoding.</p>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">Port: 8080</span>
-            </div>
-
-            {/* Microservice Skeletons */}
-            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/30 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-blue-500/10 text-blue-400 rounded-md uppercase tracking-wider">Service</span>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${servicesHealth.auth === 'UP' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                    {servicesHealth.auth}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1">Auth Service</h3>
-                <p className="text-sm text-slate-400 mb-4">Manages user registrations, login flows, secure token signings, and Google OAuth2 integration.</p>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">Port: 8081</span>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/30 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-blue-500/10 text-blue-400 rounded-md uppercase tracking-wider">Service</span>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${servicesHealth.user === 'UP' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                    {servicesHealth.user}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1">User Service</h3>
-                <p className="text-sm text-slate-400 mb-4">Coordinates profiles, game statistics, experience (XP) parameters, and dashboard streak tracking.</p>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">Port: 8082</span>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/30 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-blue-500/10 text-blue-400 rounded-md uppercase tracking-wider">Service</span>
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${servicesHealth.notebook === 'UP' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                    {servicesHealth.notebook}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1">Notebook Service</h3>
-                <p className="text-sm text-slate-400 mb-4">Supports PDF uploads to MinIO, ChromaDB vector stores, and invokes secure Ollama RAG pipelines.</p>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">Port: 8083</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Showcase */}
-        <section id="features" className="py-16 border-t border-slate-900">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-white mb-3">Questly Core Microlearning Ecosystem</h2>
-            <p className="text-slate-400 max-w-xl mx-auto">Engineered from the ground up to offer an immersive, high-yield gamified learning loop.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-slate-900 to-purple-950/20 border border-slate-800/80 hover:border-purple-500/25 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.782 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Gamified Smart Notebooks</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Upload your files directly to **MinIO** storage. Custom document embedding flows trigger text analysis using **nomic-embed-text** and load chunks into **ChromaDB**. Perform instant RAG queries against your study notes to unlock knowledge milestones!
-              </p>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950/20 border border-slate-800/80 hover:border-indigo-500/25 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">AI-Driven Quests & Flashcards</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Generate high-impact custom quizzes, interactive coding challenges, and flashcards utilizing local **llama3.2:3b** models. Your quest completion statistics feed directly into the **Gamification** engine to unlock specialized skills.
-              </p>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-slate-900 to-emerald-950/20 border border-slate-800/80 hover:border-emerald-500/25 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Automated Local Containers</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Zero manual configuration. Our integrated **Docker Compose** spins up multi-database setups, sets up MinIO buckets dynamically, and boots an automated lightweight curl sidecar to poll Ollama and pull LLM tags instantly on container boot.
-              </p>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-slate-900 to-rose-950/20 border border-slate-800/80 hover:border-rose-500/25 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Telemetry & Distributed Tracing</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Fully pre-configured distributed tracing logs using **Zipkin**, **Prometheus**, and **Grafana** metrics servers. Monitor event bus latencies on dynamic REST endpoints seamlessly.
-              </p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-slate-900 py-8 bg-slate-950/50 mt-12 text-center text-sm text-slate-500">
-        <p>© 2026 Questly learning monorepo system. Built by Manju (Solo Developer).</p>
-      </footer>
-    </div>
-  )
+    <AppShell
+      user={MOCK_USER}
+      xp={2450}
+      level={12}
+      navItems={NAV_ITEMS}
+      activeNav={activeNav}
+      onNavChange={handleNavChange}
+    >
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/showcase" element={<ComponentShowcasePage />} />
+        {/* Placeholder routes */}
+        <Route path="/notebooks" element={<PlaceholderPage title="Notebooks" subtitle="Your study notebooks and documents" />} />
+        <Route path="/quizzes" element={<PlaceholderPage title="Quizzes" subtitle="AI-generated quiz challenges" />} />
+        <Route path="/flashcards" element={<PlaceholderPage title="Flashcards" subtitle="Spaced repetition study cards" />} />
+        <Route path="/skilltree" element={<PlaceholderPage title="Skill Tree" subtitle="Your learning progression map" />} />
+        <Route path="/chat" element={<PlaceholderPage title="AI Chat" subtitle="RAG-powered study assistant" />} />
+        <Route path="/leaderboard" element={<PlaceholderPage title="Leaderboard" subtitle="Compete with fellow learners" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AppShell>
+  );
 }
 
-export default App
+function PlaceholderPage({ title, subtitle }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-24">
+      <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center mb-4">
+        <svg className="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.648-3.01M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-2.457-1.34a6.5 6.5 0 10-8.085 0" />
+        </svg>
+      </div>
+      <h1 className="text-2xl font-bold text-text-primary">{title}</h1>
+      <p className="text-sm text-text-muted mt-1">{subtitle}</p>
+      <p className="text-xs text-text-disabled mt-4">Coming soon — visit <a href="/showcase" className="text-brand hover:underline">Component Showcase</a> to see all UI components</p>
+    </div>
+  );
+}
+
+export default App;
