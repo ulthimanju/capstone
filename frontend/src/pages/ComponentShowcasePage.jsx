@@ -185,9 +185,26 @@ export default function ComponentShowcasePage() {
       <Section title="Inputs & Forms">
         <ContentGrid cols={1} mdCols={2} gap={6}>
           <div className="space-y-4">
-            <TextInput label="Full Name" placeholder="Enter your name" />
+            <TextInput
+              label="Full Name"
+              placeholder="Enter your name"
+              icon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              }
+            />
             <PasswordInput label="Password" placeholder="Enter password" />
-            <TextInput label="With error" placeholder="Invalid input" error="This field is required" />
+            <TextInput
+              label="With error"
+              placeholder="Invalid input"
+              error="This field is required"
+              icon={
+                <svg className="w-4 h-4 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              }
+            />
             <URLInput label="Website" placeholder="https://example.com" />
           </div>
           <div className="space-y-4">

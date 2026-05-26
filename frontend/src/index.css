@@ -199,8 +199,15 @@ select:focus-visible {
 }
 
 /* ── Global transition defaults ── */
-a, button, input, select, textarea {
-  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+a, button, input, select, textarea, [role="button"] {
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
+}
+
+/* ── Tactile active click effect ── */
+button:active:not(:disabled),
+a:active,
+[role="button"]:active:not([disabled]) {
+  transform: scale(0.97);
 }
 
 /* ── Skeleton shimmer utility ── */

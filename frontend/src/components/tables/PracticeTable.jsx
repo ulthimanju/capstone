@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import DataTable from './DataTable';
 
 const DIFFICULTY_STYLES = {
@@ -15,8 +16,8 @@ const STATUS_DOT_STYLES = {
 };
 
 /**
- * PracticeTable — Displays a list of practice problems with difficulty badges
- * and cyclable status indicators.
+ * PracticeTable — Displays a list of practice problems with difficulty badges,
+ * status indicator cycling, and status-based column filtering.
  *
  * @param {Object} props
  * @param {{ id: string|number, title: string, url: string, status: string, difficulty: string }[]} props.problems
@@ -24,6 +25,9 @@ const STATUS_DOT_STYLES = {
  * @param {string} [props.className]
  */
 export default function PracticeTable({ problems = [], onStatusChange, className = '' }) {
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [difficultyFilter, setDifficultyFilter] = useState('ALL');
+
   const cycleStatus = (problem) => {
     if (!onStatusChange) return;
     const currentIndex = STATUS_CYCLE.indexOf(problem.status);
@@ -100,5 +104,80 @@ export default function PracticeTable({ problems = [], onStatusChange, className
     },
   ];
 
-  return <DataTable columns={columns} data={problems} className={className} />;
+  // Combined Filter logic
+  const filteredProblems = problems.filter((p) => {
+    const matchesStatus = statusFilter === 'ALL' || p.status?.toUpperCase() === statusFilter;
+    const matchesDifficulty = difficultyFilter === 'ALL' || p.difficulty?.toUpperCase() === difficultyFilter;
+    return matchesStatus && matchesDifficulty;
+  });
+
+  return (
+    <div className={`space-y-3 ${className}`}>
+      {/* Filtering header controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-surface/30 p-2 rounded-lg border border-border/50">
+        <span className="text-xs text-text-muted">
+          Showing <span className="font-semibold text-text-primary">{filteredProblems.length}</span> of <span className="font-semibold">{problems.length}</span> problems
+        </span>
+        <div className="flex flex-wrap items-center gap-4 self-end md:self-auto">
+          {/* Status Filter */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-text-muted uppercase tracking-wider font-semibold mr-1">Status:</span>
+            <div className="flex items-center gap-0.5 bg-surface border border-border rounded-md p-0.5">
+              {['ALL', ...STATUS_CYCLE].map((status) => {
+                const isActive = statusFilter === status;
+                return (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setStatusFilter(status)}
+                    className={`
+                      px-2 py-0.5 text-[9px] font-bold rounded-sm cursor-pointer
+                      transition-all duration-150 uppercase tracking-wider
+                      ${
+                        isActive
+                          ? 'bg-brand text-bg shadow-sm font-extrabold'
+                          : 'text-text-muted hover:text-text-primary hover:bg-surface-elevated/40'
+                      }
+                    `}
+                  >
+                    {status}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Difficulty Filter */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-text-muted uppercase tracking-wider font-semibold mr-1">Difficulty:</span>
+            <div className="flex items-center gap-0.5 bg-surface border border-border rounded-md p-0.5">
+              {['ALL', 'EASY', 'MEDIUM', 'HARD'].map((diff) => {
+                const isActive = difficultyFilter === diff;
+                return (
+                  <button
+                    key={diff}
+                    type="button"
+                    onClick={() => setDifficultyFilter(diff)}
+                    className={`
+                      px-2 py-0.5 text-[9px] font-bold rounded-sm cursor-pointer
+                      transition-all duration-150 uppercase tracking-wider
+                      ${
+                        isActive
+                          ? 'bg-brand text-bg shadow-sm font-extrabold'
+                          : 'text-text-muted hover:text-text-primary hover:bg-surface-elevated/40'
+                      }
+                    `}
+                  >
+                    {diff}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <DataTable columns={columns} data={filteredProblems} />
+    </div>
+  );
 }

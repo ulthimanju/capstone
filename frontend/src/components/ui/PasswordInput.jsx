@@ -1,19 +1,53 @@
 import { useState } from 'react';
 
 /**
- * PasswordInput — Password field with visibility toggle.
+ * PasswordInput — Password field with visibility toggle and live segmented strength indicator.
  *
- * @param {string} label
- * @param {string} error
- * @param {string} className
+ * @param {object} props
+ * @param {string} [props.label]
+ * @param {string} [props.error]
+ * @param {string} [props.value]
+ * @param {(e: React.ChangeEvent<HTMLInputElement>) => void} [props.onChange]
+ * @param {string} [props.className]
  */
 export default function PasswordInput({
   label,
   error,
+  value,
+  onChange,
   className = '',
   ...rest
 }) {
   const [visible, setVisible] = useState(false);
+  const [localVal, setLocalVal] = useState('');
+
+  const currentVal = value !== undefined ? value : localVal;
+
+  const handleChange = (e) => {
+    setLocalVal(e.target.value);
+    onChange?.(e);
+  };
+
+  // Password strength logic
+  const getStrength = (val) => {
+    if (!val) return 0;
+    let score = 0;
+    if (val.length >= 6) score += 1;
+    if (/[a-zA-Z]/.test(val) && /[0-9]/.test(val)) score += 1;
+    if (/[^a-zA-Z0-9]/.test(val)) score += 1;
+    if (val.length >= 10) score += 1;
+    return Math.max(1, score); // 1 = Weak, 2 = Fair, 3 = Good, 4 = Strong
+  };
+
+  const strength = getStrength(currentVal);
+
+  const strengthConfigs = [
+    { label: '', color: 'bg-border' },
+    { label: 'Weak', color: 'bg-danger' },
+    { label: 'Fair', color: 'bg-warning' },
+    { label: 'Good', color: 'bg-accent-blue' },
+    { label: 'Strong', color: 'bg-brand' },
+  ];
 
   return (
     <div className={className}>
@@ -23,9 +57,25 @@ export default function PasswordInput({
         </label>
       )}
       <div className="relative">
+        {/* Left lock icon */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1v-2a4 4 0 00-4-4zm-2 6V6a2 2 0 114 0v2H8zm2 4a1 1 0 100 2 1 1 0 000-2z"
+            clipRule="evenodd"
+          />
+        </svg>
         <input
           type={visible ? 'text' : 'password'}
-          className={`w-full h-9 px-3 pr-10 rounded-md text-sm bg-surface border text-text-primary placeholder:text-text-disabled transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-focus-glow ${
+          value={currentVal}
+          onChange={handleChange}
+          className={`w-full h-9 pl-9 pr-10 rounded-md text-sm bg-surface border text-text-primary placeholder:text-text-disabled transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-focus-glow ${
             error
               ? 'border-danger focus:border-danger'
               : 'border-border focus:border-brand'
@@ -73,6 +123,42 @@ export default function PasswordInput({
           )}
         </button>
       </div>
+
+      {/* Strength Indicator Segmented Bar */}
+      {currentVal && (
+        <div className="mt-2 space-y-1 animate-fade-in">
+          <div className="flex gap-1 h-1">
+            {[1, 2, 3, 4].map((index) => {
+              const isActive = strength >= index;
+              return (
+                <div
+                  key={index}
+                  className={`flex-1 h-full rounded-full transition-all duration-300 ${
+                    isActive ? strengthConfigs[strength].color : 'bg-border/30'
+                  }`}
+                />
+              );
+            })}
+          </div>
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-text-muted">Password Strength</span>
+            <span
+              className={`font-semibold uppercase tracking-wider ${
+                strength === 1
+                  ? 'text-danger'
+                  : strength === 2
+                  ? 'text-warning'
+                  : strength === 3
+                  ? 'text-accent-blue'
+                  : 'text-brand'
+              }`}
+            >
+              {strengthConfigs[strength].label}
+            </span>
+          </div>
+        </div>
+      )}
+
       {error && (
         <p className="mt-1 text-xs text-danger">{error}</p>
       )}
