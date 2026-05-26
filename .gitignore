@@ -50,3 +50,6 @@ kafka-data/
 *.pem
 *.key
 *.der
+
+# Questly orchestrator logs and PID files
+services/logs/

@@ -243,8 +243,8 @@ function Start-Services {
 
         Write-Host "  - Bootstrapping $name on port $($s.port)..."
         
-        # Start the java process directly on a single line with separated log and error outputs in a minimized window
-        $proc = Start-Process -FilePath 'java' -ArgumentList '-jar', "target/$name-1.0.0.jar" -WorkingDirectory $folder -WindowStyle Minimized -PassThru -RedirectStandardOutput $logFile -RedirectStandardError $errFile
+        # Start the java process directly on a single line with separated log and error outputs in a hidden background window
+        $proc = Start-Process -FilePath 'java' -ArgumentList '-jar', "target/$name-1.0.0.jar" -WorkingDirectory $folder -WindowStyle Hidden -PassThru -RedirectStandardOutput $logFile -RedirectStandardError $errFile
         
         # Save PID
         $proc.Id | Out-File -FilePath $pidFile -NoNewline -Encoding ascii
