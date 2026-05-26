@@ -33,7 +33,8 @@ $Services = @(
     @{ name = 'ai-service';            port = 8089; folder = 'services/ai-service' },
     @{ name = 'gamification-service';  port = 8090; folder = 'services/gamification-service' },
     @{ name = 'analytics-service';     port = 8091; folder = 'services/analytics-service' },
-    @{ name = 'notification-service';  port = 8092; folder = 'services/notification-service' }
+    @{ name = 'notification-service';  port = 8092; folder = 'services/notification-service' },
+    @{ name = 'frontend';              port = 5173; folder = 'frontend' }
 )
 
 $LogsDir = Join-Path $PSScriptRoot 'services/logs'
@@ -43,12 +44,12 @@ if (-not (Test-Path $LogsDir)) {
     New-Item -ItemType Directory -Path $LogsDir | Out-Null
 }
 
-# Helper: Test if Port is Listening
+# Helper: Test if Port is Listening (supports both IPv4 127.0.0.1 and IPv6 [::1] loopbacks)
 function Test-PortListening {
     param([int]$Port)
     $tc = New-Object System.Net.Sockets.TcpClient
     try {
-        $tc.Connect('127.0.0.1', $Port)
+        $tc.Connect('localhost', $Port)
         return $true
     } catch {
         return $false
@@ -96,16 +97,32 @@ function Get-ServiceProcess {
         }
     }
     
-    # 2. Resilient Fallback: Query active java.exe command-lines (self-heals launcher PID differences on Windows)
-    $procList = Get-CimInstance Win32_Process -Filter "Name = 'java.exe'" -ErrorAction SilentlyContinue
-    if ($procList) {
-        foreach ($p in $procList) {
-            if ($p.CommandLine -and $p.CommandLine.Contains("$ServiceName-1.0.0.jar")) {
-                $proc = Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue
-                if ($proc) {
-                    # Auto-heal the PID file with the real runtime Java process ID
-                    $proc.Id | Out-File -FilePath $pidFile -NoNewline -Encoding ascii
-                    return $proc
+    # 2. Resilient Fallback: Query active java.exe or node.exe command-lines (self-heals launcher PID differences on Windows)
+    if ($ServiceName -eq 'frontend') {
+        $procList = Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue
+        if ($procList) {
+            foreach ($p in $procList) {
+                if ($p.CommandLine -and ($p.CommandLine.Contains("vite") -or $p.CommandLine.Contains("frontend"))) {
+                    $proc = Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue
+                    if ($proc) {
+                        # Auto-heal the PID file with the real runtime Node process ID
+                        $proc.Id | Out-File -FilePath $pidFile -NoNewline -Encoding ascii
+                        return $proc
+                    }
+                }
+            }
+        }
+    } else {
+        $procList = Get-CimInstance Win32_Process -Filter "Name = 'java.exe'" -ErrorAction SilentlyContinue
+        if ($procList) {
+            foreach ($p in $procList) {
+                if ($p.CommandLine -and $p.CommandLine.Contains("$ServiceName-1.0.0.jar")) {
+                    $proc = Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue
+                    if ($proc) {
+                        # Auto-heal the PID file with the real runtime Java process ID
+                        $proc.Id | Out-File -FilePath $pidFile -NoNewline -Encoding ascii
+                        return $proc
+                    }
                 }
             }
         }
@@ -204,29 +221,37 @@ function Start-Services {
             $activeNames = 'config-server', 'discovery-server', 'gateway'
         }
         'core' {
-            $activeNames = 'config-server', 'discovery-server', 'gateway', 'auth-service', 'user-service', 'notebook-service', 'ai-service'
+            $activeNames = 'config-server', 'discovery-server', 'gateway', 'auth-service', 'user-service', 'notebook-service', 'ai-service', 'frontend'
         }
         'dev' {
-            $activeNames = 'config-server', 'discovery-server', 'gateway', 'auth-service', 'user-service', 'notebook-service', 'ai-service', 'quiz-service', 'flashcard-service'
+            $activeNames = 'config-server', 'discovery-server', 'gateway', 'auth-service', 'user-service', 'notebook-service', 'ai-service', 'quiz-service', 'flashcard-service', 'frontend'
         }
         'all' {
             $activeNames = $Services | ForEach-Object { $_.name }
         }
     }
 
-    # Helper function to launch a jar
+    # Helper function to launch a jar or node process
     $launchService = {
         param($s)
         $name = $s.name
         $folder = $s.folder
-        $jarPath = "$folder/target/$name-1.0.0.jar"
         $pidFile = Join-Path $LogsDir "$name.pid"
         $logFile = Join-Path $LogsDir "$name.log"
         $errFile = Join-Path $LogsDir "$name-error.log"
 
-        if (-not (Test-Path $jarPath)) {
-            Write-Host "  - [ERROR] Compiled jar missing for $name! Run 'mvn clean install -DskipTests' first." -ForegroundColor Red
-            return $false
+        if ($name -eq 'frontend') {
+            $packageJson = "$folder/package.json"
+            if (-not (Test-Path $packageJson)) {
+                Write-Host "  - [ERROR] package.json missing for $name! Cannot start." -ForegroundColor Red
+                return $false
+            }
+        } else {
+            $jarPath = "$folder/target/$name-1.0.0.jar"
+            if (-not (Test-Path $jarPath)) {
+                Write-Host "  - [ERROR] Compiled jar missing for $name! Run 'mvn clean install -DskipTests' first." -ForegroundColor Red
+                return $false
+            }
         }
 
         # Check conflict
@@ -243,8 +268,12 @@ function Start-Services {
 
         Write-Host "  - Bootstrapping $name on port $($s.port)..."
         
-        # Start the java process directly on a single line with separated log and error outputs in a hidden background window
-        $proc = Start-Process -FilePath 'java' -ArgumentList '-jar', "target/$name-1.0.0.jar" -WorkingDirectory $folder -WindowStyle Hidden -PassThru -RedirectStandardOutput $logFile -RedirectStandardError $errFile
+        # Start in a hidden background window
+        if ($name -eq 'frontend') {
+            $proc = Start-Process -FilePath 'npm.cmd' -ArgumentList 'run', 'dev' -WorkingDirectory $folder -WindowStyle Hidden -PassThru -RedirectStandardOutput $logFile -RedirectStandardError $errFile
+        } else {
+            $proc = Start-Process -FilePath 'java' -ArgumentList '-jar', "target/$name-1.0.0.jar" -WorkingDirectory $folder -WindowStyle Hidden -PassThru -RedirectStandardOutput $logFile -RedirectStandardError $errFile
+        }
         
         # Save PID
         $proc.Id | Out-File -FilePath $pidFile -NoNewline -Encoding ascii
@@ -285,7 +314,7 @@ function Start-Services {
     }
 
     # --- 4. DOMAIN SERVICES (Started in parallel with 1s stagger to prevent CPU thrashing) ---
-    $domainServices = $Services | Where-Object { $_.name -notmatch 'config-server|discovery-server|gateway' -and $activeNames -contains $_.name }
+    $domainServices = $Services | Where-Object { $_.name -notmatch 'config-server|discovery-server|gateway|frontend' -and $activeNames -contains $_.name }
     if ($domainServices) {
         Write-Host ''
         Write-Host 'Spawning domain services...' -ForegroundColor Yellow
@@ -295,6 +324,16 @@ function Start-Services {
                 # Stagger startup slightly
                 Start-Sleep -Milliseconds 1000
             }
+        }
+    }
+
+    # --- 5. FRONTEND (Started as the final piece in its own step) ---
+    $frontendSvc = $Services | Where-Object { $_.name -eq 'frontend' }
+    if ($activeNames -contains 'frontend') {
+        Write-Host ''
+        if (& $launchService $frontendSvc) {
+            # Wait for frontend to bind to port 5173
+            Wait-ForPort -ServiceName 'frontend' -Port 5173 -TimeoutSeconds 30
         }
     }
 
