@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 55 |
+| Completed | 73 |
 | In Progress | 0 |
-| Pending | 57 |
-| Overall Completion | 49.1% |
+| Pending | 39 |
+| Overall Completion | 65.2% |
 
 ---
 
@@ -28,8 +28,8 @@
 | 📌 Phase 1 — Requirements Gathering | ✅ Complete | 2026-05-24 | 28 | 28 | 100% |
 | 🏗️ Phase 2 — System Design & Architecture | ✅ Complete | 2026-06-07 | 14 | 14 | 100% |
 | 🔧 Phase 3 — Core Infrastructure Setup | ✅ Complete | 2026-06-14 | 13 | 13 | 100% |
-| 🚀 Sprint 1 — Auth + Upload + RAG | ⏳ Pending | 2026-06-28 | 0 | 10 | 0% |
-| 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ⏳ Pending | 2026-07-10 | 0 | 8 | 0% |
+| 🚀 Sprint 1 — Auth + Upload + RAG | ✅ Complete | 2026-06-28 | 10 | 10 | 100% |
+| 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ✅ Complete | 2026-07-10 | 8 | 8 | 100% |
 | 🚀 Sprint 3 — Courses + Practice + Skill Tree | ⏳ Pending | 2026-07-18 | 0 | 8 | 0% |
 | 🚀 Sprint 4 — Gamification + Analytics + Polish | ⏳ Pending | 2026-07-25 | 0 | 9 | 0% |
 | 🧪 Integration Testing | ⏳ Pending | 2026-07-28 | 0 | 6 | 0% |
@@ -170,41 +170,41 @@
 
 ## 🚀 Sprint 1 — Auth + Document Upload + RAG Core
 
-**Status**: ⏳ Pending
+**Status**: ✅ Complete
 **Target**: 2026-06-28
-**Progress**: 0 / 10 tasks
+**Progress**: 10 / 10 tasks complete (100%)
 
-| # | Task | Service | Priority | Acceptance Criteria |
-|---|---|---|---|---|
-| 1 | User registration + login (JWT) | auth-service | 🔴 High | POST /auth/register and /auth/login return valid JWT |
-| 2 | Google OAuth2 login | auth-service | 🟡 Medium | OAuth flow completes, JWT returned |
-| 3 | Role-based access control | gateway | 🔴 High | STUDENT/TUTOR/ADMIN roles enforced at gateway |
-| 4 | Document upload (PDF, MD, TXT) via MinIO | notebook-service | 🔴 High | File stored in MinIO, metadata in PostgreSQL |
-| 5 | Google Drive API integration (Docs, Slides) | notebook-service | 🟡 Medium | Google Doc URL fetched and parsed |
-| 6 | Document parsing with Apache Tika | ai-service | 🔴 High | Raw text extracted from all supported formats |
-| 7 | Chunking + embedding via nomic-embed-text | ai-service | 🔴 High | Chunks stored in ChromaDB with metadata |
-| 8 | Closed-domain RAG query endpoint | ai-service | 🔴 High | Query returns answer grounded only in uploaded docs |
-| 9 | Frontend: Login page | frontend | 🔴 High | Login + register forms functional |
-| 10 | Frontend: Document upload UI | frontend | 🔴 High | Upload UI with format validation + progress indicator |
+| # | Task | Service | Priority | Acceptance Criteria | Status |
+|---|---|---|---|---|---|
+| 1 | User registration + login (JWT) | auth-service | 🔴 High | POST /auth/register and /auth/login return valid JWT | ✅ Done |
+| 2 | Google OAuth2 login | auth-service | 🟡 Medium | OAuth flow completes, JWT returned | ✅ Done |
+| 3 | Role-based access control | gateway | 🔴 High | STUDENT/TUTOR/ADMIN roles enforced at gateway | ✅ Done |
+| 4 | Document upload (PDF, MD, TXT) via MinIO | notebook-service | 🔴 High | File stored in MinIO, metadata in PostgreSQL | ✅ Done |
+| 5 | Google Drive API integration (Docs, Slides) | notebook-service | 🟡 Medium | Google Doc URL fetched and parsed | ✅ Done |
+| 6 | Document parsing with Apache Tika | ai-service | 🔴 High | Raw text extracted from all supported formats | ✅ Done |
+| 7 | Chunking + embedding via nomic-embed-text | ai-service | 🔴 High | Chunks stored in ChromaDB with metadata | ✅ Done |
+| 8 | Closed-domain RAG query endpoint | ai-service | 🔴 High | Query returns answer grounded only in uploaded docs | ✅ Done |
+| 9 | Frontend: Login page | frontend | 🔴 High | Login + register forms functional | ✅ Done |
+| 10 | Frontend: Document upload UI | frontend | 🔴 High | Upload UI with format validation + progress indicator | ✅ Done |
 
 ---
 
 ## 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot
 
-**Status**: ⏳ Pending
+**Status**: ✅ Complete
 **Target**: 2026-07-10
-**Progress**: 0 / 8 tasks
+**Progress**: 8 / 8 tasks complete (100%)
 
-| # | Task | Service | Priority | Acceptance Criteria |
-|---|---|---|---|---|
-| 1 | AI flashcard generation from document content | flashcard-service | 🔴 High | LLM generates Q&A pairs from notebook chunks |
-| 2 | SM-2 spaced repetition scheduling engine | flashcard-service | 🔴 High | Next review date computed based on rating (1–5) |
-| 3 | Flashcard review UI (flip animation, rating) | frontend | 🔴 High | Card flips on click, 4-button rating updates schedule |
-| 4 | Quiz generation (MCQ, fill-in-blank, short answer) | quiz-service | 🔴 High | LLM generates valid question sets from notebook |
-| 5 | Quiz attempt tracking and scoring | quiz-service | 🔴 High | Score persisted per attempt, wrong topics recorded |
-| 6 | Weak spot detection logic | quiz-service | 🔴 High | Topics with >2 wrong attempts flagged and resurfaced |
-| 7 | Weak spot review session UI | frontend | 🟡 Medium | Dedicated review mode filters weak-spot questions |
-| 8 | Summarize & Simplify endpoint + UI | ai-service + frontend | 🟡 Medium | LLM returns condensed version of selected document |
+| # | Task | Service | Priority | Acceptance Criteria | Status |
+|---|---|---|---|---|---|
+| 1 | AI flashcard generation from document content | flashcard-service | 🔴 High | LLM generates Q&A pairs from notebook chunks | ✅ Done |
+| 2 | SM-2 spaced repetition scheduling engine | flashcard-service | 🔴 High | Next review date computed based on rating (1–5) | ✅ Done |
+| 3 | Flashcard review UI (flip animation, rating) | frontend | 🔴 High | Card flips on click, 4-button rating updates schedule | ✅ Done |
+| 4 | Quiz generation (MCQ, fill-in-blank, short answer) | quiz-service | 🔴 High | LLM generates valid question sets from notebook | ✅ Done |
+| 5 | Quiz attempt tracking and scoring | quiz-service | 🔴 High | Score persisted per attempt, wrong topics recorded | ✅ Done |
+| 6 | Weak spot detection logic | quiz-service | 🔴 High | Topics with >2 wrong attempts flagged and resurfaced | ✅ Done |
+| 7 | Weak spot review session UI | frontend | 🟡 Medium | Dedicated review mode filters weak-spot questions | ✅ Done |
+| 8 | Summarize & Simplify endpoint + UI | ai-service + frontend | 🟡 Medium | LLM returns condensed version of selected document | ✅ Done |
 
 ---
 
@@ -303,8 +303,8 @@
 | Phase 1 — Requirements | 28 | 28 | 0 | ✅ Complete |
 | Phase 2 — Design | 14 | 14 | 0 | ✅ Complete |
 | Phase 3 — Infrastructure | 13 | 13 | 0 | ✅ Complete |
-| Sprint 1 | 10 | 0 | — | Not started |
-| Sprint 2 | 8 | 0 | — | Not started |
+| Sprint 1 | 10 | 10 | 0 | ✅ Complete |
+| Sprint 2 | 8 | 8 | 0 | ✅ Complete |
 | Sprint 3 | 8 | 0 | — | Not started |
 | Sprint 4 | 9 | 0 | — | Not started |
 | Testing | 6 | 0 | — | Not started |
@@ -410,4 +410,4 @@
 
 ---
 
-*Last Updated: 2026-05-26 | Phase 3: ✅ Complete | Next: Sprint 1 — Auth + Document Upload + RAG Core*
+*Last Updated: 2026-05-27 | Sprint 2: ✅ Complete | Next: Sprint 3 — Courses + Coding Tracker + Skill Tree*
