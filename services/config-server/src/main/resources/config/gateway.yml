@@ -8,13 +8,13 @@ spring:
         jwt:
           public-key-value: |
             -----BEGIN PUBLIC KEY-----
-            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA66uo527cR+Bp9G4xz3+q
-            O+DFVmgYPpTmIguoEDP8Xom7pBWLc+OQLqkOvyS567G7qvhraKYBgVGOZmJOq+oz
-            0rRa8/uB4k/DhylCBTT6odbnoU8Tb4fIWymhcFS20XqIJuIlxW3DXHKtGuAAhMSk
-            ZatOVVjbrMY3geI/DNek2Hbec03zPXN1NQW80Si9hLKo5AO7eyXKT9UFcBxvmM5w
-            94ZnaBQXxF66kMTn4IFje1wc0r//3eNWsxNBJTmn28eKqYYs1NE1b6rB/D1AKU6a
-            Be09uJwxSrDZc7Rzezdf6jAuxxZw0mRtGgrgZv6HeI/Ci07wdsYmKXoHs6L+aZ21
-            EQIDAQAB
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1pbf5NnE1o3ZP4JoN4uF
+            yO7mlfBtwXwr5E5OBwuho3eimakCzuH3kkRT+p4+af4plOdYsYIxRRNUuBEdIKTq
+            Ip4av6eo06tSoxo6ObWD4IDliPaCBSQL741sNlFOXGh7LZVIcSLbF8oSxznCmucQ
+            3Z2ftpGZqaKY86BhS9TXrUSNXJfxAVhrgIw4JH7S9gvIoGlIAqHg7MsHsVmMlA/4
+            bJih1KvxWZ9c+SXOv0zrYBfTUpYFl75YRMg+oHbifo7MLvYFwXfw5xrCrsVz1g/Y
+            L3nexWARMxum8dXQgIguoZ/aOItmXPnybmwrHwV7u+XnnpeSg0s6GI85ASP5/DhY
+            fQIDAQAB
             -----END PUBLIC KEY-----
 
   cloud:

@@ -5,6 +5,21 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-value: |
+            -----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1pbf5NnE1o3ZP4JoN4uF
+            yO7mlfBtwXwr5E5OBwuho3eimakCzuH3kkRT+p4+af4plOdYsYIxRRNUuBEdIKTq
+            Ip4av6eo06tSoxo6ObWD4IDliPaCBSQL741sNlFOXGh7LZVIcSLbF8oSxznCmucQ
+            3Z2ftpGZqaKY86BhS9TXrUSNXJfxAVhrgIw4JH7S9gvIoGlIAqHg7MsHsVmMlA/4
+            bJih1KvxWZ9c+SXOv0zrYBfTUpYFl75YRMg+oHbifo7MLvYFwXfw5xrCrsVz1g/Y
+            L3nexWARMxum8dXQgIguoZ/aOItmXPnybmwrHwV7u+XnnpeSg0s6GI85ASP5/DhY
+            fQIDAQAB
+            -----END PUBLIC KEY-----
+
   # Database Connections Default (Individual service overrides only database name)
   datasource:
     username: postgres
@@ -27,27 +42,32 @@ auth:
   jwt:
     # 2048-bit RSA Private Key base64 string for token signing
     private-key: >
-      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
+      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
+      925eSkKBnQx3MQ9S81Sw==
 
 # Actuator Management Default
 management:
