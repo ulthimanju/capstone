@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .pathMatchers("/api/auth/**").permitAll()
                 .pathMatchers("/actuator/**").permitAll()
                 .pathMatchers("/health").permitAll()
+                .pathMatchers("/error").permitAll()
                 .pathMatchers("/internal/**").denyAll()
                 .anyExchange().authenticated()
             )

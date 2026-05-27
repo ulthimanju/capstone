@@ -1,5 +1,6 @@
 package com.questly.auth.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,7 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers(
                     "/api/auth/register",
                     "/api/auth/login",
@@ -34,7 +36,8 @@ public class SecurityConfig {
                     "/api/auth/.well-known/jwks.json",
                     "/api/auth/google/**",
                     "/actuator/**",
-                    "/health"
+                    "/health",
+                    "/error"
                 ).permitAll()
                 .anyRequest().authenticated()
             );

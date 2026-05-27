@@ -1,6 +1,12 @@
 server:
   port: 8081
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/db_auth
