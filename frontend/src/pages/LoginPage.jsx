@@ -6,19 +6,11 @@ import { useAuthStore } from '../store/useAuthStore';
 /* ── Logo ── */
 function QuestlyLogo() {
   return (
-    <svg
-      className="w-8 h-8 text-brand"
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M16 2L20 10H28L22 15.5L24.5 24L16 19L7.5 24L10 15.5L4 10H12L16 2Z"
-        fill="currentColor"
-        opacity="0.9"
-      />
-    </svg>
+    <img
+      src="/logo.png"
+      alt="Questly Logo"
+      className="w-8 h-8 object-contain"
+    />
   );
 }
 

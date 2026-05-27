@@ -1,0 +1,15 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Install dependencies first for efficient caching
+COPY package*.json ./
+RUN npm install
+
+# Copy application source files
+COPY . .
+
+# Expose Vite default dev port
+EXPOSE 5173
+
+# Run Vite in host binding mode
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

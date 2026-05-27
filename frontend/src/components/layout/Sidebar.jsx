@@ -13,9 +13,7 @@ export default function Sidebar({ collapsed, onToggle, navItems = [], activeNav,
     >
       {/* Logo area */}
       <div className="flex items-center gap-3 px-4 h-14 border-b border-border shrink-0">
-        <div className="w-8 h-8 rounded-md bg-brand flex items-center justify-center shrink-0">
-          <span className="font-extrabold text-bg text-lg leading-none">Q</span>
-        </div>
+        <img src="/logo.png" alt="Questly Logo" className="w-8 h-8 object-contain shrink-0" />
         {!collapsed && (
           <div className="min-w-0">
             <span className="font-bold text-text-primary text-base tracking-tight block truncate">Questly</span>
