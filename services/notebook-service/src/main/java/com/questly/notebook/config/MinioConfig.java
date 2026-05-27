@@ -36,7 +36,10 @@ public class MinioConfig {
     @PostConstruct
     public void ensureBucketExists() {
         try {
-            MinioClient client = minioClient();
+            MinioClient client = MinioClient.builder()
+                    .endpoint(endpoint)
+                    .credentials(accessKey, secretKey)
+                    .build();
             boolean exists = client.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!exists) {
                 client.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());

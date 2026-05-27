@@ -14,7 +14,7 @@ const api = {
   getDocumentStatus: (nbId, docId) =>
     axiosClient.get(`/api/notebooks/${nbId}/documents/${docId}/status`).then((r) => r.data),
   sendChat: (nbId, question) =>
-    axiosClient.post(`/api/notebooks/${nbId}/chat`, { question }).then((r) => r.data),
+    axiosClient.post(`/api/notebooks/${nbId}/query`, { question }).then((r) => r.data),
 };
 
 /* ═════════════════════════════════════════════
