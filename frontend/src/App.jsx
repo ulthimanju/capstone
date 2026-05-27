@@ -1,8 +1,12 @@
-import { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router';
 import AppShell from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import ComponentShowcasePage from './pages/ComponentShowcasePage';
+import LoginPage from './pages/LoginPage';
+import NotebooksPage from './pages/NotebooksPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { useAuthStore } from './store/useAuthStore';
+import { useState, useEffect } from 'react';
 
 /* ── Navigation items ── */
 const NAV_ITEMS = [
@@ -89,25 +93,48 @@ const NAV_ITEMS = [
   },
 ];
 
-const MOCK_USER = {
-  name: 'Manju',
-  avatar: null,
-};
+/* ── Placeholder for future pages ── */
+function PlaceholderPage({ title, subtitle }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-24">
+      <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center mb-4">
+        <svg className="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.648-3.01M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-2.457-1.34a6.5 6.5 0 10-8.085 0" />
+        </svg>
+      </div>
+      <h1 className="text-2xl font-bold text-text-primary">{title}</h1>
+      <p className="text-sm text-text-muted mt-1">{subtitle}</p>
+      <p className="text-xs text-text-disabled mt-4">
+        Coming soon — visit{' '}
+        <a href="/showcase" className="text-brand hover:underline">Component Showcase</a> to see all UI components
+      </p>
+    </div>
+  );
+}
 
-function App() {
-  const [activeNav, setActiveNav] = useState('dashboard');
+/* ── Authenticated shell wrapper — syncs nav active state with route ── */
+function AuthenticatedApp() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = useAuthStore((s) => s.user);
+
+  // Derive activeNav from current path
+  const activeNav =
+    NAV_ITEMS.find((n) => n.path !== '/' && location.pathname.startsWith(n.path))?.id ??
+    (location.pathname === '/' ? 'dashboard' : 'dashboard');
 
   const handleNavChange = (id) => {
-    setActiveNav(id);
     const item = NAV_ITEMS.find((n) => n.id === id);
-    if (item?.path) {
-      window.history.pushState({}, '', item.path);
-    }
+    if (item?.path) navigate(item.path);
   };
+
+  // Derive display name: prefer user.displayName, fall back to email prefix
+  const displayName = user?.displayName || user?.email?.split('@')[0] || 'User';
+  const shellUser = { name: displayName, avatar: null };
 
   return (
     <AppShell
-      user={MOCK_USER}
+      user={shellUser}
       xp={2450}
       level={12}
       navItems={NAV_ITEMS}
@@ -116,9 +143,9 @@ function App() {
     >
       <Routes>
         <Route path="/" element={<DashboardPage />} />
+        <Route path="/notebooks" element={<NotebooksPage />} />
         <Route path="/showcase" element={<ComponentShowcasePage />} />
         {/* Placeholder routes */}
-        <Route path="/notebooks" element={<PlaceholderPage title="Notebooks" subtitle="Your study notebooks and documents" />} />
         <Route path="/quizzes" element={<PlaceholderPage title="Quizzes" subtitle="AI-generated quiz challenges" />} />
         <Route path="/flashcards" element={<PlaceholderPage title="Flashcards" subtitle="Spaced repetition study cards" />} />
         <Route path="/skilltree" element={<PlaceholderPage title="Skill Tree" subtitle="Your learning progression map" />} />
@@ -130,18 +157,25 @@ function App() {
   );
 }
 
-function PlaceholderPage({ title, subtitle }) {
+/* ═══════════════════════════════════════════════
+   App root
+═══════════════════════════════════════════════ */
+function App() {
   return (
-    <div className="flex flex-col items-center justify-center h-full py-24">
-      <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center mb-4">
-        <svg className="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.648-3.01M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-2.457-1.34a6.5 6.5 0 10-8.085 0" />
-        </svg>
-      </div>
-      <h1 className="text-2xl font-bold text-text-primary">{title}</h1>
-      <p className="text-sm text-text-muted mt-1">{subtitle}</p>
-      <p className="text-xs text-text-disabled mt-4">Coming soon — visit <a href="/showcase" className="text-brand hover:underline">Component Showcase</a> to see all UI components</p>
-    </div>
+    <Routes>
+      {/* Public route */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Protected routes */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedApp />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 

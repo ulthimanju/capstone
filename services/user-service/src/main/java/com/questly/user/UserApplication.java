@@ -2,19 +2,15 @@ package com.questly.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.kafka.annotation.EnableKafka;
 
 @SpringBootApplication
-@RestController
+@EnableDiscoveryClient
+@EnableKafka
 public class UserApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);
-    }
-
-    @GetMapping("/health")
-    public String health() {
-        return "user-service is healthy";
     }
 }

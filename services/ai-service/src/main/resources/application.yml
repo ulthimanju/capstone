@@ -6,3 +6,29 @@ spring:
     name: ai-service
   config:
     import: "optional:configserver:http://localhost:8888"
+
+ollama:
+  base-url: http://localhost:11434
+  chat-model: llama3.2:3b
+  embedding-model: nomic-embed-text
+
+chroma:
+  base-url: http://localhost:8000
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
