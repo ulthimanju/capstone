@@ -1,0 +1,13 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_quiz
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+ai-service:
+  base-url: http://localhost:8089

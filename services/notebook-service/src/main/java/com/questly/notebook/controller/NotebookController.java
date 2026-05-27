@@ -75,6 +75,15 @@ public class NotebookController {
         return ResponseEntity.ok(notebookService.getDocumentStatus(id, docId, userId));
     }
 
+    @PostMapping("/{id}/documents/{docId}/summarize")
+    public ResponseEntity<java.util.Map<String, String>> summarizeDocument(
+            @PathVariable UUID id,
+            @PathVariable UUID docId,
+            HttpServletRequest request) {
+        UUID userId = extractUserId(request);
+        return ResponseEntity.ok(notebookService.summarizeDocument(id, docId, userId));
+    }
+
     @PostMapping("/{id}/query")
     public ResponseEntity<QueryResponse> query(
             @PathVariable UUID id,

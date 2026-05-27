@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -127,6 +128,43 @@ public class NotebookService {
         Document doc = documentRepository.findByIdAndNotebookId(docId, notebookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
         return toDocumentResponse(doc);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, String> summarizeDocument(UUID notebookId, UUID docId, UUID userId) {
+        notebookRepository.findByIdAndUserId(notebookId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found"));
+        Document doc = documentRepository.findByIdAndNotebookId(docId, notebookId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+
+        if (!"READY".equalsIgnoreCase(doc.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document embedding is still processing or has failed.");
+        }
+
+        String format = doc.getMinioPath().substring(doc.getMinioPath().lastIndexOf(".") + 1).toUpperCase();
+
+        Map<String, String> payload = Map.of(
+                "minioPath", doc.getMinioPath(),
+                "format", format
+        );
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, String> response = aiRestClient.post()
+                    .uri("/internal/v1/ai/summarize")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(Map.class);
+
+            if (response == null || !response.containsKey("summary")) {
+                return Map.of("summary", "Could not generate summary.");
+            }
+            return response;
+        } catch (Exception e) {
+            log.error("AI service summarize call failed for document {}: {}", docId, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "AI generation engine unavailable: " + e.getMessage());
+        }
     }
 
     private NotebookResponse toResponse(Notebook notebook, int documentCount) {

@@ -4,6 +4,8 @@ import DashboardPage from './pages/DashboardPage';
 import ComponentShowcasePage from './pages/ComponentShowcasePage';
 import LoginPage from './pages/LoginPage';
 import NotebooksPage from './pages/NotebooksPage';
+import FlashcardsPage from './pages/FlashcardsPage';
+import QuizzesPage from './pages/QuizzesPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthStore } from './store/useAuthStore';
 import { useState, useEffect } from 'react';
@@ -146,8 +148,8 @@ function AuthenticatedApp() {
         <Route path="/notebooks" element={<NotebooksPage />} />
         <Route path="/showcase" element={<ComponentShowcasePage />} />
         {/* Placeholder routes */}
-        <Route path="/quizzes" element={<PlaceholderPage title="Quizzes" subtitle="AI-generated quiz challenges" />} />
-        <Route path="/flashcards" element={<PlaceholderPage title="Flashcards" subtitle="Spaced repetition study cards" />} />
+        <Route path="/quizzes" element={<QuizzesPage />} />
+        <Route path="/flashcards" element={<FlashcardsPage />} />
         <Route path="/skilltree" element={<PlaceholderPage title="Skill Tree" subtitle="Your learning progression map" />} />
         <Route path="/chat" element={<PlaceholderPage title="AI Chat" subtitle="RAG-powered study assistant" />} />
         <Route path="/leaderboard" element={<PlaceholderPage title="Leaderboard" subtitle="Compete with fellow learners" />} />

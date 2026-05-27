@@ -1,12 +1,10 @@
 package com.questly.ai.controller;
 
-import com.questly.ai.dto.EmbedRequest;
-import com.questly.ai.dto.EmbedResponse;
-import com.questly.ai.dto.QueryRequest;
-import com.questly.ai.dto.QueryResponse;
+import com.questly.ai.dto.*;
 import com.questly.ai.service.CollectionService;
 import com.questly.ai.service.EmbeddingService;
 import com.questly.ai.service.RagQueryService;
+import com.questly.ai.service.AiGenerationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +21,7 @@ public class InternalAiController {
     private final EmbeddingService embeddingService;
     private final RagQueryService ragQueryService;
     private final CollectionService collectionService;
+    private final AiGenerationService aiGenerationService;
 
     /**
      * Embed a document into ChromaDB.
@@ -66,5 +65,38 @@ public class InternalAiController {
         log.info("Received delete collection request for notebook {}", notebookId);
         collectionService.deleteCollection(notebookId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Generate flashcards from document context.
+     * Called by flashcard-service.
+     */
+    @PostMapping("/generate/flashcards")
+    public ResponseEntity<FlashcardGenResponse> generateFlashcards(@RequestBody FlashcardGenRequest request) {
+        log.info("Received generate flashcards request for notebook {}", request.getNotebookId());
+        FlashcardGenResponse response = aiGenerationService.generateFlashcards(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Generate quiz questions from document context.
+     * Called by quiz-service.
+     */
+    @PostMapping("/generate/quiz")
+    public ResponseEntity<QuizGenResponse> generateQuiz(@RequestBody QuizGenRequest request) {
+        log.info("Received generate quiz request for notebook {}", request.getNotebookId());
+        QuizGenResponse response = aiGenerationService.generateQuiz(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Generate plain-language summary of a document.
+     * Called by notebook-service.
+     */
+    @PostMapping("/summarize")
+    public ResponseEntity<SummarizeResponse> summarize(@RequestBody SummarizeRequest request) {
+        log.info("Received summarize request for document path: {}", request.getMinioPath());
+        SummarizeResponse response = aiGenerationService.summarize(request);
+        return ResponseEntity.ok(response);
     }
 }
