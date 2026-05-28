@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 73 |
+| Completed | 81 |
 | In Progress | 0 |
-| Pending | 39 |
-| Overall Completion | 65.2% |
+| Pending | 31 |
+| Overall Completion | 72.3% |
 
 ---
 
@@ -30,7 +30,7 @@
 | 🔧 Phase 3 — Core Infrastructure Setup | ✅ Complete | 2026-06-14 | 13 | 13 | 100% |
 | 🚀 Sprint 1 — Auth + Upload + RAG | ✅ Complete | 2026-06-28 | 10 | 10 | 100% |
 | 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ✅ Complete | 2026-07-10 | 8 | 8 | 100% |
-| 🚀 Sprint 3 — Courses + Practice + Skill Tree | ⏳ Pending | 2026-07-18 | 0 | 8 | 0% |
+| 🚀 Sprint 3 — Courses + Practice + Skill Tree | ✅ Complete | 2026-07-18 | 8 | 8 | 100% |
 | 🚀 Sprint 4 — Gamification + Analytics + Polish | ⏳ Pending | 2026-07-25 | 0 | 9 | 0% |
 | 🧪 Integration Testing | ⏳ Pending | 2026-07-28 | 0 | 6 | 0% |
 | 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-07-30 | 0 | 6 | 0% |
@@ -210,20 +210,21 @@
 
 ## 🚀 Sprint 3 — Courses + Coding Tracker + Skill Tree
 
-**Status**: ⏳ Pending
-**Target**: 2026-07-18
-**Progress**: 0 / 8 tasks
+**Status**: ✅ Complete
+**Started**: 2026-05-27
+**Completed**: 2026-05-28
+**Progress**: 8 / 8 tasks complete (100%)
 
-| # | Task | Service | Priority | Acceptance Criteria |
-|---|---|---|---|---|
-| 1 | Course entity: modules, lessons, drip-unlock logic | course-service | 🟡 Medium | Modules unlock sequentially on completion |
-| 2 | Course enrollment and progress tracking | course-service | 🟡 Medium | Enrollment stored, progress % computed |
-| 3 | Coding practice list CRUD | practice-service | 🟡 Medium | Create / read / update / delete practice lists |
-| 4 | Solve status tracking (Unsolved / Attempted / Solved) | practice-service | 🟡 Medium | Status persists per problem per user |
-| 5 | Skill Tree data model (nodes, prerequisites, unlock) | gamification-service | 🟢 Low | Node unlocks when all prerequisite nodes completed |
-| 6 | Skill Tree visual UI (DAG graph) | frontend | 🟢 Low | Interactive DAG with locked/unlocked node states |
-| 7 | Assignment submission endpoint | assignment-service | 🟢 Low | Submission stored, AI grading triggered via Kafka |
-| 8 | AI auto-grading for assignments | ai-service | 🟢 Low | LLM grades submission against rubric, returns score + feedback |
+| # | Task | Service | Priority | Acceptance Criteria | Status |
+|---|---|---|---|---|---|
+| 1 | Course entity: modules, lessons, drip-unlock logic | course-service | 🟡 Medium | Modules unlock sequentially on completion | ✅ Done |
+| 2 | Course enrollment and progress tracking | course-service | 🟡 Medium | Enrollment stored, progress % computed | ✅ Done |
+| 3 | Coding practice list CRUD | practice-service | 🟡 Medium | Create / read / update / delete practice lists | ✅ Done |
+| 4 | Solve status tracking (Unsolved / Attempted / Solved) | practice-service | 🟡 Medium | Status persists per problem per user | ✅ Done |
+| 5 | Skill Tree data model (nodes, prerequisites, unlock) | gamification-service | 🟢 Low | Node unlocks when all prerequisite nodes completed | ✅ Done |
+| 6 | Skill Tree visual UI (DAG graph) | frontend | 🟢 Low | Interactive DAG with locked/unlocked node states | ✅ Done |
+| 7 | Assignment submission endpoint | assignment-service | 🟢 Low | Submission stored, AI grading triggered via Kafka | ✅ Done |
+| 8 | AI auto-grading for assignments | ai-service | 🟢 Low | LLM grades submission against rubric, returns score + feedback | ✅ Done |
 
 ---
 
@@ -305,7 +306,7 @@
 | Phase 3 — Infrastructure | 13 | 13 | 0 | ✅ Complete |
 | Sprint 1 | 10 | 10 | 0 | ✅ Complete |
 | Sprint 2 | 8 | 8 | 0 | ✅ Complete |
-| Sprint 3 | 8 | 0 | — | Not started |
+| Sprint 3 | 8 | 8 | 0 | ✅ Complete |
 | Sprint 4 | 9 | 0 | — | Not started |
 | Testing | 6 | 0 | — | Not started |
 | Polish | 6 | 0 | — | Not started |
@@ -410,4 +411,4 @@
 
 ---
 
-*Last Updated: 2026-05-27 | Sprint 2: ✅ Complete | Next: Sprint 3 — Courses + Coding Tracker + Skill Tree*
+*Last Updated: 2026-05-28 | Sprint 3: ✅ Complete | Next: Sprint 4 — Gamification + Analytics + Polish*
