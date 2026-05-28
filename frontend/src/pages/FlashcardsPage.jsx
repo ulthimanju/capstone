@@ -4,6 +4,7 @@ import axiosClient from '../api/axiosClient';
 import FlashCard from '../components/flashcard/FlashCard';
 import FlashCardDeck from '../components/flashcard/FlashCardDeck';
 import ReviewRatingBar from '../components/flashcard/ReviewRatingBar';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const api = {
   getNotebooks: () => axiosClient.get('/api/notebooks').then((r) => r.data),
@@ -187,7 +188,7 @@ export default function FlashcardsPage() {
             {!isGenerating && activeTab === 'study' && (
               <div className="max-w-xl mx-auto flex flex-col h-full justify-center">
                 {allCardsLoading || dueCardsLoading ? (
-                  <div className="flex justify-center py-20"><Spinner size="md" /></div>
+                  <div className="flex justify-center py-20"><LoadingSpinner size="md" /></div>
                 ) : allCards.length === 0 ? (
                   /* No Cards at all */
                   <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
@@ -271,7 +272,7 @@ export default function FlashcardsPage() {
             {!isGenerating && activeTab === 'browse' && (
               <div className="space-y-4">
                 {allCardsLoading ? (
-                  <div className="flex justify-center py-10"><Spinner size="md" /></div>
+                  <div className="flex justify-center py-10"><LoadingSpinner size="md" /></div>
                 ) : allCards.length === 0 ? (
                   <p className="text-sm text-text-disabled text-center py-10">No flashcards generated yet.</p>
                 ) : (
@@ -303,7 +304,7 @@ export default function FlashcardsPage() {
             {!isGenerating && activeTab === 'stats' && (
               <div className="max-w-4xl mx-auto space-y-6">
                 {allCardsLoading ? (
-                  <div className="flex justify-center py-10"><Spinner size="md" /></div>
+                  <div className="flex justify-center py-10"><LoadingSpinner size="md" /></div>
                 ) : allCards.length === 0 ? (
                   <p className="text-sm text-text-disabled text-center py-10">No metrics available.</p>
                 ) : (
@@ -336,7 +337,7 @@ export default function FlashcardsPage() {
         </div>
       ) : (
         <div className="flex-grow flex items-center justify-center py-20 text-center">
-          <Spinner size="md" />
+          <LoadingSpinner size="md" />
         </div>
       )}
     </div>
