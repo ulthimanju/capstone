@@ -20,5 +20,6 @@ public class QuizCompletedEvent {
     private int totalQuestions;
     private List<String> wrongTopics;
     private UUID challengeId;
+    private Integer durationS;
     private String timestamp;
 }

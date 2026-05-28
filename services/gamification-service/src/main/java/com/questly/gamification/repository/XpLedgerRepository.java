@@ -18,4 +18,6 @@ public interface XpLedgerRepository extends JpaRepository<XpLedger, UUID> {
 
     @Query("SELECT x.userId, CAST(SUM(x.amount) AS long) FROM XpLedger x GROUP BY x.userId ORDER BY SUM(x.amount) DESC")
     List<Object[]> getLeaderboardData();
+
+    int countByUserIdAndReason(UUID userId, String reason);
 }

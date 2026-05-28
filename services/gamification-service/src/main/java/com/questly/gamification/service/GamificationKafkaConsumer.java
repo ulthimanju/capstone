@@ -30,7 +30,9 @@ public class GamificationKafkaConsumer {
     @RequiredArgsConstructor
     private static class DuelState {
         final BigDecimal challengerScore;
+        final Integer challengerDuration;
         final BigDecimal opponentScore;
+        final Integer opponentDuration;
     }
 
     /**
@@ -66,7 +68,7 @@ public class GamificationKafkaConsumer {
 
             // 2. Duel Resolution Gating (Conditional path correlation)
             if (challengeId != null) {
-                resolveDuelScore(userId, challengeId, score);
+                resolveDuelScore(userId, challengeId, score, event.getDurationS());
             }
 
         } catch (Exception e) {
@@ -77,8 +79,8 @@ public class GamificationKafkaConsumer {
     /**
      * Correlate duel scores and declare the winner under optimistic lock concurrency.
      */
-    private void resolveDuelScore(UUID userId, UUID challengeId, BigDecimal score) {
-        log.info("Processing duel score for user {} in challenge {}", userId, challengeId);
+    private void resolveDuelScore(UUID userId, UUID challengeId, BigDecimal score, Integer durationS) {
+        log.info("Processing duel score for user {} in challenge {}, duration={}", userId, challengeId, durationS);
         
         // Optimistic locking retry loop (up to 3 attempts)
         int attempts = 0;
@@ -102,25 +104,27 @@ public class GamificationKafkaConsumer {
                 if (state == null) {
                     // First submission
                     if (isChallenger) {
-                        activeDuels.put(challengeId, new DuelState(score, null));
+                        activeDuels.put(challengeId, new DuelState(score, durationS, null, null));
                     } else {
-                        activeDuels.put(challengeId, new DuelState(null, score));
+                        activeDuels.put(challengeId, new DuelState(null, null, score, durationS));
                     }
-                    log.info("Recorded first submission for duel {} by user {}: score={}", challengeId, userId, score);
+                    log.info("Recorded first submission for duel {} by user {}: score={}, duration={}", challengeId, userId, score, durationS);
                     return;
                 } else {
                     // Second submission
                     BigDecimal challengerScore = isChallenger ? score : state.challengerScore;
+                    Integer challengerDuration = isChallenger ? durationS : state.challengerDuration;
                     BigDecimal opponentScore = isOpponent ? score : state.opponentScore;
+                    Integer opponentDuration = isOpponent ? durationS : state.opponentDuration;
 
                     if (challengerScore == null || opponentScore == null) {
                         // DuelState correlation guard
                         if (isChallenger) {
-                            activeDuels.put(challengeId, new DuelState(score, state.opponentScore));
+                            activeDuels.put(challengeId, new DuelState(score, durationS, state.opponentScore, state.opponentDuration));
                         } else {
-                            activeDuels.put(challengeId, new DuelState(state.challengerScore, score));
+                            activeDuels.put(challengeId, new DuelState(state.challengerScore, state.challengerDuration, score, durationS));
                         }
-                        log.info("Recorded submission for duel {} by user {}: score={}", challengeId, userId, score);
+                        log.info("Recorded submission for duel {} by user {}: score={}, duration={}", challengeId, userId, score, durationS);
                         return;
                     }
 
@@ -131,8 +135,16 @@ public class GamificationKafkaConsumer {
                     } else if (opponentScore.compareTo(challengerScore) > 0) {
                         winnerId = challenge.getOpponentId();
                     } else {
-                        // Tie-breaker rule (fallback: challenger wins in v1 since duration is not in event)
-                        winnerId = challenge.getChallengerId();
+                        // Tie-breaker rule: player with lowest duration wins
+                        int challengerDur = challengerDuration != null ? challengerDuration : 9999;
+                        int opponentDur = opponentDuration != null ? opponentDuration : 9999;
+                        if (challengerDur < opponentDur) {
+                            winnerId = challenge.getChallengerId();
+                            log.info("Duel tie-breaker triggered! Challenger won on speed: {}s vs {}s", challengerDur, opponentDur);
+                        } else {
+                            winnerId = challenge.getOpponentId();
+                            log.info("Duel tie-breaker triggered! Opponent won on speed: {}s vs {}s", opponentDur, challengerDur);
+                        }
                     }
 
                     challenge.setWinnerId(winnerId);

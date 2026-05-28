@@ -12,7 +12,13 @@ import PracticePage from './pages/PracticePage';
 import SkillTreePage from './pages/SkillTreePage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthStore } from './store/useAuthStore';
+import { useNotificationStore } from './store/useNotificationStore';
+import useNotificationSSE from './hooks/useNotificationSSE';
+import Toast from './components/ui/Toast';
 import { useState, useEffect } from 'react';
+import AnalyticsPage from './pages/AnalyticsPage';
+import TutorPanelPage from './pages/TutorPanelPage';
+import AdminPanelPage from './pages/AdminPanelPage';
 
 /* ── Navigation items ── */
 const NAV_ITEMS = [
@@ -23,6 +29,16 @@ const NAV_ITEMS = [
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    path: '/analytics',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.25c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 013 18.375v-5.25zM9.75 9.75c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v8.625c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V9.75zM16.5 5.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v12.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V5.625z" />
       </svg>
     ),
   },
@@ -144,13 +160,47 @@ function AuthenticatedApp() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
 
+  // Subscribe to real-time notification stream
+  useNotificationSSE();
+
+  const activeToast = useNotificationStore(s => s.activeToast);
+  const clearToast = useNotificationStore(s => s.clearToast);
+
+  // Build dynamic nav items based on user role
+  const userNavItems = [...NAV_ITEMS];
+  if (user?.role === 'TUTOR' || user?.role === 'ADMIN') {
+    userNavItems.push({
+      id: 'tutor',
+      label: 'Tutor Workspace',
+      path: '/tutor',
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.9c2.785 0 5.37-.474 7.731-1.332.076-.257.183-.756.26-1.077l.79-3.3c.12-.5.24-1 .36-1.5m-16.882 0.05a54.898 54.898 0 012.263-8.813c.471-1.432 1.57-2.52 3.033-2.88 1.48-.363 3.012-.553 4.588-.553 1.578 0 3.11.19 4.59.553 1.462.36 2.56 1.448 3.03 2.88a54.912 54.912 0 012.26 8.814M9 10.5V6a3 3 0 016 0v4.5" />
+        </svg>
+      ),
+    });
+  }
+  if (user?.role === 'ADMIN') {
+    userNavItems.push({
+      id: 'admin',
+      label: 'Admin Panel',
+      path: '/admin',
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.524a1.125 1.125 0 011.592.253l.773 1.337a1.125 1.125 0 01-.253 1.592l-.737.524c-.35.25-.472.707-.379 1.124.093.418.423.74.843.817l.914.17c.539.098.933.565.933 1.114v1.37c0 .548-.394 1.015-.933 1.114l-.914.17c-.42.077-.75.399-.843.817-.093.418.028.875.379 1.124l.737.524c.48.34.62 1 .253 1.592l-.773 1.337a1.125 1.125 0 01-1.592.253l-.737-.524c-.35-.25-.807-.272-1.205-.108-.396.166-.71.506-.78.93l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.524a1.125 1.125 0 01-1.592-.253l-.772-1.337a1.125 1.125 0 01.253-1.592l.737-.524c.351-.25.473-.707.38-1.124-.094-.418-.424-.74-.843-.817l-.914-.17a1.125 1.125 0 01-.933-1.114v-1.37c0-.548.394-1.015.933-1.114l.914-.17c.42-.077.75-.399.843-.817.093-.418-.028-.875-.379-1.124l-.737-.524a1.125 1.125 0 01-.253-1.592l.772-1.337a1.125 1.125 0 011.592-.253l.738.524c.35.25.806.272 1.204.108.397-.166.71-.506.781-.93l.148-.894z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+    });
+  }
+
   // Derive activeNav from current path
   const activeNav =
-    NAV_ITEMS.find((n) => n.path !== '/' && location.pathname.startsWith(n.path))?.id ??
+    userNavItems.find((n) => n.path !== '/' && location.pathname.startsWith(n.path))?.id ??
     (location.pathname === '/' ? 'dashboard' : 'dashboard');
 
   const handleNavChange = (id) => {
-    const item = NAV_ITEMS.find((n) => n.id === id);
+    const item = userNavItems.find((n) => n.id === id);
     if (item?.path) navigate(item.path);
   };
 
@@ -159,11 +209,12 @@ function AuthenticatedApp() {
   const shellUser = { name: displayName, avatar: null };
 
   return (
-    <AppShell
+    <>
+      <AppShell
       user={shellUser}
       xp={2450}
       level={12}
-      navItems={NAV_ITEMS}
+      navItems={userNavItems}
       activeNav={activeNav}
       onNavChange={handleNavChange}
     >
@@ -171,6 +222,22 @@ function AuthenticatedApp() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/notebooks" element={<NotebooksPage />} />
         <Route path="/showcase" element={<ComponentShowcasePage />} />
+        {/* Real routes */}
+        <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/tutor" element={
+          user?.role === 'TUTOR' || user?.role === 'ADMIN' ? (
+            <TutorPanelPage />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        } />
+        <Route path="/admin" element={
+          user?.role === 'ADMIN' ? (
+            <AdminPanelPage />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        } />
         {/* Placeholder routes */}
         <Route path="/quizzes" element={<QuizzesPage />} />
         <Route path="/flashcards" element={<FlashcardsPage />} />
@@ -183,6 +250,16 @@ function AuthenticatedApp() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>
+
+      {activeToast && (
+        <Toast
+          message={activeToast.message}
+          variant={activeToast.variant}
+          visible={true}
+          onClose={clearToast}
+        />
+      )}
+    </>
   );
 }
 

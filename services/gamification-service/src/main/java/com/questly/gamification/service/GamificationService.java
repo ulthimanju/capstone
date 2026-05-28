@@ -13,6 +13,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,6 +33,7 @@ public class GamificationService {
     private final UserSkillProgressRepository progressRepository;
     private final ChallengeRepository challengeRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     // Seed data UUIDs for absolute reproducibility of Skill Tree DAG
     private static final UUID NODE_A_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -56,6 +58,7 @@ public class GamificationService {
             badgeRepository.save(Badge.builder().name("Leet Solver").description("Solve 5 practice problems").icon("💻").conditionType("PRACTICE_COUNT").conditionValue(5).build());
             badgeRepository.save(Badge.builder().name("Quiz Champion").description("Pass 5 quizzes").icon("🏆").conditionType("QUIZ_COUNT").conditionValue(5).build());
             badgeRepository.save(Badge.builder().name("Grandmaster").description("Earn 1000 XP").icon("👑").conditionType("XP_THRESHOLD").conditionValue(1000).build());
+            badgeRepository.save(Badge.builder().name("Consistent Learner").description("Maintain a 7-day learning streak").icon("🔥").conditionType("STREAK").conditionValue(7).build());
         }
 
         // 2. Seed Skill Tree nodes (DAG structure)
@@ -112,18 +115,31 @@ public class GamificationService {
     public void awardXp(UUID userId, int amount, String reason, UUID refId) {
         log.info("Awarding {} XP to user {} for {}", amount, userId, reason);
         XpLedger entry = XpLedger.builder()
-                .userId(userId)
-                .amount(amount)
-                .reason(reason)
-                .refId(refId)
-                .build();
+                 .userId(userId)
+                 .amount(amount)
+                 .reason(reason)
+                 .refId(refId)
+                 .build();
         xpLedgerRepository.save(entry);
 
         // Publish xp.awarded event
         publishXpAwardedEvent(userId, amount, reason, refId);
 
+        // ZSET Leaderboard Sync
+        try {
+            int newTotal = sumXpLedgerDirect(userId);
+            redisTemplate.opsForZSet().add("leaderboard:global", userId.toString(), (double) newTotal);
+            log.info("Synced Redis ZSET leaderboard for user {} score {}", userId, newTotal);
+        } catch (Exception e) {
+            log.error("Failed to sync leaderboard to Redis ZSET: {}", e.getMessage());
+        }
+
         // Check badge awards asynchronously
-        evaluateXpThresholdBadges(userId);
+        evaluateAllBadges(userId);
+    }
+
+    private int sumXpLedgerDirect(UUID userId) {
+        return xpLedgerRepository.sumAmountByUserId(userId);
     }
 
     @Transactional(readOnly = true)
@@ -285,11 +301,11 @@ public class GamificationService {
     }
 
     /**
-     * Evaluate XP Threshold based Badge Awards.
+     * Evaluate badge awards comprehensively across XP, flashcards, practice, quizzes, and streaks.
      */
-    private void evaluateXpThresholdBadges(UUID userId) {
+    public void evaluateAllBadges(UUID userId) {
+        log.info("Evaluating all badges for user {}", userId);
         try {
-            int totalXp = getUserXpTotal(userId);
             List<Badge> allBadges = badgeRepository.findAll();
             List<UserBadge> earned = userBadgeRepository.findByUserId(userId);
 
@@ -299,14 +315,52 @@ public class GamificationService {
             }
 
             for (Badge badge : allBadges) {
-                if ("XP_THRESHOLD".equalsIgnoreCase(badge.getConditionType()) && !earnedBadgeIds.contains(badge.getId())) {
-                    if (totalXp >= badge.getConditionValue()) {
-                        awardBadge(userId, badge);
-                    }
+                if (earnedBadgeIds.contains(badge.getId())) {
+                    continue;
+                }
+
+                String condType = badge.getConditionType().toUpperCase();
+                int condValue = badge.getConditionValue();
+                boolean eligible = false;
+
+                switch (condType) {
+                    case "XP_THRESHOLD":
+                        int totalXp = getUserXpTotal(userId);
+                        eligible = (totalXp >= condValue);
+                        break;
+                    case "FLASHCARD_COUNT":
+                        int flashcards = xpLedgerRepository.countByUserIdAndReason(userId, "FLASHCARD_REVIEWED");
+                        eligible = (flashcards >= condValue);
+                        break;
+                    case "PRACTICE_COUNT":
+                        int practice = xpLedgerRepository.countByUserIdAndReason(userId, "PRACTICE_SOLVED");
+                        eligible = (practice >= condValue);
+                        break;
+                    case "QUIZ_COUNT":
+                        int quizzes = xpLedgerRepository.countByUserIdAndReason(userId, "QUIZ_COMPLETED");
+                        eligible = (quizzes >= condValue);
+                        break;
+                    case "STREAK":
+                        // Retrieve current user streak from Redis
+                        String streakStr = redisTemplate.opsForValue().get("user:streak:" + userId);
+                        int streak = 0;
+                        if (streakStr != null) {
+                            try {
+                                streak = Integer.parseInt(streakStr);
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        eligible = (streak >= condValue);
+                        break;
+                    default:
+                        log.warn("Unknown badge condition type: {}", condType);
+                }
+
+                if (eligible) {
+                    awardBadge(userId, badge);
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to evaluate XP threshold badges for user {}: {}", userId, e.getMessage());
+            log.error("Failed to evaluate badges for user {}: {}", userId, e.getMessage(), e);
         }
     }
 
