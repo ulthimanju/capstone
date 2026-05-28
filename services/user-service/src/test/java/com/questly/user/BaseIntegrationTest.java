@@ -10,7 +10,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer"
     }
 )
 @Testcontainers
