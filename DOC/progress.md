@@ -15,8 +15,8 @@
 |---|---|
 | Total Tasks | 112 |
 | Completed | 90 |
-| In Progress | 0 |
-| Pending | 22 |
+| In Progress | 1 |
+| Pending | 21 |
 | Overall Completion | 80.4% |
 
 ---
@@ -32,7 +32,7 @@
 | 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ✅ Complete | 2026-07-10 | 8 | 8 | 100% |
 | 🚀 Sprint 3 — Courses + Practice + Skill Tree | ✅ Complete | 2026-07-18 | 8 | 8 | 100% |
 | 🚀 Sprint 4 — Gamification + Analytics + Polish | ✅ Complete | 2026-07-25 | 9 | 9 | 100% |
-| 🧪 Integration Testing | ⏳ Pending | 2026-07-28 | 0 | 6 | 0% |
+| 🧪 Integration Testing | 🔄 In Progress | 2026-07-28 | 1 | 6 | 16.7% |
 | 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-07-30 | 0 | 6 | 0% |
 | 🎓 Final Submission / Demo | ⏳ Pending | 2026-07-31 | 0 | 4 | 0% |
 
@@ -251,18 +251,18 @@
 
 ## 🧪 Integration Testing
 
-**Status**: ⏳ Pending
+**Status**: 🔄 In Progress
 **Target**: 2026-07-28
-**Progress**: 0 / 6 tasks
+**Progress**: 1 / 6 tasks
 
-| # | Test Scenario | Services Involved | Pass Criteria |
-|---|---|---|---|
-| 1 | Upload → parse → embed → RAG query | notebook, ai | Accurate answer from uploaded doc only |
-| 2 | Login → enroll → complete module → unlock next | auth, course, gamification | Module 2 unlocks after module 1 completed |
-| 3 | Quiz attempt → weak spot flagged → resurface | quiz | Weak topic reappears in next session |
-| 4 | Activity → XP awarded → badge triggered → notification sent | gamification, user, notification | Full Kafka event chain verified |
-| 5 | JWT validation, role enforcement at gateway | auth, gateway | STUDENT cannot access TUTOR-only endpoints |
-| 6 | Load test: document ingestion pipeline | notebook, ai, chromadb | 10 concurrent uploads complete without failure |
+| # | Test Scenario | Services Involved | Pass Criteria | Status |
+|---|---|---|---|---|
+| 1 | Upload → parse → embed → RAG query | notebook, ai | Accurate answer from uploaded doc only | ⏳ Pending |
+| 2 | Login → enroll → complete module → unlock next | auth, course, gamification | Module 2 unlocks after module 1 completed | ⏳ Pending |
+| 3 | Quiz attempt → weak spot flagged → resurface | quiz | Weak topic reappears in next session | ⏳ Pending |
+| 4 | Activity → XP awarded → badge triggered → notification sent | gamification, user, notification | Full Kafka event chain verified | 🔄 In Progress (Base suites verified) |
+| 5 | JWT validation, role enforcement at gateway | auth, gateway | STUDENT cannot access TUTOR-only endpoints | ⏳ Pending |
+| 6 | Load test: document ingestion pipeline | notebook, ai, chromadb | 10 concurrent uploads complete without failure | ⏳ Pending |
 
 ---
 
@@ -412,4 +412,4 @@
 
 ---
 
-*Last Updated: 2026-05-28 | Sprint 4: ✅ Complete | Next: Integration Testing & Polish*
+*Last Updated: 2026-05-28 | Integration Testing: 🔄 In Progress | Next: Solve remaining test scenarios & polish*
