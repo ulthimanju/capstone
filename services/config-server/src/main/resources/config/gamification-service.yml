@@ -1,0 +1,10 @@
+server:
+  port: 8090
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/db_gamification
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false

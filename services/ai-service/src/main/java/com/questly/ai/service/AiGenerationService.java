@@ -263,4 +263,45 @@ public class AiGenerationService {
 
         return clean.trim();
     }
+
+    /**
+     * Grades a student submission against an evaluation rubric.
+     */
+    public GradeResponse gradeSubmission(GradeRequest req) {
+        log.info("Grading submission against rubric...");
+        try {
+            String prompt = String.format(
+                    """
+                    You are an expert grading tutor. Grade the following student's assignment submission based strictly on the evaluation rubric.
+                    Provide a numeric score out of 100 and construct clear, actionable structured feedback.
+                    Do not output anything other than a valid JSON object matching the format below.
+                    
+                    Format:
+                    {
+                      "score": 85.5,
+                      "feedback": "Your explanation of self-attention is solid, but you missed the formula."
+                    }
+                    
+                    Rubric:
+                    %s
+                    
+                    Submission:
+                    %s
+                    """, req.getRubric(), req.getSubmissionContent());
+
+            String responseText = chatModel.generate(prompt);
+            String cleanJson = sanitizeJsonPayload(responseText);
+            log.info("Sanitized grading LLM response: {}", cleanJson);
+
+            return objectMapper.readValue(cleanJson, GradeResponse.class);
+        } catch (Exception e) {
+            log.error("Failed to grade assignment submission via LLM: {}", e.getMessage(), e);
+            // Return a fallback grading response so the pipeline does not completely fail
+            return GradeResponse.builder()
+                    .score(java.math.BigDecimal.valueOf(50.0))
+                    .feedback("Auto-grading encountered an error, but here is a default pass: " + e.getMessage())
+                    .build();
+        }
+    }
 }
+

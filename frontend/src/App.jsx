@@ -6,6 +6,10 @@ import LoginPage from './pages/LoginPage';
 import NotebooksPage from './pages/NotebooksPage';
 import FlashcardsPage from './pages/FlashcardsPage';
 import QuizzesPage from './pages/QuizzesPage';
+import CoursesPage from './pages/CoursesPage';
+import CourseViewerPage from './pages/CourseViewerPage';
+import PracticePage from './pages/PracticePage';
+import SkillTreePage from './pages/SkillTreePage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthStore } from './store/useAuthStore';
 import { useState, useEffect } from 'react';
@@ -49,6 +53,26 @@ const NAV_ITEMS = [
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" />
+      </svg>
+    ),
+  },
+  {
+    id: 'courses',
+    label: 'Courses',
+    path: '/courses',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292" />
+      </svg>
+    ),
+  },
+  {
+    id: 'practice',
+    label: 'Practice',
+    path: '/practice',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
       </svg>
     ),
   },
@@ -150,7 +174,10 @@ function AuthenticatedApp() {
         {/* Placeholder routes */}
         <Route path="/quizzes" element={<QuizzesPage />} />
         <Route path="/flashcards" element={<FlashcardsPage />} />
-        <Route path="/skilltree" element={<PlaceholderPage title="Skill Tree" subtitle="Your learning progression map" />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/courses/:id" element={<CourseViewerPage />} />
+        <Route path="/practice" element={<PracticePage />} />
+        <Route path="/skilltree" element={<SkillTreePage />} />
         <Route path="/chat" element={<PlaceholderPage title="AI Chat" subtitle="RAG-powered study assistant" />} />
         <Route path="/leaderboard" element={<PlaceholderPage title="Leaderboard" subtitle="Compete with fellow learners" />} />
         <Route path="*" element={<Navigate to="/" replace />} />

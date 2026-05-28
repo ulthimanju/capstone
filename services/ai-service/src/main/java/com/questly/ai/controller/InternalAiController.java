@@ -99,4 +99,16 @@ public class InternalAiController {
         SummarizeResponse response = aiGenerationService.summarize(request);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * Grade student submission.
+     * Called by assignment-service.
+     */
+    @PostMapping("/grade")
+    public ResponseEntity<GradeResponse> gradeSubmission(@RequestBody GradeRequest request) {
+        log.info("Received assignment grading request");
+        GradeResponse response = aiGenerationService.gradeSubmission(request);
+        return ResponseEntity.ok(response);
+    }
 }
+
