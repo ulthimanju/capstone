@@ -14,10 +14,10 @@
 | Metric | Value |
 |---|---|
 | Total Tasks | 112 |
-| Completed | 90 |
-| In Progress | 1 |
-| Pending | 21 |
-| Overall Completion | 80.4% |
+| Completed | 95 |
+| In Progress | 0 |
+| Pending | 17 |
+| Overall Completion | 84.8% |
 
 ---
 
@@ -32,7 +32,7 @@
 | 🚀 Sprint 2 — Flashcards + Quiz + Weak Spot | ✅ Complete | 2026-07-10 | 8 | 8 | 100% |
 | 🚀 Sprint 3 — Courses + Practice + Skill Tree | ✅ Complete | 2026-07-18 | 8 | 8 | 100% |
 | 🚀 Sprint 4 — Gamification + Analytics + Polish | ✅ Complete | 2026-07-25 | 9 | 9 | 100% |
-| 🧪 Integration Testing | 🔄 In Progress | 2026-07-28 | 1 | 6 | 16.7% |
+| 🧪 Integration Testing | ✅ Complete | 2026-07-28 | 6 | 6 | 100% |
 | 🐛 Bug Fixing & Polish | ⏳ Pending | 2026-07-30 | 0 | 6 | 0% |
 | 🎓 Final Submission / Demo | ⏳ Pending | 2026-07-31 | 0 | 4 | 0% |
 
@@ -251,18 +251,18 @@
 
 ## 🧪 Integration Testing
 
-**Status**: 🔄 In Progress
+**Status**: ✅ Complete
 **Target**: 2026-07-28
-**Progress**: 1 / 6 tasks
+**Progress**: 6 / 6 tasks complete (100%)
 
-| # | Test Scenario | Services Involved | Pass Criteria | Status |
-|---|---|---|---|---|
-| 1 | Upload → parse → embed → RAG query | notebook, ai | Accurate answer from uploaded doc only | ⏳ Pending |
-| 2 | Login → enroll → complete module → unlock next | auth, course, gamification | Module 2 unlocks after module 1 completed | ⏳ Pending |
-| 3 | Quiz attempt → weak spot flagged → resurface | quiz | Weak topic reappears in next session | ⏳ Pending |
-| 4 | Activity → XP awarded → badge triggered → notification sent | gamification, user, notification | Full Kafka event chain verified | 🔄 In Progress (Base suites verified) |
-| 5 | JWT validation, role enforcement at gateway | auth, gateway | STUDENT cannot access TUTOR-only endpoints | ⏳ Pending |
-| 6 | Load test: document ingestion pipeline | notebook, ai, chromadb | 10 concurrent uploads complete without failure | ⏳ Pending |
+| # | Test Scenario | Services Involved | Pass Criteria | Status | Completed On | Notes |
+|---|---|---|---|---|---|---|
+| 1 | Upload → parse → embed → RAG query | notebook, ai | Accurate answer from uploaded doc only | ✅ Complete | 2026-05-29 | Validated with DocumentIngestionIT using postgres & MinIO |
+| 2 | Login → enroll → complete module → unlock next | auth, course, gamification | Module 2 unlocks after module 1 completed | ✅ Complete | 2026-05-29 | Validated sequential unlocks with CourseProgressionIT |
+| 3 | Quiz attempt → weak spot flagged → resurface | quiz | Weak topic reappears in next session | ✅ Complete | 2026-05-29 | Validated weak spots tracking with QuizWeakSpotIT |
+| 4 | Activity → XP awarded → badge triggered → notification sent | gamification, user, notification | Full Kafka event chain verified | ✅ Complete | 2026-05-29 | Verified via integration Kafka event triggers |
+| 5 | JWT validation, role enforcement at gateway | auth, gateway | STUDENT cannot access TUTOR-only endpoints | ✅ Complete | 2026-05-29 | Validated edge routing with GatewaySecurityIT |
+| 6 | Load test: document ingestion pipeline | notebook, ai, chromadb | 10 concurrent uploads complete without failure | ✅ Complete | 2026-05-29 | Simulated parallel uploads in DocumentLoadTestIT |
 
 ---
 
@@ -309,7 +309,7 @@
 | Sprint 2 | 8 | 8 | 0 | ✅ Complete |
 | Sprint 3 | 8 | 8 | 0 | ✅ Complete |
 | Sprint 4 | 9 | 9 | 0 | ✅ Complete |
-| Testing | 6 | 0 | — | Not started |
+| Testing | 6 | 6 | 0 | ✅ Complete |
 | Polish | 6 | 0 | — | Not started |
 | Demo | 4 | 0 | — | Not started |
 
@@ -412,4 +412,4 @@
 
 ---
 
-*Last Updated: 2026-05-28 | Integration Testing: 🔄 In Progress | Next: Solve remaining test scenarios & polish*
+*Last Updated: 2026-05-29 | Integration Testing: ✅ Complete | Next: Move to Bug Fixing & Polish*
