@@ -81,6 +81,31 @@ export default function QuizzesPage() {
     queryFn: api.getWeakSpots,
   });
 
+  const handleAutoSubmit = () => {
+    alert("Time's up! Submitting your attempt automatically.");
+    handleSubmitAttempt();
+  };
+
+  const handleSubmitAttempt = async () => {
+    if (!activeQuiz) return;
+    setIsQuizActive(false);
+
+    // Format answers map to payload list
+    const formattedAnswers = activeQuiz.questions.map((q) => ({
+      questionId: q.id,
+      answer: answers[q.id] || '',
+    }));
+
+    try {
+      const res = await api.attemptQuiz(activeQuiz.id, formattedAnswers);
+      setAttemptResult(res);
+      queryClient.invalidateQueries({ queryKey: ['quizzes-attempts-all'] });
+      queryClient.invalidateQueries({ queryKey: ['weak-spots'] });
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to submit quiz attempt.');
+    }
+  };
+
   /* ── Query all attempts globally ── */
   const { data: allAttempts = [], isLoading: attemptsLoading } = useQuery({
     queryKey: ['quizzes-attempts-all'],
@@ -100,6 +125,13 @@ export default function QuizzesPage() {
     }, 1000);
     return () => clearInterval(timer);
   }, [isQuizActive, timeLeft]);
+
+  const exitQuiz = () => {
+    setActiveQuiz(null);
+    setIsQuizActive(false);
+    setAttemptResult(null);
+    setActiveTab('dashboard');
+  };
 
   const handleGenerate = async () => {
     if (!selectedNb) return;
@@ -141,38 +173,6 @@ export default function QuizzesPage() {
       ...prev,
       [questionId]: text,
     }));
-  };
-
-  const handleAutoSubmit = () => {
-    alert("Time's up! Submitting your attempt automatically.");
-    handleSubmitAttempt();
-  };
-
-  const handleSubmitAttempt = async () => {
-    if (!activeQuiz) return;
-    setIsQuizActive(false);
-
-    // Format answers map to payload list
-    const formattedAnswers = activeQuiz.questions.map((q) => ({
-      questionId: q.id,
-      answer: answers[q.id] || '',
-    }));
-
-    try {
-      const res = await api.attemptQuiz(activeQuiz.id, formattedAnswers);
-      setAttemptResult(res);
-      queryClient.invalidateQueries({ queryKey: ['quizzes-attempts-all'] });
-      queryClient.invalidateQueries({ queryKey: ['weak-spots'] });
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to submit quiz attempt.');
-    }
-  };
-
-  const exitQuiz = () => {
-    setActiveQuiz(null);
-    setIsQuizActive(false);
-    setAttemptResult(null);
-    setActiveTab('dashboard');
   };
 
   const handleToggleType = (type) => {

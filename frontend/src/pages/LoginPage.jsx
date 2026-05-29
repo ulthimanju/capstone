@@ -196,7 +196,7 @@ export default function LoginPage() {
     if (!regForm.email.trim()) errs.email = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regForm.email)) errs.email = 'Enter a valid email address.';
     if (!regForm.password) errs.password = 'Password is required.';
-    else if (regForm.password.length < 6) errs.password = 'Password must be at least 6 characters.';
+    else if (regForm.password.length < 8) errs.password = 'Password must be at least 8 characters.';
     if (regForm.confirmPassword !== regForm.password) errs.confirmPassword = 'Passwords do not match.';
     return errs;
   };
@@ -375,7 +375,7 @@ export default function LoginPage() {
             <PasswordField
               label="Password"
               name="password"
-              placeholder="Create a password (min. 6 chars)"
+              placeholder="Create a password (min. 8 chars)"
               value={regForm.password}
               onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
               error={regErrors.password}

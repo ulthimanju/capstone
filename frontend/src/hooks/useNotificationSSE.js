@@ -13,9 +13,8 @@ export default function useNotificationSSE() {
   useEffect(() => {
     if (!user || !accessToken) return;
 
-    // Use SSE stream URL. In microservices behind a gateway, we route via port 8080.
-    // Pass accessToken as query parameter so browser EventSource can authenticate.
-    const streamUrl = `/api/notifications/stream?token=${accessToken}`;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    const streamUrl = `${API_BASE_URL}/api/notifications/stream?token=${accessToken}`;
     logDebug('Establishing SSE connection to: ' + streamUrl);
 
     const eventSource = new EventSource(streamUrl);

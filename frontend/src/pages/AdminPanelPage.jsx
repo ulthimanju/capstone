@@ -11,10 +11,6 @@ export default function AdminPanelPage() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   async function fetchUsers() {
     try {
       setLoading(true);
@@ -28,6 +24,10 @@ export default function AdminPanelPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleRoleChange = async (userId, newRole) => {
     try {

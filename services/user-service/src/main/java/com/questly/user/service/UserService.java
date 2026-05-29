@@ -1,5 +1,8 @@
 package com.questly.user.service;
 
+import com.questly.user.event.UserRoleUpdatedEvent;
+import com.questly.user.event.UserSuspendedEvent;
+import com.questly.user.kafka.UserEventProducer;
 import com.questly.user.model.UserProfile;
 import com.questly.user.model.UserStats;
 import com.questly.user.repository.UserProfileRepository;
@@ -30,6 +33,7 @@ public class UserService {
     private final UserProfileRepository userProfileRepository;
     private final UserStatsRepository userStatsRepository;
     private final StringRedisTemplate redisTemplate;
+    private final UserEventProducer userEventProducer;
 
     private static final String TZ_CACHE_KEY_PREFIX = "user:timezone:";
     private static final String STREAK_CACHE_KEY_PREFIX = "user:streak:";
@@ -168,10 +172,25 @@ public class UserService {
     public UserProfile updateRole(UUID id, String role) {
         UserProfile existing = getProfile(id);
         existing.setRole(role);
-        return userProfileRepository.save(existing);
+        UserProfile saved = userProfileRepository.save(existing);
+
+        userEventProducer.publishUserRoleUpdated(
+            UserRoleUpdatedEvent.builder()
+                .userId(id)
+                .role(role)
+                .build()
+        );
+
+        return saved;
     }
 
     public void deleteUser(UUID id) {
         userProfileRepository.deleteById(id);
+
+        userEventProducer.publishUserSuspended(
+            UserSuspendedEvent.builder()
+                .userId(id)
+                .build()
+        );
     }
 }

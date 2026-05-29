@@ -41,6 +41,29 @@ public class IngestionService {
 
     @Transactional
     public DocumentResponse ingestFile(UUID notebookId, UUID userId, MultipartFile file) {
+        // 0. File validation
+        if (file == null || file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File must not be empty");
+        }
+        if (file.getSize() > 10 * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File size exceeds limit of 10MB");
+        }
+        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "";
+        String lowerFilename = originalFilename.toLowerCase();
+        if (!lowerFilename.endsWith(".pdf") && !lowerFilename.endsWith(".md") && !lowerFilename.endsWith(".txt")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported file extension. Only PDF, MD, and TXT are allowed.");
+        }
+        String contentType = file.getContentType();
+        if (contentType != null) {
+            String lowerContentType = contentType.toLowerCase();
+            if (!lowerContentType.contains("pdf") &&
+                !lowerContentType.contains("markdown") &&
+                !lowerContentType.contains("text/plain") &&
+                !lowerContentType.contains("application/octet-stream")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MIME type: " + contentType);
+            }
+        }
+
         // 1. Ownership check
         notebookRepository.findByIdAndUserId(notebookId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found"));
@@ -62,7 +85,6 @@ public class IngestionService {
         }
 
         // 4. Determine format
-        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "upload";
         String format = detectFormat(file.getContentType(), originalFilename);
 
         // 5. Generate UUID and build MinIO path

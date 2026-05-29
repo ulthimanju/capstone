@@ -3,15 +3,21 @@ package com.questly.gateway.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
@@ -62,7 +68,10 @@ public class SecurityConfig {
                 
                 .anyExchange().authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .bearerTokenConverter(new CustomBearerTokenAuthenticationConverter())
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+            );
         return http.build();
     }
 
@@ -93,6 +102,28 @@ public class SecurityConfig {
             return NimbusReactiveJwtDecoder.withPublicKey(publicKey).build();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to configure ReactiveJwtDecoder", e);
+        }
+    }
+
+    private static class CustomBearerTokenAuthenticationConverter implements ServerAuthenticationConverter {
+        @Override
+        public Mono<Authentication> convert(ServerWebExchange exchange) {
+            return Mono.justOrEmpty(resolveToken(exchange))
+                    .map(BearerTokenAuthenticationToken::new);
+        }
+
+        private String resolveToken(ServerWebExchange exchange) {
+            // 1. Check Authorization header
+            String authorization = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            if (authorization != null && authorization.toLowerCase().startsWith("bearer ")) {
+                return authorization.substring(7);
+            }
+            // 2. Check "token" query parameter (e.g. for SSE)
+            String token = exchange.getRequest().getQueryParams().getFirst("token");
+            if (token != null && !token.trim().isEmpty()) {
+                return token;
+            }
+            return null;
         }
     }
 }

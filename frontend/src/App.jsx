@@ -15,7 +15,6 @@ import { useAuthStore } from './store/useAuthStore';
 import { useNotificationStore } from './store/useNotificationStore';
 import useNotificationSSE from './hooks/useNotificationSSE';
 import Toast from './components/ui/Toast';
-import { useState, useEffect } from 'react';
 import AnalyticsPage from './pages/AnalyticsPage';
 import TutorPanelPage from './pages/TutorPanelPage';
 import AdminPanelPage from './pages/AdminPanelPage';

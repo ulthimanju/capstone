@@ -37,7 +37,7 @@ public class AuthController {
      * Login with email and password. Returns 200 OK.
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         log.info("Login request for email={}", request.getEmail());
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
@@ -47,9 +47,8 @@ public class AuthController {
      * Exchange a refresh token for a new access token.
      */
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
-        AuthResponse response = authService.refresh(refreshToken);
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody TokenRequest request) {
+        AuthResponse response = authService.refresh(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 
@@ -57,9 +56,8 @@ public class AuthController {
      * Logout by invalidating the refresh token.
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
-        authService.logout(refreshToken);
+    public ResponseEntity<Void> logout(@Valid @RequestBody TokenRequest request) {
+        authService.logout(request.getRefreshToken());
         return ResponseEntity.noContent().build();
     }
 
@@ -76,7 +74,7 @@ public class AuthController {
      * Dev-only Google mock login — bypasses real OAuth2 flow.
      */
     @PostMapping("/google/mock")
-    public ResponseEntity<AuthResponse> googleMock(@RequestBody GoogleMockRequest request) {
+    public ResponseEntity<AuthResponse> googleMock(@Valid @RequestBody GoogleMockRequest request) {
         log.info("Google mock login for email={}", request.getEmail());
         AuthResponse response = authService.googleMockLogin(request);
         return ResponseEntity.ok(response);

@@ -172,6 +172,20 @@ public class CourseService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot complete a module you have not unlocked yet");
         }
 
+        List<UUID> completed = new ArrayList<>(enrollment.getCompletedModules());
+        if (completed.contains(moduleId)) {
+            log.info("Module {} already completed for student {} in course {}. Skipping.", moduleId, userId, courseId);
+            return ProgressResponse.builder()
+                    .progress(enrollment.getProgress())
+                    .unlockedModules(enrollment.getUnlockedModules())
+                    .completed(enrollment.isCompleted())
+                    .build();
+        }
+
+        // Add to completed modules
+        completed.add(moduleId);
+        enrollment.setCompletedModules(completed);
+
         // Sort modules to evaluate sequence
         List<Module> modules = new ArrayList<>(course.getModules());
         modules.sort(Comparator.comparingInt(Module::getOrderIndex));
@@ -184,10 +198,8 @@ public class CourseService {
             }
         }
 
-        // 1. Calculate progress: Number of completed modules.
-        // Assuming consecutive order completion: completing module index i means i + 1 modules completed.
         int totalModules = modules.size();
-        int completedCount = completedIndex + 1;
+        int completedCount = completed.size();
 
         BigDecimal progress = BigDecimal.valueOf(completedCount)
                 .multiply(BigDecimal.valueOf(100))

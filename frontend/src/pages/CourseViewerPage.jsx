@@ -25,6 +25,29 @@ export default function CourseViewerPage() {
   // Polling ref for grading
   const pollingIntervals = useRef({});
 
+  const startPolling = (assignmentId) => {
+    if (pollingIntervals.current[assignmentId]) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const { data: subData } = await axiosClient.get(`/api/assignments/${assignmentId}/submission`);
+        setSubmissionsMap(prev => ({
+          ...prev,
+          [assignmentId]: subData
+        }));
+
+        if (subData && subData.status !== 'PENDING') {
+          clearInterval(pollingIntervals.current[assignmentId]);
+          delete pollingIntervals.current[assignmentId];
+        }
+      } catch (e) {
+        console.error('Polling assignment submission failed', e);
+      }
+    }, 4000);
+
+    pollingIntervals.current[assignmentId] = interval;
+  };
+
   useEffect(() => {
     async function loadCourseData() {
       try {
@@ -87,29 +110,6 @@ export default function CourseViewerPage() {
       Object.values(pollingIntervals.current).forEach(clearInterval);
     };
   }, [courseId]);
-
-  const startPolling = (assignmentId) => {
-    if (pollingIntervals.current[assignmentId]) return;
-
-    const interval = setInterval(async () => {
-      try {
-        const { data: subData } = await axiosClient.get(`/api/assignments/${assignmentId}/submission`);
-        setSubmissionsMap(prev => ({
-          ...prev,
-          [assignmentId]: subData
-        }));
-
-        if (subData && subData.status !== 'PENDING') {
-          clearInterval(pollingIntervals.current[assignmentId]);
-          delete pollingIntervals.current[assignmentId];
-        }
-      } catch (e) {
-        console.error('Polling assignment submission failed', e);
-      }
-    }, 4000);
-
-    pollingIntervals.current[assignmentId] = interval;
-  };
 
   const handleCompleteModule = async (moduleId) => {
     try {

@@ -42,6 +42,11 @@ public class Enrollment {
     @Builder.Default
     private List<UUID> unlockedModules = new ArrayList<>();
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "completed_modules", columnDefinition = "uuid[]", nullable = false)
+    @Builder.Default
+    private List<UUID> completedModules = new ArrayList<>();
+
     @Column(nullable = false)
     @Builder.Default
     private boolean completed = false;

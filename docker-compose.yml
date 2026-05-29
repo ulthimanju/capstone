@@ -137,6 +137,8 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
       - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
       - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       postgres:
         condition: service_healthy
@@ -245,6 +247,7 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - AI_SERVICE_BASE_URL=http://ai-service:8089
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -294,6 +297,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_quiz
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -315,6 +319,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_flashcard
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -339,6 +344,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_course
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -360,6 +366,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_assignment
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -381,6 +388,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_practice
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -402,6 +410,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_gamification
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -423,6 +432,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_analytics
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
@@ -444,6 +454,7 @@ services:
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_notification
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       gateway:
         condition: service_started
