@@ -10,4 +10,7 @@ spring:
     show-sql: false
 
 ai-service:
-  base-url: http://ai-service:8089
+  base-url: ${AI_SERVICE_BASE_URL:http://ai-service:8089}
+
+course-service:
+  base-url: ${COURSE_SERVICE_BASE_URL:http://course-service:8086}
