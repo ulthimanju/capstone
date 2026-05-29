@@ -130,6 +130,16 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- Failsafe runs IT tests; set exit timeout to 0 so Surefire doesn't
+                 print a spurious [ERROR] when singleton Testcontainer threads keep
+                 the forked JVM alive briefly after System.exit(0). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <forkedProcessExitTimeoutInSeconds>0</forkedProcessExitTimeoutInSeconds>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
