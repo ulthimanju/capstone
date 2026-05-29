@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axiosClient from '../api/axiosClient';
 import { useAuthStore } from '../store/useAuthStore';
@@ -132,6 +132,50 @@ export default function LoginPage() {
   const [googleMockOpen, setGoogleMockOpen] = useState(false);
   const [googleEmail, setGoogleEmail] = useState('');
   const [googleName, setGoogleName] = useState('');
+
+  // Show the dev mock panel only in Vite dev mode
+  const isDevMode = import.meta.env.DEV;
+
+  // ── OAuth2 exchange-code handler ────────────────────────────────────────────
+  // After a successful Google OAuth2 login, auth-service redirects here with
+  // ?code=<uuid>. We POST that code to /api/auth/oauth2/exchange to receive the
+  // JWT tokens in the response body (tokens never appear in browser history).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const exchangeCode = params.get('code');
+    if (!exchangeCode) return;
+
+    // Remove the code from the URL immediately so it can't be replayed
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    const redeemCode = async () => {
+      setLoading(true);
+      setApiError('');
+      try {
+        // Step 1: exchange the one-time code for tokens
+        const { data } = await axiosClient.post('/api/auth/oauth2/exchange', {
+          code: exchangeCode,
+        });
+        const { accessToken, refreshToken } = data;
+
+        // Step 2: fetch server-verified identity (never trust client-side JWT decode)
+        const meRes = await axiosClient.get('/api/auth/me', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const { userId, role, email } = meRes.data;
+
+        setAuth(accessToken, refreshToken, { userId, email, role });
+        navigate('/', { replace: true });
+      } catch (err) {
+        setApiError(friendlyError(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    redeemCode();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* ── Login form state ── */
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
@@ -400,59 +444,73 @@ export default function LoginPage() {
           </form>
         )}
 
-        {/* Divider */}
+        {/* Google sign-in section */}
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-border" />
           <span className="text-xs text-text-disabled">or continue with</span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
-        {/* Google mock button */}
-        {!googleMockOpen ? (
-          <button
-            type="button"
-            onClick={() => setGoogleMockOpen(true)}
-            className="w-full h-10 rounded-md border border-border hover:border-brand-hover bg-transparent text-text-primary text-sm font-medium flex items-center justify-center gap-3 cursor-pointer transition-colors duration-150 hover:bg-surface-elevated"
-          >
-            <GoogleGIcon />
-            Continue with Google <span className="text-text-disabled text-xs">(Dev Mock)</span>
-          </button>
-        ) : (
-          <form onSubmit={handleGoogleMock} className="space-y-3 animate-fade-in">
-            <p className="text-xs text-text-muted mb-2">Enter details for Google mock login:</p>
-            <Field label="Display name">
-              <Input
-                type="text"
-                placeholder="Your name"
-                value={googleName}
-                onChange={(e) => setGoogleName(e.target.value)}
-              />
-            </Field>
-            <Field label="Email address">
-              <Input
-                type="email"
-                placeholder="you@gmail.com"
-                value={googleEmail}
-                onChange={(e) => setGoogleEmail(e.target.value)}
-              />
-            </Field>
-            <div className="flex gap-2 pt-1">
+        {/* Real Google OAuth2 button — initiates the server-side flow */}
+        <a
+          id="google-oauth-btn"
+          href="http://localhost:8080/api/auth/oauth2/authorization/google"
+          className="w-full h-10 rounded-md border border-border hover:border-brand-hover bg-transparent text-text-primary text-sm font-medium flex items-center justify-center gap-3 cursor-pointer transition-colors duration-150 hover:bg-surface-elevated no-underline"
+        >
+          <GoogleGIcon />
+          Continue with Google
+        </a>
+
+        {/* Dev-only mock panel — rendered only in Vite DEV mode */}
+        {isDevMode && (
+          <div className="mt-3">
+            {!googleMockOpen ? (
               <button
                 type="button"
-                onClick={() => setGoogleMockOpen(false)}
-                className="flex-1 h-9 rounded-md border border-border text-text-muted hover:text-text-primary text-sm cursor-pointer transition-colors duration-150"
+                onClick={() => setGoogleMockOpen(true)}
+                className="w-full h-8 rounded-md border border-dashed border-border text-text-disabled hover:text-text-muted text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors duration-150"
               >
-                Cancel
+                <GoogleGIcon />
+                Dev Mock Login
               </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 h-9 rounded-md bg-brand hover:bg-brand-hover text-bg text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {loading ? <><Spinner /> Signing in…</> : 'Sign In with Google'}
-              </button>
-            </div>
-          </form>
+            ) : (
+              <form onSubmit={handleGoogleMock} className="space-y-3 animate-fade-in mt-2">
+                <p className="text-xs text-text-muted mb-2">Dev mock — bypasses real OAuth flow:</p>
+                <Field label="Display name">
+                  <Input
+                    type="text"
+                    placeholder="Your name"
+                    value={googleName}
+                    onChange={(e) => setGoogleName(e.target.value)}
+                  />
+                </Field>
+                <Field label="Email address">
+                  <Input
+                    type="email"
+                    placeholder="you@gmail.com"
+                    value={googleEmail}
+                    onChange={(e) => setGoogleEmail(e.target.value)}
+                  />
+                </Field>
+                <div className="flex gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setGoogleMockOpen(false)}
+                    className="flex-1 h-9 rounded-md border border-border text-text-muted hover:text-text-primary text-sm cursor-pointer transition-colors duration-150"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 h-9 rounded-md bg-brand hover:bg-brand-hover text-bg text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loading ? <><Spinner /> Signing in…</> : 'Sign In with Google'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         )}
 
         <p className="mt-6 text-center text-xs text-text-disabled">

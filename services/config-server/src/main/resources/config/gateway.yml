@@ -43,6 +43,12 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
+        # OAuth2 routes must be listed BEFORE the general auth-service route so
+        # the Google callback /api/auth/login/oauth2/code/google is matched first.
+        - id: auth-service-oauth2
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/oauth2/**, /api/auth/login/oauth2/code/**
         - id: auth-service
           uri: lb://auth-service
           predicates:

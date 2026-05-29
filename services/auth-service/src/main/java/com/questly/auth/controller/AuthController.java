@@ -8,6 +8,7 @@ import com.questly.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AuthController {
     private final JWKSource<SecurityContext> jwkSource;
 
     /**
-     * Register a new user. Returns 201 Created.
+     * Register a new user with email and password. Returns 201 Created.
      */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -44,7 +45,7 @@ public class AuthController {
     }
 
     /**
-     * Exchange a refresh token for a new access token.
+     * Exchange a refresh token for a new access + refresh token pair (token rotation).
      */
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody TokenRequest request) {
@@ -53,7 +54,7 @@ public class AuthController {
     }
 
     /**
-     * Logout by invalidating the refresh token.
+     * Logout by invalidating the stored refresh token.
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Valid @RequestBody TokenRequest request) {
@@ -62,7 +63,8 @@ public class AuthController {
     }
 
     /**
-     * JWKS endpoint — returns public key in JWK format for token verification.
+     * JWKS endpoint — returns the RSA public key set so downstream services and
+     * the gateway can verify JWT signatures without calling auth-service.
      */
     @GetMapping("/.well-known/jwks.json")
     public ResponseEntity<Map<String, Object>> jwks() throws Exception {
@@ -71,8 +73,45 @@ public class AuthController {
     }
 
     /**
-     * Dev-only Google mock login — bypasses real OAuth2 flow.
+     * OAuth2 one-time code exchange.
+     *
+     * After a successful Google OAuth2 login the browser is redirected to the React SPA
+     * with ?code=UUID. The SPA POSTs that code here to receive tokens safely in the
+     * response body — tokens never appear in browser history or server access logs.
      */
+    @PostMapping("/oauth2/exchange")
+    public ResponseEntity<AuthResponse> exchangeCode(@Valid @RequestBody ExchangeRequest request) {
+        log.info("OAuth2 exchange code redemption requested");
+        AuthResponse response = authService.exchangeCode(request.getCode());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Authenticated user profile endpoint.
+     *
+     * The Gateway validates the JWT and injects X-User-Id and X-User-Role headers.
+     * The SPA calls this after any login flow to obtain server-verified identity claims
+     * rather than parsing the JWT client-side (which would trust unverified data).
+     *
+     * Requires a valid Bearer token in the Authorization header (enforced by Gateway).
+     */
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, String>> me(
+            @RequestHeader("X-User-Id")   String userId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader(value = "X-User-Email", required = false) String email) {
+        return ResponseEntity.ok(Map.of(
+                "userId", userId,
+                "role",   role,
+                "email",  email != null ? email : ""
+        ));
+    }
+
+    /**
+     * Dev-only Google mock login — bypasses the real OAuth2 flow.
+     * Guarded by @Profile("dev") so it is NEVER available in production builds.
+     */
+    @Profile("dev")
     @PostMapping("/google/mock")
     public ResponseEntity<AuthResponse> googleMock(@Valid @RequestBody GoogleMockRequest request) {
         log.info("Google mock login for email={}", request.getEmail());

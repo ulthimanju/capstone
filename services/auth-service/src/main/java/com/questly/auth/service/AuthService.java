@@ -4,8 +4,10 @@ import com.questly.auth.config.JwtConfig;
 import com.questly.auth.dto.*;
 import com.questly.auth.event.UserRegisteredEvent;
 import com.questly.auth.kafka.UserEventProducer;
+import com.questly.auth.model.OAuth2ExchangeCode;
 import com.questly.auth.model.RefreshToken;
 import com.questly.auth.model.User;
+import com.questly.auth.repository.OAuth2ExchangeCodeRepository;
 import com.questly.auth.repository.RefreshTokenRepository;
 import com.questly.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final OAuth2ExchangeCodeRepository exchangeCodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtConfig jwtConfig;
     private final RSAPrivateKey privateKey;
@@ -148,6 +151,89 @@ public class AuthService {
         String refreshToken = generateRefreshToken(user);
 
         return buildAuthResponse(user, accessToken, refreshToken);
+    }
+
+    /**
+     * Find or create a local user account for a Google OAuth2 login.
+     *
+     * Look-up priority:
+     *  1. By googleId (covers returning Google users).
+     *  2. By email (covers accounts originally registered locally — links the googleId).
+     *  3. New registration (first-time Google sign-in).
+     *
+     * password_hash is intentionally left null for federated accounts.
+     */
+    @Transactional
+    public AuthResponse oauth2LoginOrRegister(String email, String displayName, String googleId) {
+        boolean isNewUser = false;
+
+        User user = userRepository.findByGoogleId(googleId)
+                .orElseGet(() -> userRepository.findByEmail(email).orElse(null));
+
+        if (user == null) {
+            // Brand-new Google user — no local account exists
+            user = User.builder()
+                    .email(email)
+                    .displayName(displayName)
+                    .role("STUDENT")
+                    .googleId(googleId)
+                    .build();
+            user = userRepository.save(user);
+            isNewUser = true;
+            log.info("New Google OAuth2 user created: id={}, email={}", user.getId(), user.getEmail());
+        } else {
+            // Existing user — backfill googleId if they previously registered locally
+            if (user.getGoogleId() == null) {
+                user.setGoogleId(googleId);
+                user = userRepository.save(user);
+                log.info("Linked googleId to existing local account: id={}", user.getId());
+            } else {
+                log.info("Returning Google OAuth2 user resolved: id={}", user.getId());
+            }
+        }
+
+        if (isNewUser) {
+            publishRegistrationEvent(user);
+        }
+
+        String accessToken  = generateAccessToken(user);
+        String refreshToken = generateRefreshToken(user);
+
+        return buildAuthResponse(user, accessToken, refreshToken);
+    }
+
+    /**
+     * Redeem a one-time OAuth2 exchange code.
+     *
+     * The code must exist, be unexpired, and is deleted immediately on first use
+     * (single-use enforcement). This prevents replay attacks.
+     */
+    @Transactional
+    public AuthResponse exchangeCode(String code) {
+        OAuth2ExchangeCode entity = exchangeCodeRepository.findById(code)
+                .orElseThrow(() -> new InvalidTokenException("Invalid or expired exchange code"));
+
+        if (entity.getExpiryDate().isBefore(OffsetDateTime.now())) {
+            exchangeCodeRepository.delete(entity);
+            throw new InvalidTokenException("Exchange code has expired");
+        }
+
+        // Consume immediately — single-use
+        exchangeCodeRepository.delete(entity);
+
+        User user = userRepository.findById(entity.getUserId())
+                .orElseThrow(() -> new InvalidTokenException("User not found for exchange code"));
+
+        log.info("OAuth2 exchange code redeemed for userId={}", user.getId());
+
+        return AuthResponse.builder()
+                .accessToken(entity.getAccessToken())
+                .refreshToken(entity.getRefreshToken())
+                .expiresIn(ACCESS_TOKEN_EXPIRY_SECONDS)
+                .userId(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
     }
 
     // ---- Private helpers ----
