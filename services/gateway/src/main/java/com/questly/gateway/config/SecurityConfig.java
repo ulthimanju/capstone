@@ -36,6 +36,11 @@ public class SecurityConfig {
                 .pathMatchers("/error").permitAll()
                 .pathMatchers("/internal/**").denyAll()
                 
+                // Specific Student POST flows allowed first (to prevent being blocked by broad course/assignment creation POST blocks below)
+                .pathMatchers(HttpMethod.POST, "/api/courses/*/enroll").hasAnyRole("STUDENT", "TUTOR", "ADMIN")
+                .pathMatchers(HttpMethod.POST, "/api/courses/*/modules/*/complete").hasAnyRole("STUDENT", "TUTOR", "ADMIN")
+                .pathMatchers(HttpMethod.POST, "/api/assignments/*/submit").hasAnyRole("STUDENT", "TUTOR", "ADMIN")
+                
                 // Course-service / Assignment-service role rejections (TUTOR and ADMIN only)
                 .pathMatchers(HttpMethod.POST, "/api/courses", "/api/courses/**").hasAnyRole("TUTOR", "ADMIN")
                 .pathMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("TUTOR", "ADMIN")
@@ -47,6 +52,12 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.DELETE, "/api/assignments/**").hasAnyRole("TUTOR", "ADMIN")
                 .pathMatchers("/api/assignments/*/submissions").hasAnyRole("TUTOR", "ADMIN")
                 
+                // User Administration Admin-only endpoints
+                .pathMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.PATCH, "/api/users/*/role").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.DELETE, "/api/users/*").hasRole("ADMIN")
+                
+                .pathMatchers("/api/analytics/platform").hasRole("ADMIN")
                 .pathMatchers("/api/analytics/students/**").hasAnyRole("TUTOR", "ADMIN")
                 
                 .anyExchange().authenticated()

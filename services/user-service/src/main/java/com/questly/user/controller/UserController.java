@@ -73,7 +73,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserProfile>> listAllProfiles() {
+    public ResponseEntity<List<UserProfile>> listAllProfiles(HttpServletRequest request) {
+        verifyAdminRole(request);
         List<UserProfile> list = userService.listAllProfiles();
         return ResponseEntity.ok(list);
     }
@@ -81,7 +82,9 @@ public class UserController {
     @PatchMapping("/{id}/role")
     public ResponseEntity<UserProfile> updateRole(
             @PathVariable UUID id,
-            @RequestBody RoleUpdateDto body) {
+            @RequestBody RoleUpdateDto body,
+            HttpServletRequest request) {
+        verifyAdminRole(request);
         if (body.getRole() == null || body.getRole().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role is required");
         }
@@ -90,9 +93,25 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> suspendUser(@PathVariable UUID id) {
+    public ResponseEntity<Void> suspendUser(@PathVariable UUID id, HttpServletRequest request) {
+        verifyAdminRole(request);
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void verifyAdminRole(HttpServletRequest request) {
+        String role = extractUserRole(request);
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied. Admin role required.");
+        }
+    }
+
+    private String extractUserRole(HttpServletRequest request) {
+        String header = request.getHeader("X-User-Role");
+        if (header == null || header.isBlank()) {
+            return "STUDENT";
+        }
+        return header.toUpperCase();
     }
 
     private UUID extractUserId(HttpServletRequest request) {
