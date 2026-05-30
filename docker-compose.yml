@@ -465,6 +465,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_notification
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - SPRING_DATA_REDIS_HOST=redis
     depends_on:
       gateway:
         condition: service_started
