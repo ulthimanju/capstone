@@ -10,6 +10,7 @@ spring:
   cloud:
     config:
       server:
+        resolve-placeholders: true
         native:
           # Search inside src/main/resources/config/ for shared service configs
           search-locations: classpath:/config/

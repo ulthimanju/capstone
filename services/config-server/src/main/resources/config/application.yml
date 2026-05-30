@@ -9,7 +9,16 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          public-key-value: ${JWT_PUBLIC_KEY}
+          public-key-value: |
+            -----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr6Nrh9RBO/zU/l5VQ9HR
+            3z90fyEkKXdJgTBsaORHVcAdbSPAujM7difYMSjWyB5bhswjv4+TVal3nCsmunzH
+            MK5mp8EVEsSeRvOSvPGq9uLBmxObIPBq0vQMFxcUSeB2yb4haNzr4gi26p68y1I3
+            vEM4xMlmJPs0oPG4nR079jHsFAV22Y6WUFwOlIeo/uIuVBv92TcCJGUvYTcIQXd0
+            zHrSMTLiXNgA+WhvQ5P/3zjdF+h4II2ikjbDL33+5dhJti1fxq+Uw4ZaR7nbxhei
+            KCxNAExfUawUnxUemk4tX8dtxj65eFr19KLVWQncKaCdw5y3E2XTBAwY4THGhOX9
+            nwIDAQAB
+            -----END PUBLIC KEY-----
 
   # Database Connections Default (Individual service overrides only database name)
   datasource:

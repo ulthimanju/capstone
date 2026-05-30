@@ -9,24 +9,10 @@ logging:
 
 
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          public-key-value: |
-            -----BEGIN PUBLIC KEY-----
-            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1pbf5NnE1o3ZP4JoN4uF
-            yO7mlfBtwXwr5E5OBwuho3eimakCzuH3kkRT+p4+af4plOdYsYIxRRNUuBEdIKTq
-            Ip4av6eo06tSoxo6ObWD4IDliPaCBSQL741sNlFOXGh7LZVIcSLbF8oSxznCmucQ
-            3Z2ftpGZqaKY86BhS9TXrUSNXJfxAVhrgIw4JH7S9gvIoGlIAqHg7MsHsVmMlA/4
-            bJih1KvxWZ9c+SXOv0zrYBfTUpYFl75YRMg+oHbifo7MLvYFwXfw5xrCrsVz1g/Y
-            L3nexWARMxum8dXQgIguoZ/aOItmXPnybmwrHwV7u+XnnpeSg0s6GI85ASP5/DhY
-            fQIDAQAB
-            -----END PUBLIC KEY-----
-
   cloud:
     gateway:
       globalcors:
+        add-to-simple-url-handler-mapping: true   # Ensures OPTIONS preflight hits CORS filter even on unmatched routes
         cors-configurations:
           '[/**]':
             allowedOrigins: "http://localhost:5173"
