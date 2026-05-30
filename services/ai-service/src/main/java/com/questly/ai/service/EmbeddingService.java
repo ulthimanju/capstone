@@ -30,6 +30,8 @@ public class EmbeddingService {
 
     private final MinioClient minioClient;
     private final OllamaEmbeddingModel embeddingModel;
+    private final QueryCacheService queryCacheService;
+    private final AdaptiveChunkingService adaptiveChunkingService;
 
     @Value("${chroma.base-url}")
     private String chromaBaseUrl;
@@ -72,8 +74,8 @@ public class EmbeddingService {
             lcMetadata.put("source_name", req.getMinioPath());
             Document lcDocument = Document.from(text, lcMetadata);
 
-            // 4. Split into segments
-            DocumentSplitter splitter = DocumentSplitters.recursive(512, 64);
+            // 4. Split into segments using adaptive chunking
+            DocumentSplitter splitter = adaptiveChunkingService.getSplitterForDocument(lcDocument);
             List<TextSegment> segments = splitter.split(lcDocument);
             log.info("Split document {} into {} chunks", req.getDocumentId(), segments.size());
 
@@ -96,6 +98,9 @@ public class EmbeddingService {
             collectionStore.addAll(embeddings, segments);
 
             log.info("Stored {} embeddings in ChromaDB collection {}", embeddings.size(), collectionName);
+            
+            // 7. Invalidate query cache for this notebook since context has changed
+            queryCacheService.invalidateNotebookCache(req.getNotebookId());
 
             return EmbedResponse.builder()
                     .status("COMPLETED")

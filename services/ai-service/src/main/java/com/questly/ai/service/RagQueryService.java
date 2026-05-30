@@ -27,6 +27,8 @@ public class RagQueryService {
 
     private final OllamaEmbeddingModel embeddingModel;
     private final OllamaChatModel chatModel;
+    private final QueryCacheService queryCacheService;
+    private final EmbeddingCacheService embeddingCacheService;
 
     @Value("${chroma.base-url}")
     private String chromaBaseUrl;
@@ -59,6 +61,12 @@ public class RagQueryService {
             String collectionName = "notebook_" + req.getNotebookId();
             log.info("RAG query for notebook {} (collection {})", req.getNotebookId(), collectionName);
 
+            // 0. Check cache
+            QueryResponse cachedResponse = queryCacheService.getCachedResponse(req.getNotebookId(), req.getQuestion());
+            if (cachedResponse != null) {
+                return cachedResponse;
+            }
+
             // 1. Build per-notebook ChromaDB store
             ChromaEmbeddingStore collectionStore;
             try {
@@ -74,8 +82,12 @@ public class RagQueryService {
                         .build();
             }
 
-            // 2. Embed the question
-            Embedding questionEmbedding = embeddingModel.embed(req.getQuestion()).content();
+            // 2. Embed the question (with cache)
+            Embedding questionEmbedding = embeddingCacheService.getCachedEmbedding(req.getQuestion());
+            if (questionEmbedding == null) {
+                questionEmbedding = embeddingModel.embed(req.getQuestion()).content();
+                embeddingCacheService.cacheEmbedding(req.getQuestion(), questionEmbedding);
+            }
 
             // 3. Search ChromaDB
             EmbeddingSearchResult<TextSegment> result;
@@ -138,10 +150,15 @@ public class RagQueryService {
                         .build());
             }
 
-            return QueryResponse.builder()
+            QueryResponse response = QueryResponse.builder()
                     .answer(answer)
                     .sources(sources)
                     .build();
+
+            // 8. Cache response
+            queryCacheService.cacheResponse(req.getNotebookId(), req.getQuestion(), response);
+
+            return response;
 
         } catch (Exception e) {
             log.error("RAG query failed for notebook {}: {}", req.getNotebookId(), e.getMessage(), e);

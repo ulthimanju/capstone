@@ -5,16 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QueryRequest {
-
-    private UUID notebookId;
-    private String question;
-    private List<ChatMessageDto> chatHistory;
+public class ChatMessageDto {
+    private String role; // "user" or "assistant"
+    private String content;
 }

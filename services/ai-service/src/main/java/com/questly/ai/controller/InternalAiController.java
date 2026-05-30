@@ -4,6 +4,7 @@ import com.questly.ai.dto.*;
 import com.questly.ai.service.CollectionService;
 import com.questly.ai.service.EmbeddingService;
 import com.questly.ai.service.RagQueryService;
+import com.questly.ai.service.StreamingRagQueryService;
 import com.questly.ai.service.AiGenerationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ public class InternalAiController {
 
     private final EmbeddingService embeddingService;
     private final RagQueryService ragQueryService;
+    private final StreamingRagQueryService streamingRagQueryService;
     private final CollectionService collectionService;
     private final AiGenerationService aiGenerationService;
 
@@ -43,6 +45,15 @@ public class InternalAiController {
         log.info("Received query request for notebook {}: {}", request.getNotebookId(), request.getQuestion());
         QueryResponse response = ragQueryService.query(request);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * RAG query with SSE streaming.
+     */
+    @PostMapping(value = "/query/stream", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
+    public reactor.core.publisher.Flux<String> streamQuery(@RequestBody QueryRequest request) {
+        log.info("Received streaming query request for notebook {}: {}", request.getNotebookId(), request.getQuestion());
+        return streamingRagQueryService.streamQuery(request);
     }
 
     /**

@@ -8,9 +8,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CollectionService {
+
+    private final QueryCacheService queryCacheService;
 
     @Value("${chroma.base-url}")
     private String chromaBaseUrl;
@@ -33,6 +43,7 @@ public class CollectionService {
             store.removeAll(
                     MetadataFilterBuilder.metadataKey("notebook_id").isEqualTo(notebookId.toString())
             );
+            queryCacheService.invalidateNotebookCache(notebookId);
             log.info("Deleted all embeddings from ChromaDB collection {}", collectionName);
         } catch (Exception e) {
             log.warn("Could not delete ChromaDB collection {} (may not exist): {}", collectionName, e.getMessage());
@@ -54,6 +65,7 @@ public class CollectionService {
             store.removeAll(
                     MetadataFilterBuilder.metadataKey("document_id").isEqualTo(documentId.toString())
             );
+            queryCacheService.invalidateNotebookCache(notebookId);
             log.info("Deleted chunks for document {} from collection {}", documentId, collectionName);
         } catch (Exception e) {
             log.warn("Could not delete chunks for document {} from collection {}: {}", documentId, collectionName, e.getMessage());

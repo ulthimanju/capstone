@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../api/axiosClient';
 import DocumentUploadZone from '../components/ui/DocumentUploadZone';
 import StatusBadge from '../components/ui/StatusBadge';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 /* ═════════════════════════════════════════════
    API helpers
@@ -17,6 +19,57 @@ const api = {
     axiosClient.post(`/api/notebooks/${nbId}/query`, { question }).then((r) => r.data),
   summarizeDocument: (nbId, docId) =>
     axiosClient.post(`/api/notebooks/${nbId}/documents/${docId}/summarize`).then((r) => r.data),
+  
+  // Chat memory API
+  getChatSessions: (nbId) => axiosClient.get(`/api/notebooks/${nbId}/chat/sessions`).then(r => r.data),
+  getChatMessages: (nbId, sessionId) => axiosClient.get(`/api/notebooks/${nbId}/chat/sessions/${sessionId}/messages`).then(r => r.data),
+  deleteChatSession: (nbId, sessionId) => axiosClient.delete(`/api/notebooks/${nbId}/chat/sessions/${sessionId}`).then(r => r.data),
+
+  sendChatStream: async (nbId, sessionId, question, onToken, onError, onComplete) => {
+    const { useAuthStore } = await import('../store/useAuthStore');
+    const token = useAuthStore.getState().accessToken;
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/notebooks/${nbId}/query/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ sessionId, question })
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Stream failed with status ${res.status}`);
+      }
+      
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        
+        let tokenBuffer = '';
+        for (const line of lines) {
+          if (line.startsWith('data:')) {
+            const data = line.slice(5).replace(/^ /, ''); // remove 'data:' and leading space if any
+            tokenBuffer += data;
+          }
+        }
+        if (tokenBuffer) {
+           onToken(tokenBuffer.replace(/\\n/g, '\n')); // Basic unescaping if WebFlux escaped it
+        }
+      }
+      onComplete();
+    } catch (err) {
+      onError(err);
+    }
+  }
 };
 
 /* ═════════════════════════════════════════════
@@ -294,10 +347,16 @@ function ChatMessage({ msg }) {
           className={`rounded-xl px-4 py-2.5 text-sm leading-relaxed ${
             isUser
               ? 'bg-brand text-white rounded-br-sm'
-              : 'bg-surface-elevated text-text-primary rounded-bl-sm border border-border'
+              : 'bg-surface-elevated text-text-primary rounded-bl-sm border border-border prose prose-sm prose-invert max-w-none'
           }`}
         >
-          {msg.content}
+          {isUser ? (
+            <div className="whitespace-pre-wrap">{msg.content}</div>
+          ) : (
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {msg.content}
+            </ReactMarkdown>
+          )}
         </div>
 
         {/* Citations */}
@@ -518,8 +577,27 @@ function NotebookDetail({ notebook }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
+  const [sessions, setSessions] = useState([]);
+  const [isSessionsSidebarOpen, setIsSessionsSidebarOpen] = useState(false);
+
+  // Load sessions
+  useEffect(() => {
+    api.getChatSessions(notebook.id).then(setSessions).catch(console.error);
+  }, [notebook.id]);
+
+  // Load messages for selected session
+  useEffect(() => {
+    if (sessionId) {
+      api.getChatMessages(notebook.id, sessionId)
+        .then(data => setMessages(data))
+        .catch(console.error);
+    } else {
+      setMessages([]);
+    }
+  }, [notebook.id, sessionId]);
 
   /* ── Summarize modal states ── */
   const [summaryOpen, setSummaryOpen] = useState(false);
@@ -542,26 +620,36 @@ function NotebookDetail({ notebook }) {
     const userMsg = { role: 'user', content: q, id: Date.now() };
     setMessages((prev) => [...prev, userMsg]);
     setAiLoading(true);
+
+    const aiMsgId = Date.now() + 1;
+    setMessages((prev) => [...prev, { role: 'assistant', content: '', id: aiMsgId }]);
+
     try {
-      const resp = await api.sendChat(notebook.id, q);
-      const aiMsg = {
-        role: 'assistant',
-        content: resp.answer || resp.response || resp.content || 'No response received.',
-        sources: resp.sources || resp.citations || [],
-        id: Date.now() + 1,
-      };
-      setMessages((prev) => [...prev, aiMsg]);
+      await api.sendChatStream(
+        notebook.id, 
+        sessionId, 
+        q, 
+        (token) => {
+          setMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: m.content + token } : m));
+        },
+        (err) => {
+          console.error("Stream error:", err);
+          setMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: m.content + "\n[Stream failed]" } : m));
+          setAiLoading(false);
+        },
+        () => {
+          setAiLoading(false);
+          // If no sessionId existed, we should probably refetch sessions to show the newly created one.
+          if (!sessionId) {
+             api.getChatSessions(notebook.id).then(data => {
+               setSessions(data);
+               if (data.length > 0) setSessionId(data[0].id); // Assuming backend created and returned it first
+             });
+          }
+        }
+      );
     } catch (err) {
-      const errMsg = {
-        role: 'assistant',
-        content:
-          err.response?.data?.message ||
-          'Sorry, I couldn\'t get a response. Please try again.',
-        sources: [],
-        id: Date.now() + 1,
-      };
-      setMessages((prev) => [...prev, errMsg]);
-    } finally {
+      setMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: "Sorry, I couldn't get a response. Please try again." } : m));
       setAiLoading(false);
     }
   };
@@ -649,20 +737,111 @@ function NotebookDetail({ notebook }) {
       </div>
 
       {/* ── Chat section (45%) ── */}
-      <div className="flex flex-col border-t border-border overflow-hidden" style={{ flex: '0 0 45%' }}>
-        {/* Chat header */}
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-border shrink-0">
-          <svg className="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-          </svg>
-          <h3 className="text-sm font-semibold text-text-primary">Ask AI</h3>
-          <span className="text-xs text-text-disabled truncate">· {notebook.title}</span>
-        </div>
+      <div className="flex border-t border-border overflow-hidden" style={{ flex: '0 0 45%' }}>
+        
+        {/* Sessions Sidebar (conditionally rendered) */}
+        {isSessionsSidebarOpen && (
+          <div className="w-64 border-r border-border bg-surface-elevated flex flex-col h-full shrink-0 animate-fade-in">
+            <div className="flex items-center justify-between p-3 border-b border-border">
+              <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wider">Chat History</h4>
+              <button
+                type="button"
+                onClick={() => setIsSessionsSidebarOpen(false)}
+                className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-surface text-text-muted hover:text-text-primary cursor-pointer transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-2 border-b border-border">
+              <button
+                type="button"
+                onClick={() => setSessionId(null)}
+                className="w-full text-left px-3 py-2 text-sm text-text-primary bg-brand/10 hover:bg-brand/20 border border-brand/30 rounded-md cursor-pointer transition-colors flex items-center gap-2"
+              >
+                <svg className="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                New Chat
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              {sessions.map(s => (
+                <div key={s.id} className="flex group">
+                  <button
+                    type="button"
+                    onClick={() => setSessionId(s.id)}
+                    className={`flex-1 text-left px-3 py-2 text-sm rounded-md cursor-pointer transition-colors truncate ${sessionId === s.id ? 'bg-surface text-text-primary border border-border' : 'text-text-muted hover:bg-surface hover:text-text-primary border border-transparent'}`}
+                  >
+                    {s.title}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      api.deleteChatSession(notebook.id, s.id).then(() => {
+                        setSessions(prev => prev.filter(x => x.id !== s.id));
+                        if (sessionId === s.id) setSessionId(null);
+                      });
+                    }}
+                    className="w-8 flex items-center justify-center text-text-disabled hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
-          {messages.length === 0 && !aiLoading && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
+        {/* Chat Main Area */}
+        <div className="flex-1 flex flex-col overflow-hidden h-full">
+          {/* Chat header */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
+            <div className="flex items-center gap-3">
+              {!isSessionsSidebarOpen && (
+                <button
+                  type="button"
+                  onClick={() => setIsSessionsSidebarOpen(true)}
+                  className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-surface-elevated text-text-muted hover:text-text-primary cursor-pointer transition-colors"
+                  title="View Chat History"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                  </svg>
+                </button>
+              )}
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                </svg>
+                <h3 className="text-sm font-semibold text-text-primary">
+                  Ask AI
+                </h3>
+                <span className="text-xs text-text-disabled truncate">
+                  · {sessionId ? sessions.find(s => s.id === sessionId)?.title || 'Current Chat' : 'New Chat'}
+                </span>
+              </div>
+            </div>
+            
+            {sessionId && (
+              <button
+                type="button"
+                onClick={() => setSessionId(null)}
+                className="text-xs font-medium text-brand hover:text-brand-hover cursor-pointer"
+              >
+                + New Chat
+              </button>
+            )}
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+            {messages.length === 0 && !aiLoading && (
+              <div className="flex flex-col items-center justify-center h-full text-center">
               <svg className="w-8 h-8 text-text-disabled mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
@@ -683,46 +862,47 @@ function NotebookDetail({ notebook }) {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input bar */}
-        <div className="px-4 py-3 border-t border-border shrink-0">
-          <div className={`flex items-center gap-2 rounded-lg border bg-surface-elevated px-3 py-1.5 transition-colors ${
-            chatDisabled ? 'border-border opacity-60' : 'border-border focus-within:border-brand'
-          }`}>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={chatDisabled}
-              placeholder={
-                hasProcessing
-                  ? 'Waiting for documents to process…'
-                  : !hasReadyDocs
-                  ? 'Upload a document to chat'
-                  : 'Ask a question…'
-              }
-              className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-disabled focus:outline-none disabled:cursor-not-allowed"
-            />
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={chatDisabled || !input.trim()}
-              className="w-7 h-7 rounded-md bg-brand hover:bg-brand-hover text-bg flex items-center justify-center shrink-0 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Send message"
-            >
-              {aiLoading ? (
-                <Spinner />
-              ) : (
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                </svg>
-              )}
-            </button>
+          {/* Input bar */}
+          <div className="px-4 py-3 border-t border-border shrink-0">
+            <div className={`flex items-center gap-2 rounded-lg border bg-surface-elevated px-3 py-1.5 transition-colors ${
+              chatDisabled ? 'border-border opacity-60' : 'border-border focus-within:border-brand'
+            }`}>
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={chatDisabled}
+                placeholder={
+                  hasProcessing
+                    ? 'Waiting for documents to process…'
+                    : !hasReadyDocs
+                    ? 'Upload a document to chat'
+                    : 'Ask a question…'
+                }
+                className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-disabled focus:outline-none disabled:cursor-not-allowed"
+              />
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={chatDisabled || !input.trim()}
+                className="w-7 h-7 rounded-md bg-brand hover:bg-brand-hover text-bg flex items-center justify-center shrink-0 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Send message"
+              >
+                {aiLoading ? (
+                  <Spinner />
+                ) : (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-text-disabled mt-1.5 text-center">
+              Shift+Enter for new line · Enter to send
+            </p>
           </div>
-          <p className="text-xs text-text-disabled mt-1.5 text-center">
-            Shift+Enter for new line · Enter to send
-          </p>
         </div>
       </div>
 

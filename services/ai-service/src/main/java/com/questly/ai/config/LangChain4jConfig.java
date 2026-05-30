@@ -1,6 +1,7 @@
 package com.questly.ai.config;
 
 import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,18 @@ public class LangChain4jConfig {
                 .baseUrl(ollamaBaseUrl)
                 .modelName(chatModelName)
                 .temperature(0.0)
-                .timeout(Duration.ofSeconds(60))
+                .timeout(Duration.ofSeconds(300))
+                .build();
+    }
+
+    @Bean
+    public OllamaStreamingChatModel streamingChatModel() {
+        log.info("Configuring Ollama streaming chat model: {} at {}", chatModelName, ollamaBaseUrl);
+        return OllamaStreamingChatModel.builder()
+                .baseUrl(ollamaBaseUrl)
+                .modelName(chatModelName)
+                .temperature(0.0)
+                .timeout(Duration.ofSeconds(300))
                 .build();
     }
 

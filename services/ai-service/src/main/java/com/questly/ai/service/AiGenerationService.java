@@ -25,7 +25,7 @@ public class AiGenerationService {
     private final ObjectMapper objectMapper;
 
     private static final String BUCKET = "documents";
-    private static final int TEXT_SAFETY_CAP_PER_DOC = 20000;
+    private static final int TEXT_SAFETY_CAP_PER_DOC = 10000;
 
     /**
      * Generates a plain-text simple language summary of a single document.

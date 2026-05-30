@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class QueryResponse {
 
+    private UUID sessionId;
     private String answer;
     private List<SourceDto> sources;
 
