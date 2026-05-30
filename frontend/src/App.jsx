@@ -18,6 +18,7 @@ import Toast from './components/ui/Toast';
 import AnalyticsPage from './pages/AnalyticsPage';
 import TutorPanelPage from './pages/TutorPanelPage';
 import AdminPanelPage from './pages/AdminPanelPage';
+import axiosClient from './api/axiosClient';
 
 /* ── Navigation items ── */
 const NAV_ITEMS = [
@@ -198,6 +199,22 @@ function AuthenticatedApp() {
     userNavItems.find((n) => n.path !== '/' && location.pathname.startsWith(n.path))?.id ??
     (location.pathname === '/' ? 'dashboard' : 'dashboard');
 
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+  const refreshToken = useAuthStore((s) => s.refreshToken);
+
+  const handleLogout = async () => {
+    try {
+      if (refreshToken) {
+        await axiosClient.post('/api/auth/logout', { refreshToken });
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      clearAuth();
+      navigate('/login');
+    }
+  };
+
   const handleNavChange = (id) => {
     const item = userNavItems.find((n) => n.id === id);
     if (item?.path) navigate(item.path);
@@ -216,6 +233,7 @@ function AuthenticatedApp() {
       navItems={userNavItems}
       activeNav={activeNav}
       onNavChange={handleNavChange}
+      onLogout={handleLogout}
     >
       <Routes>
         <Route path="/" element={<DashboardPage />} />

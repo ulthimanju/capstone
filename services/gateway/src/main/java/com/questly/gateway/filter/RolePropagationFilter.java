@@ -35,7 +35,7 @@ public class RolePropagationFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        // Run just after TokenMaskingFilter (HIGHEST_PRECEDENCE)
-        return Ordered.HIGHEST_PRECEDENCE + 1;
+        // Run just after JwtBlacklistFilter (Ordered.HIGHEST_PRECEDENCE + 1)
+        return Ordered.HIGHEST_PRECEDENCE + 2;
     }
 }

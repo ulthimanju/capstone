@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -31,7 +33,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Register request for email={}", request.getEmail());
         AuthResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return buildResponseWithCookie(response, HttpStatus.CREATED);
     }
 
     /**
@@ -41,25 +43,81 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         log.info("Login request for email={}", request.getEmail());
         AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        return buildResponseWithCookie(response, HttpStatus.OK);
     }
 
     /**
      * Exchange a refresh token for a new access + refresh token pair (token rotation).
      */
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody TokenRequest request) {
-        AuthResponse response = authService.refresh(request.getRefreshToken());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AuthResponse> refresh(
+            @RequestBody(required = false) TokenRequest request,
+            @CookieValue(value = "refreshToken", required = false) String cookieRefreshToken) {
+        
+        String token = null;
+        if (request != null && request.getRefreshToken() != null) {
+            token = request.getRefreshToken();
+        } else if (cookieRefreshToken != null) {
+            token = cookieRefreshToken;
+        }
+
+        if (token == null || token.trim().isEmpty()) {
+            throw new AuthService.InvalidTokenException("Refresh token is required");
+        }
+
+        AuthResponse response = authService.refresh(token);
+        return buildResponseWithCookie(response, HttpStatus.OK);
     }
 
     /**
      * Logout by invalidating the stored refresh token.
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@Valid @RequestBody TokenRequest request) {
-        authService.logout(request.getRefreshToken());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> logout(
+            @RequestBody(required = false) TokenRequest request,
+            @CookieValue(value = "refreshToken", required = false) String cookieRefreshToken,
+            @RequestParam(value = "global", defaultValue = "false") boolean global,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authHeader) {
+        
+        String token = null;
+        if (request != null && request.getRefreshToken() != null) {
+            token = request.getRefreshToken();
+        } else if (cookieRefreshToken != null) {
+            token = cookieRefreshToken;
+        }
+
+        if (token != null && !token.trim().isEmpty()) {
+            authService.logout(token, global, authHeader);
+        } else {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                authService.logout(null, global, authHeader);
+            }
+        }
+
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/api/auth")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .build();
+    }
+
+    private ResponseEntity<AuthResponse> buildResponseWithCookie(AuthResponse response, HttpStatus status) {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", response.getRefreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/api/auth")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
+        return ResponseEntity.status(status)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
     /**
@@ -83,7 +141,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> exchangeCode(@Valid @RequestBody ExchangeRequest request) {
         log.info("OAuth2 exchange code redemption requested");
         AuthResponse response = authService.exchangeCode(request.getCode());
-        return ResponseEntity.ok(response);
+        return buildResponseWithCookie(response, HttpStatus.OK);
     }
 
     /**

@@ -12,12 +12,17 @@ import com.questly.auth.repository.RefreshTokenRepository;
 import com.questly.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.nimbusds.jwt.SignedJWT;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -35,6 +40,9 @@ public class AuthService {
     private final JwtConfig jwtConfig;
     private final RSAPrivateKey privateKey;
     private final UserEventProducer userEventProducer;
+
+    @Autowired(required = false)
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * Register a new local user account.
@@ -110,13 +118,66 @@ public class AuthService {
     }
 
     /**
-     * Logout by deleting the refresh token.
+     * Logout by deleting the refresh token, blacklisting the access token, and optionally revoking all user sessions globally.
      */
     @Transactional
-    public void logout(String rawRefreshToken) {
-        refreshTokenRepository.findByToken(rawRefreshToken)
-                .ifPresent(refreshTokenRepository::delete);
-        log.info("Refresh token deleted for logout");
+    public void logout(String rawRefreshToken, boolean global, String authHeader) {
+        UUID userId = null;
+        String jti = null;
+        long ttlSeconds = 0;
+
+        // Parse and validate current access token from Authorization header if present
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String accessToken = authHeader.substring(7);
+                SignedJWT signedJWT = SignedJWT.parse(accessToken);
+                String sub = signedJWT.getJWTClaimsSet().getSubject();
+                if (sub != null) {
+                    userId = UUID.fromString(sub);
+                }
+                jti = signedJWT.getJWTClaimsSet().getJWTID();
+                Date expiry = signedJWT.getJWTClaimsSet().getExpirationTime();
+                if (expiry != null) {
+                    ttlSeconds = (expiry.getTime() - System.currentTimeMillis()) / 1000;
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse access token during logout", e);
+            }
+        }
+
+        // Revoke the specific refresh token
+        if (rawRefreshToken != null) {
+            Optional<RefreshToken> storedTokenOpt = refreshTokenRepository.findByToken(rawRefreshToken);
+            if (storedTokenOpt.isPresent()) {
+                RefreshToken storedToken = storedTokenOpt.get();
+                userId = storedToken.getUserId(); // Fallback if access token wasn't provided or parsed
+                log.info("User id={} initiated logout, invalidating refresh token", userId);
+                refreshTokenRepository.delete(storedToken);
+            } else {
+                log.info("Logout requested for non-existent or already deleted refresh token");
+            }
+        }
+
+        // Global logout: revoke all active sessions for the user
+        if (global && userId != null) {
+            refreshTokenRepository.deleteByUserId(userId);
+            log.info("Global logout completed: all refresh tokens deleted for user id={}", userId);
+        }
+
+        // Blacklist current access token in Redis
+        if (jti != null && ttlSeconds > 0) {
+            if (stringRedisTemplate != null) {
+                try {
+                    String blacklistKey = "blacklist:jwt:" + jti;
+                    stringRedisTemplate.opsForValue().set(blacklistKey, "blacklisted", java.time.Duration.ofSeconds(ttlSeconds));
+                    log.info("Access token JTI={} successfully blacklisted in Redis for {} seconds", jti, ttlSeconds);
+                } catch (Exception e) {
+                    log.error("Redis error while storing blacklisted JTI={}; fail-open", jti, e);
+                }
+            } else {
+                log.warn("StringRedisTemplate is unavailable; skipping JTI={} blacklist storage", jti);
+            }
+        }
     }
 
     /**

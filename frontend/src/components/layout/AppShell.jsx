@@ -6,7 +6,7 @@ import TopBar from './TopBar';
  * AppShell — The root layout container for the entire application.
  * Provides the sidebar + topbar + main content area structure.
  */
-export default function AppShell({ children, user, xp, level, navItems, activeNav, onNavChange }) {
+export default function AppShell({ children, user, xp, level, navItems, activeNav, onNavChange, onLogout }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
@@ -18,6 +18,7 @@ export default function AppShell({ children, user, xp, level, navItems, activeNa
         navItems={navItems}
         activeNav={activeNav}
         onNavChange={onNavChange}
+        onLogout={onLogout}
       />
 
       {/* Main area */}
