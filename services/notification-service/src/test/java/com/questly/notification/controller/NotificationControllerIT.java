@@ -1,18 +1,13 @@
 package com.questly.notification.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.questly.notification.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -21,32 +16,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {
-        "spring.jpa.hibernate.ddl-auto=create-drop",
-        "spring.kafka.listener.auto-startup=false",
-        "eureka.client.enabled=false"
-    }
-)
-@Testcontainers
-public class NotificationControllerIT {
-
-    @Container
-    @ServiceConnection
-    protected static final PostgreSQLContainer<?> postgres = 
-        new PostgreSQLContainer<>("postgres:16-alpine")
-            .withDatabaseName("db_notification_test")
-            .withUsername("test")
-            .withPassword("test");
-
-    @Container
-    @ServiceConnection(name = "redis")
-    protected static final GenericContainer<?> redis = 
-        new GenericContainer<>("redis:7-alpine")
-            .withExposedPorts(6379);
+public class NotificationControllerIT extends BaseIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;

@@ -118,6 +118,25 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Adds byte-buddy-agent as a JVM agent so Mockito doesn't have to
+                 self-attach at runtime (suppresses the JDK dynamic-agent warning). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar</argLine>
+                </configuration>
+            </plugin>
+            <!-- Failsafe runs IT tests; exit timeout 0 prevents the spurious [ERROR]
+                 caused by singleton Testcontainer threads outliving System.exit(0). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <forkedProcessExitTimeoutInSeconds>0</forkedProcessExitTimeoutInSeconds>
+                    <argLine>-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
