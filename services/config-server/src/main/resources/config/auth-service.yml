@@ -8,6 +8,8 @@ logging:
 
 
 spring:
+  main:
+    allow-circular-references: true
   datasource:
     url: jdbc:postgresql://localhost:5432/db_auth
   jpa:

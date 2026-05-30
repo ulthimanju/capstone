@@ -212,6 +212,7 @@ services:
       - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SPRING_MAIN_ALLOW_CIRCULAR_REFERENCES=true
     depends_on:
       gateway:
         condition: service_started

@@ -26,3 +26,15 @@ CREATE INDEX IF NOT EXISTS idx_users_email      ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_google_id  ON users(google_id);
 CREATE INDEX IF NOT EXISTS idx_refresh_token    ON refresh_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_refresh_user_id  ON refresh_tokens(user_id);
+
+CREATE TABLE IF NOT EXISTS oauth2_exchange_codes (
+    code          VARCHAR(255) PRIMARY KEY,
+    user_id       UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    access_token  TEXT         NOT NULL,
+    refresh_token VARCHAR(512) NOT NULL,
+    expiry_date   TIMESTAMPTZ  NOT NULL,
+    created_at    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_oauth2_exchange_code ON oauth2_exchange_codes(code);
+

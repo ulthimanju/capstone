@@ -7,9 +7,9 @@ import com.questly.auth.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -33,13 +33,17 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private static final int EXCHANGE_CODE_TTL_SECONDS = 60;
 
     private final AuthService authService;
     private final OAuth2ExchangeCodeRepository exchangeCodeRepository;
+
+    public OAuth2SuccessHandler(@Lazy AuthService authService, OAuth2ExchangeCodeRepository exchangeCodeRepository) {
+        this.authService = authService;
+        this.exchangeCodeRepository = exchangeCodeRepository;
+    }
 
     @Value("${auth.frontend-redirect-url:http://localhost:5173/login}")
     private String frontendRedirectUrl;
