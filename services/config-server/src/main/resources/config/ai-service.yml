@@ -4,7 +4,12 @@ server:
 chroma:
   base-url: http://localhost:8000
 
-ollama:
-  base-url: http://localhost:11434
-  chat-model: llama3.2:3b
-  embedding-model: nomic-embed-text
+openrouter:
+  api-key: ${OPENROUTER_API_KEY}
+  base-url: https://openrouter.ai/api/v1
+  chat-model: google/gemini-2.5-flash
+
+huggingface:
+  api-key: ${HF_API_KEY}
+  base-url: https://router.huggingface.co/v1
+  embedding-model: BAAI/bge-small-en-v1.5

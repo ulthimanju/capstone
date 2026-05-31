@@ -2,7 +2,7 @@
 
 > **Methodology**: Adapted Agile (Solo Developer)
 > **Project**: Questly — AI-Powered Student Learning Platform
-> **Stack**: Spring Boot 3.x · React 19 · Ollama · ChromaDB · Kafka · PostgreSQL
+> **Stack**: Spring Boot 3.x · React 19 · OpenRouter & HuggingFace · ChromaDB · Kafka · PostgreSQL
 > **Developer**: Manju (Solo)
 > **Start Date**: 2026-05-22
 > **Target Completion**: 2026-07-31
@@ -56,7 +56,7 @@
 | 1 | Write project abstract | 2026-05-22 | One-paragraph summary covering AI, RAG, gamification |
 | 2 | Define problem statement | 2026-05-22 | Student-centric; AI as primary tutor |
 | 3 | Define key features (11 core) | 2026-05-22 | Notebooks, Quiz, Flashcards, Courses, Practice, Skill Tree, Gamification, Analytics, Assignments |
-| 4 | Select and document tech stack | 2026-05-22 | React 19, Spring Boot 3.x, Ollama, ChromaDB, Kafka, PostgreSQL, Redis |
+| 4 | Select and document tech stack | 2026-05-22 | React 19, Spring Boot 3.x, OpenRouter/HuggingFace, ChromaDB, Kafka, PostgreSQL, Redis |
 | 5 | Define high-level architecture (HLD) | 2026-05-22 | 6-layer HLD created in FigJam |
 | 6 | Define infrastructure design | 2026-05-22 | Docker Compose, Kafka, MinIO, Redis, Elasticsearch, Eureka, Zipkin |
 | 7 | Define user roles and permissions matrix | 2026-05-22 | STUDENT / TUTOR / ADMIN — 11 resource groups, 50+ permission rules |
@@ -155,7 +155,7 @@
 | 1 | Initialize Git monorepo structure | 🔴 High | `git log` shows initial commit | ✅ Done |
 | 2 | Set up React 19 + Vite frontend project | 🔴 High | `npm run dev` runs on :5173 | ✅ Done |
 | 3 | Set up Spring Boot parent POM (multi-module Maven) | 🔴 High | `mvn clean install` passes | ✅ Done |
-| 4 | Configure Docker Compose (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Ollama, Zipkin) | 🔴 High | `docker compose up` all healthy | ✅ Done |
+| 4 | Configure Docker Compose (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Zipkin) | 🔴 High | `docker compose up` all healthy | ✅ Done |
 | 5 | Set up Spring Cloud Config Server | 🟡 Medium | Config server on :8888 | ✅ Done |
 | 6 | Set up Spring Cloud Eureka Server | 🔴 High | Eureka dashboard on :8761 | ✅ Done |
 | 7 | Set up Spring Cloud Gateway | 🔴 High | Gateway on :8080 routes correctly | ✅ Done |
@@ -163,7 +163,7 @@
 | 9 | Set up GitHub Actions CI pipeline | 🟡 Medium | PR triggers build + test | ✅ Done |
 | 10 | Configure Prometheus + Grafana | 🟢 Low | Metrics visible on :3000 | ✅ Done |
 | 11 | Set up Zipkin + Micrometer tracing | 🟢 Low | Traces visible on :9411 | ✅ Done |
-| 12 | Verify Ollama models running | 🔴 High | `ollama list` shows all 4 models | ✅ Done |
+| 12 | Verify Cloud AI endpoints active | 🔴 High | OpenRouter and HuggingFace APIs accessible | ✅ Done |
 | 13 | Verify full local stack startup | 🔴 High | All services UP in Docker Compose | ✅ Done |
 
 ---
@@ -319,15 +319,15 @@
 
 | Date | Decision | Rationale |
 |---|---|---|
-| 2026-05-22 | Ollama for all AI (fully local) | Zero token cost, no data leaves machine |
+| 2026-05-22 | Cloud AI APIs (OpenRouter/HuggingFace) | High performance, free tier access, zero local RAM requirements |
 | 2026-05-22 | MinIO instead of AWS S3 | Keep storage local during development |
 | 2026-05-22 | LangChain4j for RAG | Native Java, no Python dependency |
 | 2026-05-22 | ChromaDB as vector store | Lightweight, easy local Docker setup |
 | 2026-05-22 | SM-2 algorithm for spaced repetition | Industry standard, well-documented, proven |
 | 2026-05-22 | Monorepo (single Git repo, all services) | Easier for solo dev — one clone, shared Compose |
 | 2026-05-22 | Schema-per-service PostgreSQL isolation | Microservice principle — no cross-service DB joins |
-| 2026-05-22 | llama3.2:3b as primary LLM | Fits 16GB RAM; mistral:7b as fallback |
-| 2026-05-22 | nomic-embed-text for embeddings | Local, fast, good quality for RAG |
+| 2026-05-22 | google/gemini-2.5-flash as primary LLM | Large context window, highly accurate, fast responses |
+| 2026-05-22 | BAAI/bge-small-en-v1.5 for embeddings | High accuracy, zero local RAM overhead |
 | 2026-05-22 | RS256 JWT (asymmetric) | Gateway validates without calling auth service |
 
 ---
@@ -341,8 +341,8 @@
 | Kafka complexity for solo dev | 🟡 Medium | Planned | Use sync REST for non-critical paths initially; add Kafka later |
 | Scope creep (11 features) | 🔴 High | Active | MoSCoW prioritization enforced per sprint |
 | ChromaDB data loss on restart | 🟢 Low | Planned | Named Docker volumes in Compose |
-| Intel Arc GPU not supported by Ollama | 🟡 Medium | Active | CPU mode confirmed working; slower but functional |
-| 16GB RAM under pressure with all services | 🟡 Medium | Active | Close non-essential apps; start services selectively |
+| Cloud API service limits | 🟡 Medium | Active | Mitigated via rate-limit retries and caching layer |
+| 16GB RAM under pressure with all services | 🟢 Low | Mitigated | Offloaded LLM and embeddings to cloud APIs, saving ~6 GB of local RAM |
 
 ---
 
@@ -405,7 +405,6 @@
 | Kafka | 9092 | localhost:9092 |
 | ChromaDB | 8000 | http://localhost:8000 |
 | MinIO | 9000 / 9001 | http://localhost:9001 (console) |
-| Ollama | 11434 | http://localhost:11434 |
 | Zipkin | 9411 | http://localhost:9411 |
 | Prometheus | 9090 | http://localhost:9090 |
 | Grafana | 3000 | http://localhost:3000 |

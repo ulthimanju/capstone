@@ -293,11 +293,11 @@ To preserve architectural decoupling and ensure robust execution, failure modes 
    - To alert the student, `notebook-service` publishes a generic **`notification.dispatch`** event to Kafka.
    - The `notification-service` (the **sole consumer** of the dispatch topic) consumes the event, saves the alert to `db_notification`, and pushes it to the browser SSE stream.
 
-### 🧠 3.2 Ollama / Local LLM Downtime
+### 🧠 3.2 Cloud LLM / Embedding Service Downtime
 1. **REST Invocations**:
-   - If Ollama is offline or undergoing high CPU contention when an internal service calls `ai-service` (e.g. for quiz generation or RAG queries), the HTTP request times out.
+   - If the cloud AI APIs (OpenRouter/HuggingFace) are offline or undergoing service interruptions when an internal service calls `ai-service` (e.g. for quiz generation or RAG queries), the HTTP request times out.
    - The connection is retried twice. On complete failure, `ai-service` responds to the caller with a standard, graceful fallback response:
-     - *RAG query fallback*: returns a grounded response: *"Questly is currently experiencing local AI engine maintenance. Please try again in a few minutes."*
+     - *RAG query fallback*: returns a grounded response: *"Questly is currently experiencing AI service interruption. Please try again in a few moments."*
      - *Quiz/Flashcard fallback*: returns a clean REST exception block, allowing `quiz-service`/`flashcard-service` to show the student a friendly warning without crashing their active session.
 
 ---
@@ -457,9 +457,9 @@ spring:
 
 ---
 
-## 6. Local RAG Pipeline & ChromaDB Lifecycle
+## 6. Cloud RAG Pipeline & ChromaDB Lifecycle
 
-Questly uses a fully isolated, offline RAG pipeline utilizing local Ollama execution and LangChain4j abstractions.
+Questly uses an isolated RAG pipeline utilizing cloud AI APIs (OpenRouter + HuggingFace) and LangChain4j abstractions.
 
 ---
 
@@ -471,7 +471,7 @@ Questly uses a fully isolated, offline RAG pipeline utilizing local Ollama execu
    - If a duplicate exists inside the *same* notebook, `notebook-service` returns the existing `documentId` immediately, skipping MinIO writes and vector indexing.
 2. **Extraction**: `ai-service` parses file content using **Apache Tika** to extract clean string buffers.
 3. **Chunking**: Uses LangChain4j's `DocumentSplitters.recursive(512, 64, new GptBytePairEncoder())` to chunk data.
-4. **Embeddings Generation**: Chunks are processed via Ollama using `nomic-embed-text` (producing 768-dimension arrays).
+4. **Embeddings Generation**: Chunks are processed via the HuggingFace Inference API using `BAAI/bge-small-en-v1.5` (producing 384-dimension arrays).
 5. **Isolated Vector Storage**:
    - Collections are partitioned per-notebook using naming schema: `notebook_{notebook_id}`.
    - **Strict Lazy Collection Lifecycle**: Collections are not created on empty notebook creation. Instead, the collection is instantiated strictly on the successful processing of the first document upload payload.
@@ -479,9 +479,9 @@ Questly uses a fully isolated, offline RAG pipeline utilizing local Ollama execu
 ---
 
 ### 🔍 6.2 Retrieval & Grounded Query Execution
-1. **Inquiry Validation**: When executing a query, `ai-service` runs a defensive fallback check. If the ChromaDB collection `notebook_{notebookId}` does not exist (e.g., student notebook has no files uploaded), it returns a standard grounded error response immediately without reaching out to Ollama: *"Please upload study documents to this notebook first."*
+1. **Inquiry Validation**: When executing a query, `ai-service` runs a defensive fallback check. If the ChromaDB collection `notebook_{notebookId}` does not exist (e.g., student notebook has no files uploaded), it returns a standard grounded error response immediately without reaching out to the cloud LLM: *"Please upload study documents to this notebook first."*
 2. **Context Compilation**:
-   - Embeds user input question using `nomic-embed-text`.
+   - Embeds user input question using `BAAI/bge-small-en-v1.5`.
    - Executes similarity match query using cosine distance metrics to capture the **top 5** chunks.
    - Context is injected directly into a structured, strict LLM system instructions boundary block.
 3. **Prompt Template**:
@@ -500,7 +500,7 @@ Questly uses a fully isolated, offline RAG pipeline utilizing local Ollama execu
    STUDENT QUESTION:
    {question}
    ```
-4. **Generation**: `llama3.2:3b` generates the grounded answer.
+4. **Generation**: `google/gemini-2.5-flash` via OpenRouter generates the grounded answer.
 
 ---
 
@@ -671,7 +671,7 @@ sequenceDiagram
     Kafka-->>AISvc: Consume document.uploaded
     Note over AISvc: Parse text with Tika
     Note over AISvc: Split text into 512-token chunks
-    Note over AISvc: Generate nomic-embed-text embeddings
+    Note over AISvc: Generate BAAI/bge-small-en-v1.5 embeddings
     AISvc->>Chroma: Lazy create collection "notebook_{id}" if needed
     AISvc->>Chroma: Store chunks and vector coordinates
     

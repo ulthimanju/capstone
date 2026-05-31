@@ -6,7 +6,7 @@ This document provides a comprehensive technical overview of Questly's local AI 
 
 ## 1. AI Summary & Simplification Pipeline
 
-When a user requests a summary for an uploaded document, the system initiates a synchronous document processing pipeline across `notebook-service`, `ai-service`, and local `Ollama` hosting.
+When a user requests a summary for an uploaded document, the system initiates a synchronous document processing pipeline across `notebook-service`, `ai-service`, and cloud AI APIs (`OpenRouter`).
 
 ### Pipeline Flow
 
@@ -19,7 +19,7 @@ sequenceDiagram
     participant Notebook as notebook-service
     participant MinIO as MinIO Storage
     participant AI as ai-service
-    participant Ollama as Ollama (Llama 3.2)
+    participant OpenRouter as OpenRouter (Gemini 2.5)
 
     Student->>React: Click "Summarize"
     React->>Gateway: POST /api/notebooks/{nbId}/documents/{docId}/summarize
@@ -30,9 +30,9 @@ sequenceDiagram
     MinIO-->>AI: File InputStream
     AI->>AI: Apache Tika (AutoDetectParser) extract text
     AI->>AI: Cap text to 10,000 chars (eval safety)
-    AI->>Ollama: Generate Chat Request (llama3.2:3b)
-    Note over Ollama: Token Generation on CPU
-    Ollama-->>AI: Summary String Response
+    AI->>OpenRouter: Generate Chat Request (google/gemini-2.5-flash)
+    Note over OpenRouter: Token Generation on Cloud
+    OpenRouter-->>AI: Summary String Response
     AI-->>Notebook: SummarizeResponse (JSON)
     Notebook-->>Gateway: HTTP 200 OK
     Gateway-->>React: HTTP 200 OK
@@ -83,8 +83,8 @@ To answer chat questions about uploaded books, Questly implements a high-perform
                  │ 1. Vectorize Query           │ 3. Semantic Similarity Match
                  ▼                              ▼
   ┌──────────────────────────────┐       ┌──────────────────────┐
-  │            Ollama            │       │       ChromaDB       │
-  │      (nomic-embed-text)      │       │     Vector Index     │
+  │         HuggingFace          │       │       ChromaDB       │
+  │     (bge-small-en-v1.5)      │       │     Vector Index     │
   └──────────────────────────────┘       └──────────────────────┘
                  │                              │
                  │ 2. Return Query Vector       │ 4. Return Top 5 Source Chunks
@@ -93,11 +93,11 @@ To answer chat questions about uploaded books, Questly implements a high-perform
   │                        ai-service                           │
   └──────────────────────────────┬──────────────────────────────┘
                                  │
-                                 │ 5. Call LLM (llama3.2:3b)
+                                 │ 5. Call LLM (Gemini 2.5)
                                  ▼
   ┌─────────────────────────────────────────────────────────────┐
-  │                            Ollama                           │
-  │                         (llama3.2:3b)                       │
+  │                          OpenRouter                         │
+  │                   (gemini-2.5-flash)                        │
   └──────────────────────────────┬──────────────────────────────┘
                                  │
                                  ▼ Generated Answer
@@ -110,7 +110,7 @@ To answer chat questions about uploaded books, Questly implements a high-perform
 
 #### Phase A: Ingestion & Vector Encoding (On Upload)
 * When a PDF/document is processed, `ai-service` splits it into semantic chunks.
-* Each chunk is passed to the **`nomic-embed-text`** model inside Ollama, creating vector embeddings representing the semantic meaning of that chunk.
+* Each chunk is passed to the **`BAAI/bge-small-en-v1.5`** model on HuggingFace, creating vector embeddings representing the semantic meaning of that chunk.
 * These embeddings are saved inside a notebook-isolated collection in **ChromaDB** (`notebook_{notebookId}`).
 
 #### Phase B: Semantic Retrieval (During Query)
@@ -138,18 +138,18 @@ To answer chat questions about uploaded books, Questly implements a high-perform
   > STUDENT QUESTION:
   > What is inheritance?
   > ```
-* This ensures that `llama3.2:3b` operates strictly in an **"open-book"** style, drastically reducing factual hallucinations and grounding answers directly in the student's study material.
+* This ensures that `google/gemini-2.5-flash` operates strictly in an **"open-book"** style, drastically reducing factual hallucinations and grounding answers directly in the student's study material.
 
 ---
 
 ## 3. Performance & Timeout Optimization
 
-When running large language models locally on typical developer setups, CPU-only execution can introduce high latencies during the model load and prompt evaluation stages.
+Since all AI tasks are offloaded to high-performance cloud APIs (OpenRouter and HuggingFace), local CPU latencies are entirely avoided.
 
 ### Optimization Parameters
 
 | Parameter | Original Value | Optimized Value | Technical Rationale |
 | :--- | :--- | :--- | :--- |
-| **Ollama Chat Timeout** | `60 seconds` | `300 seconds` (5m) | Allows the local CPU execution enough headroom to load model weights and generate tokens without throwing socket disconnects. |
-| **Max Text Safety Cap** | `20,000` chars | `10,000` chars | Cuts prompt processing and context evaluation time on CPU in half while retaining more than enough text context for high-quality summaries. |
-| **Model Pre-warming** | Dynamic | Cached in RAM | Once loaded by Ollama, subsequent request latencies fall dramatically because model weights remain warm in memory. |
+| **OpenRouter Chat Timeout** | `60 seconds` | `120 seconds` (2m) | Ensures cloud API generation has plenty of threshold buffer for complex long-context tasks. |
+| **Max Text Safety Cap** | `20,000` chars | `10,000` chars | Cuts down API payload transmission times and token consumption while retaining more than enough text context for high-quality summaries. |
+| **Model Pre-warming** | Cached in RAM | Cloud Serverless | Fully managed on cloud servers; no local RAM or pre-warming is required. |

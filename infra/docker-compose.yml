@@ -112,37 +112,6 @@ services:
       exit 0;
       "
 
-  # # 6. Ollama Local LLM Engine
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   container_name: ollama
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama-data:/root/.ollama
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
-
-  # # Ollama Setup Sidecar (Lightweight curlimages/curl auto-model downloader)
-  # ollama-setup:
-  #   image: curlimages/curl:latest
-  #   container_name: ollama-setup
-  #   depends_on:
-  #     ollama:
-  #       condition: service_healthy
-  #   entrypoint: >
-  #     /bin/sh -c "
-  #     until curl -s http://ollama:11434/api/tags; do echo 'Waiting for Ollama engine...'; sleep 2; done;
-  #     echo 'Pulling llama3.2:3b (this might take a few minutes)...';
-  #     curl -s -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:3b\"}';
-  #     echo 'Pulling nomic-embed-text (this might take a minute)...';
-  #     curl -s -X POST http://ollama:11434/api/pull -d '{\"name\": \"nomic-embed-text\"}';
-  #     echo 'Models pulled successfully!';
-  #     exit 0;
-  #     "
 
   # 7. Zipkin Distributed Tracing Server
   zipkin:
@@ -162,4 +131,4 @@ volumes:
   kafka-data:
   chromadb-data:
   minio-data:
-  # ollama-data:
+

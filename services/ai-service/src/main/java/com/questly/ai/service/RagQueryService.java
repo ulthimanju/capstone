@@ -37,7 +37,7 @@ public class RagQueryService {
             "Please upload study documents to this notebook first.";
 
     private static final String AI_UNAVAILABLE_ANSWER =
-            "Questly is currently experiencing local AI engine maintenance. Please try again in a few minutes.";
+            "Questly is currently experiencing AI service interruption. Please try again in a few moments.";
 
     private static final String SYSTEM_PROMPT_TEMPLATE =
             """

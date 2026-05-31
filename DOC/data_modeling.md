@@ -407,8 +407,8 @@ notebook_{notebook_id}
 }
 ```
 
-**Embedding Model:** `nomic-embed-text` via Ollama
-**Embedding Dimensions:** 768
+**Embedding Model:** `BAAI/bge-small-en-v1.5` via HuggingFace Inference API
+**Embedding Dimensions:** 384
 **Distance Function:** Cosine similarity
 **Chunk Size:** 512 tokens
 **Chunk Overlap:** 64 tokens
@@ -416,9 +416,9 @@ notebook_{notebook_id}
 **Query Flow:**
 ```
 User query
-  → embed query via nomic-embed-text
+  → embed query via BAAI/bge-small-en-v1.5
   → similarity search in notebook_{id} collection
   → retrieve top-5 chunks
   → inject chunks into LLM prompt
-  → llama3.2:3b generates grounded answer
+  → google/gemini-2.5-flash generates grounded answer
 ```

@@ -32,11 +32,11 @@
 ### AI / RAG
 | Layer | Technology |
 |---|---|
-| LLM Runtime | Ollama (local) |
-| Model | Llama 3.2 / Mistral / Gemma 3 |
+| LLM Runtime | OpenRouter (Cloud) |
+| Model | google/gemini-2.5-flash |
 | RAG Framework | LangChain4j |
 | Vector Store | ChromaDB |
-| Embeddings | Ollama `nomic-embed-text` (local) |
+| Embeddings | HuggingFace Inference API (`BAAI/bge-small-en-v1.5`) |
 | Document Parsing | Apache Tika |
 | Google Docs/Slides | Google Drive API |
 
@@ -71,12 +71,11 @@
 
 ## Models Usage
 
-| Purpose | Model | Size | RAM Needed |
+| Purpose | Model | Location | Cost |
 |---|---|---|---|
-| Main LLM (chat, quiz, summarize) | `llama3.2:3b` | ~2 GB | ~4–5 GB |
-| Embeddings (RAG / ChromaDB) | `nomic-embed-text` | ~274 MB | ~1 GB |
-| Code understanding (optional) | `qwen2.5-coder:3b` | ~2 GB | ~4 GB |
+| Main LLM (chat, quiz, summarize) | `google/gemini-2.5-flash` | OpenRouter (Cloud) | Free Tier |
+| Embeddings (RAG / ChromaDB) | `BAAI/bge-small-en-v1.5` (384-dim) | HuggingFace (Cloud) | Free Tier |
 
 ---
 
-> Everything AI-related runs fully local via Ollama — no external API calls, no cost per token, no data leaving the machine. S3 replaced with MinIO to keep storage local as well.
+> Everything AI-related runs via cloud-based API endpoints (OpenRouter and HuggingFace) using free-tier models. This removes any high local RAM/GPU requirements. S3 is replaced with MinIO to keep storage local.

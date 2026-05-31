@@ -8,7 +8,7 @@
 
 ## What is Questly?
 
-Questly is an AI-powered learning platform built for students. Upload your study documents and let AI generate quizzes, flashcards, and summaries from them. Track coding practice, follow structured courses, and stay motivated with XP, badges, and streaks — all powered by a fully local AI running on your machine.
+Questly is an AI-powered learning platform built for students. Upload your study documents and let AI generate quizzes, flashcards, and summaries from them. Track coding practice, follow structured courses, and stay motivated with XP, badges, and streaks — all powered by cloud AI integration (OpenRouter and HuggingFace).
 
 ---
 
@@ -33,7 +33,7 @@ Questly is an AI-powered learning platform built for students. Upload your study
 
 **Backend** — Java 21, Spring Boot 3.x, Spring Cloud Gateway, Apache Kafka
 
-**AI / RAG** — Ollama (local), llama3.2:3b, nomic-embed-text, LangChain4j, ChromaDB
+**AI / RAG** — OpenRouter (google/gemini-2.5-flash), HuggingFace (BAAI/bge-small-en-v1.5), LangChain4j, ChromaDB
 
 **Data** — PostgreSQL, Redis, MinIO, Elasticsearch
 
@@ -45,9 +45,6 @@ Questly is an AI-powered learning platform built for students. Upload your study
 # Clone
 git clone https://github.com/ulthimanju/questly.git
 cd questly
-
-# Start Ollama
-ollama serve
 
 # Start infrastructure
 cd infra && docker compose up -d

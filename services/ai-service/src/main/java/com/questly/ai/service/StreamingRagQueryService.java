@@ -35,7 +35,7 @@ public class StreamingRagQueryService {
     private String chromaBaseUrl;
 
     private static final String NO_DOCS_ANSWER = "Please upload study documents to this notebook first.";
-    private static final String AI_UNAVAILABLE_ANSWER = "Questly is currently experiencing local AI engine maintenance. Please try again in a few minutes.";
+    private static final String AI_UNAVAILABLE_ANSWER = "Questly is currently experiencing AI service interruption. Please try again in a few moments.";
 
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are Questly, an expert student learning tutor.

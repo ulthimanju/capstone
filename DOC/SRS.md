@@ -35,7 +35,7 @@ Questly is a full-stack web application that enables students to:
 - Stay motivated with XP, badges, and streaks
 - Analyse their own learning through an analytics dashboard
 
-The system is built for a **demo/academic environment** with support for up to 100 concurrent students. All AI inference runs locally via Ollama — no external API calls are made for AI features.
+The system is built for a **demo/academic environment** with support for up to 100 concurrent students. AI inference runs via cloud APIs (OpenRouter + HuggingFace Inference API).
 
 ### 1.3 Definitions, Acronyms, and Abbreviations
 
@@ -45,7 +45,7 @@ The system is built for a **demo/academic environment** with support for up to 1
 | SM-2 | SuperMemo 2 — spaced repetition scheduling algorithm |
 | SRS | Software Requirements Specification |
 | NFR | Non-Functional Requirement |
-| LLM | Large Language Model (e.g. llama3.2:3b running via Ollama) |
+| LLM | Large Language Model (e.g. google/gemini-2.5-flash via OpenRouter) |
 | DAG | Directed Acyclic Graph — used for the skill tree structure |
 | JWT | JSON Web Token — used for stateless authentication |
 | MCQ | Multiple Choice Question |
@@ -71,7 +71,7 @@ The system is built for a **demo/academic environment** with support for up to 1
 
 ### 2.1 Product Perspective
 
-Questly is a standalone web application with a microservices backend. It does not integrate with any external LMS (Moodle, Canvas, etc.) in v1. It runs entirely on the developer's local machine during development and demo, with all AI processing handled by a locally-running Ollama instance.
+Questly is a standalone web application with a microservices backend. It does not integrate with any external LMS (Moodle, Canvas, etc.) in v1. It runs entirely on the developer's local machine during development and demo, with AI processing handled via cloud-based API endpoints (OpenRouter and HuggingFace).
 
 ![](assets/ArchitectureDiagram.png)
 
@@ -88,7 +88,7 @@ Questly is a standalone web application with a microservices backend. It does no
 
 - **Frontend**: Any modern browser (Chrome, Firefox, Edge, Safari)
 - **Backend**: Java 21, Spring Boot 3.x, runs on developer's local machine
-- **AI**: Ollama running locally; requires ~8–10 GB free RAM for all models
+- **AI**: Cloud APIs (OpenRouter + HuggingFace); no local RAM requirements for LLM/Embeddings
 - **Database**: PostgreSQL (local Docker), Redis (local Docker)
 - **Storage**: MinIO (local Docker)
 - **OS**: Windows 11 / Linux / macOS
@@ -134,7 +134,7 @@ Questly is a standalone web application with a microservices backend. It does no
 | FR-DOC-01 | A student shall be able to upload files in PDF, Markdown (.md), and plain text (.txt) formats. |
 | FR-DOC-02 | A student shall be able to link a Google Doc or Google Slides file by URL; the system shall fetch and parse the content via Google Drive API. |
 | FR-DOC-03 | The system shall enforce a limit of 50 source documents per notebook and 500,000 words per source. |
-| FR-DOC-04 | Upon successful upload, the system shall automatically parse (Apache Tika), chunk, and embed (nomic-embed-text) the document without user intervention. |
+| FR-DOC-04 | Upon successful upload, the system shall automatically parse (Apache Tika), chunk, and embed (BAAI/bge-small-en-v1.5) the document without user intervention. |
 | FR-DOC-05 | Embeddings shall be stored in ChromaDB in a collection scoped to the notebook. |
 | FR-DOC-06 | The student shall be able to query their notebook with a natural language question; the system shall return an answer grounded strictly in the uploaded documents. |
 | FR-DOC-07 | Every RAG response shall include a source citation (document name and chunk reference). |
@@ -297,7 +297,7 @@ Questly is a standalone web application with a microservices backend. It does no
 | NFR-AVAIL-01 | The system shall maintain **99% uptime** during active local development sessions. |
 | NFR-AVAIL-02 | The system shall maintain **95% uptime** during the final demo presentation. |
 | NFR-AVAIL-03 | A service restart shall not result in loss of persisted user data. |
-| NFR-AVAIL-04 | The Ollama AI service shall recover automatically if killed and restarted during a session. |
+| NFR-AVAIL-04 | The system shall handle cloud AI service API request timeouts and failures gracefully. |
 
 ### 4.3 Security
 
@@ -358,8 +358,8 @@ Questly is a standalone web application with a microservices backend. It does no
 
 | Constraint | Detail |
 |---|---|
-| **RAM** | Developer machine has 16 GB RAM. All services + Ollama must fit within this budget. Ollama with llama3.2:3b uses ~4–5 GB; remaining services must stay under 10–11 GB combined. |
-| **GPU** | Intel Arc GPU is not supported by Ollama. All LLM inference runs in CPU mode. This limits throughput — concurrent AI requests will be serialised. |
+| **RAM** | Developer machine has 16 GB RAM. All microservices must fit within this budget, staying under 14 GB combined. |
+| **GPU** | Not applicable, as all LLM and embedding inference is offloaded to Cloud APIs. |
 | **Disk** | MinIO object storage and ChromaDB must be allocated at least 10 GB of local disk. |
 
 ### 5.2 Software Constraints
@@ -368,9 +368,8 @@ Questly is a standalone web application with a microservices backend. It does no
 |---|---|
 | **Java 21** | All backend services must target Java 21 LTS. No preview features. |
 | **Spring Boot 3.x** | All services must use Spring Boot 3.x; Spring Boot 2.x APIs are not used. |
-| **Ollama** | LLM inference is limited to models available through Ollama. No cloud AI API (OpenAI, Gemini, Anthropic) may be used in any AI feature. |
-| **Local-only AI** | No document content, user data, or query text may leave the local machine for AI processing. |
-| **Docker Compose** | The entire infrastructure (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Ollama, Zipkin) must be orchestratable with a single `docker compose up` command. |
+| **AI Integration** | LLM and embedding integration are handled via OpenRouter (google/gemini-2.5-flash) and HuggingFace API (BAAI/bge-small-en-v1.5). |
+| **Docker Compose** | The entire infrastructure (PostgreSQL, Redis, Kafka, ChromaDB, MinIO, Zipkin) must be orchestratable with a single `docker compose up` command. |
 | **Monorepo** | All services must reside in a single Git repository under the defined monorepo structure. |
 | **Maven Multi-Module** | The build system is Maven. All services share a root parent POM. Gradle is not used. |
 
@@ -396,8 +395,8 @@ Questly is a standalone web application with a microservices backend. It does no
 | # | Assumption |
 |---|---|
 | A-01 | The developer's machine will remain the primary and only deployment environment throughout the project lifecycle. |
-| A-02 | Ollama is installed, running, and the required models (`llama3.2:3b`, `nomic-embed-text`, `qwen2.5-coder:3b`) are available before any AI feature is tested. |
-| A-03 | A stable internet connection is available for Google OAuth2 login and Google Drive API integration, but is **not** required for core AI features. |
+| A-02 | API keys for OpenRouter and HuggingFace are configured and active before any AI feature is tested. |
+| A-03 | A stable internet connection is available for Google OAuth2 login, Google Drive API integration, and cloud AI inference. |
 | A-04 | The student's uploaded documents are in a supported format (PDF, Markdown, TXT, Google Docs/Slides). The system does not guarantee useful embeddings for scanned PDFs or image-only files. |
 | A-05 | All users accessing the system during development and demo are trusted individuals (teammates, evaluators). No adversarial user behaviour is anticipated in v1. |
 | A-06 | The SM-2 algorithm is considered sufficient for spaced repetition scheduling in v1 without calibration to individual students. |
@@ -441,7 +440,7 @@ The following features and capabilities are explicitly **not** included in versi
 | OOS-14 | **LMS integrations** (Moodle, Canvas, Blackboard) | No external LMS dependency in v1 |
 | OOS-15 | **LeetCode API integration** (auto-sync solve status) | No official public API; URL-paste approach is used instead |
 | OOS-16 | **Email / SMS notifications** | In-app Kafka-driven notifications only in v1 |
-| OOS-17 | **Third-party cloud AI APIs** (OpenAI, Gemini, Claude) | All AI is local via Ollama |
+| OOS-17 | **Local LLM and Embedding inference** | Offloaded to OpenRouter and HuggingFace cloud APIs to reduce developer RAM requirements |
 | OOS-18 | **Single Sign-On (SSO) beyond Google OAuth2** | Only Google OAuth2 is supported in v1 |
 
 ### 7.4 Data & Compliance
