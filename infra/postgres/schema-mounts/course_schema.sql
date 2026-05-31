@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS enrollments (
     course_id        UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
     progress         DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     unlocked_modules UUID[] NOT NULL DEFAULT '{}',       -- dynamic array of module UUIDs unlocked
+    completed_modules UUID[] NOT NULL DEFAULT '{}',
     completed        BOOLEAN NOT NULL DEFAULT FALSE,
     enrolled_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE (user_id, course_id)
