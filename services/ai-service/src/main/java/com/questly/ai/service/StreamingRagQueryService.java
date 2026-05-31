@@ -5,8 +5,8 @@ import com.questly.ai.dto.QueryRequest;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.StreamingResponseHandler;
-import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
-import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
@@ -26,8 +26,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StreamingRagQueryService {
 
-    private final OllamaEmbeddingModel embeddingModel;
-    private final OllamaStreamingChatModel streamingChatModel;
+    private final EmbeddingModel embeddingModel;
+    private final StreamingChatLanguageModel streamingChatModel;
     private final EmbeddingCacheService embeddingCacheService;
     private final QueryCacheService queryCacheService;
 

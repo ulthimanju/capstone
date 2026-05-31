@@ -9,7 +9,7 @@ import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
@@ -29,7 +29,7 @@ import java.util.List;
 public class EmbeddingService {
 
     private final MinioClient minioClient;
-    private final OllamaEmbeddingModel embeddingModel;
+    private final EmbeddingModel embeddingModel;
     private final QueryCacheService queryCacheService;
     private final AdaptiveChunkingService adaptiveChunkingService;
 

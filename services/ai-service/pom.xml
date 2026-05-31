@@ -14,7 +14,7 @@
     <artifactId>ai-service</artifactId>
     <version>1.0.0</version>
     <name>AI Service</name>
-    <description>AI microservice providing LangChain4j RAG pipeline with Ollama and ChromaDB</description>
+    <description>AI microservice providing LangChain4j RAG pipeline with OpenRouter (chat) and HuggingFace (embeddings) via ChromaDB</description>
 
     <dependencies>
         <!-- Spring Boot Starter Web -->
@@ -41,10 +41,10 @@
             <artifactId>langchain4j</artifactId>
         </dependency>
 
-        <!-- LangChain4j Ollama -->
+        <!-- LangChain4j OpenAI-compatible (OpenRouter chat + HuggingFace embeddings) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-ollama</artifactId>
+            <artifactId>langchain4j-open-ai</artifactId>
         </dependency>
 
         <!-- LangChain4j Chroma -->

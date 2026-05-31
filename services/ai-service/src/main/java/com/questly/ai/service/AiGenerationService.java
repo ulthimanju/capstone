@@ -2,7 +2,7 @@ package com.questly.ai.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.questly.ai.dto.*;
-import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.List;
 public class AiGenerationService {
 
     private final MinioClient minioClient;
-    private final OllamaChatModel chatModel;
+    private final ChatLanguageModel chatModel;
     private final ObjectMapper objectMapper;
 
     private static final String BUCKET = "documents";

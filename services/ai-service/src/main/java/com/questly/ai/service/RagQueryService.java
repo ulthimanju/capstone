@@ -5,8 +5,8 @@ import com.questly.ai.dto.QueryResponse;
 import com.questly.ai.dto.SourceCitation;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.ollama.OllamaChatModel;
-import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
@@ -25,8 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RagQueryService {
 
-    private final OllamaEmbeddingModel embeddingModel;
-    private final OllamaChatModel chatModel;
+    private final EmbeddingModel embeddingModel;
+    private final ChatLanguageModel chatModel;
     private final QueryCacheService queryCacheService;
     private final EmbeddingCacheService embeddingCacheService;
 
